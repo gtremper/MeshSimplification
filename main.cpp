@@ -76,9 +76,7 @@ void reshape(int w, int h){
 	glMatrixMode(GL_PROJECTION);
 	float newFovy = fovy; 
 	float aspect = width / (float) height, zNear = 0.1, zFar = 99.0 ;
-
-	mv = Transform::perspective(newFovy,aspect,zNear,zFar) ; 
-	mv = glm::transpose(mv) ; // accounting for row major 
+	mv = glm::perspective(newFovy,aspect,zNear,zFar);
 	glLoadMatrixf(&mv[0][0]) ; 
 
 	glViewport(0, 0, width, height);
@@ -184,7 +182,7 @@ void keyboard(unsigned char key, int x, int y) {
 /* Default values so the program doesn't crash with empty input */
 void def() {
 	numLights = 0;
-	fovy = 90;
+	fovy = 60;
 	width = 600;
 	height = 400;
 	eyeinit = vec3(0,0,1);
@@ -308,8 +306,9 @@ void display() {
 	
 	mat4 mv; 
 	vec3 dir = Transform::direction(yaw,pitch,FORWARD,UP,true);
-	mv = Transform::lookAt(eye,eye+dir,UP) ; 
-	mv = glm::transpose(mv) ; // accounting for row major	
+	//mv = Transform::lookAt(eye,eye+dir,UP) ; 
+	//mv = glm::transpose(mv) ; // accounting for row major	
+	mv = glm::lookAt(eye,eye+dir,UP);
 	glLoadMatrixf(&mv[0][0]) ; 
 	
 	vec4 light[MAXLIGHTS];
@@ -326,10 +325,10 @@ void display() {
 
 int main(int argc, char* argv[]) {
 	def();
-	if (argc != 3) {
-		std::cerr << "You need a mesh file as an argument";
-		exit(1);
-	}
+	//if (argc != 2) {
+	//	std::cerr << "You need a mesh file as an argument";
+	//	exit(1);
+	//}
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	glutCreateWindow("HW3: Hedge Maze");

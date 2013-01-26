@@ -21,19 +21,7 @@ mat3 Transform::rotate(const float degrees, const vec3& axis) {
 	return result; 
 }
 
-vec3 Transform::direction(float &yaw, float &pitch, const vec3& dir,const vec3& up, bool fly) {
-	mat3 M = rotate(yaw,up);
-	vec3 final = dir * M;
-	if (fly){
-		vec3 cross = glm::cross(final,up);
-		M = rotate(pitch,cross);
-		final = final * M;
-	}
-	return final;
-}
-
-void Transform::left(float degrees, vec3& eye, vec3& up) {
-	
+void Transform::left(float degrees, vec3& eye, vec3& up) {	
 	mat3 R = rotate(degrees,glm::normalize(up));
 	eye = eye * R;
 }
@@ -62,6 +50,18 @@ mat4 Transform::lookAt(const vec3& eye, const vec3& center, const vec3& up) {
 	return M;
 }
 
+vec3 Transform::direction(float &yaw, float &pitch, const vec3& dir,const vec3& up, bool fly) {
+	mat3 M = rotate(yaw,up);
+	vec3 final = dir * M;
+	if (fly){
+		vec3 cross = glm::cross(final,up);
+		M = rotate(pitch,cross);
+		final = final * M;
+	}
+	return final;
+}
+
+/*
 mat4 Transform::perspective(float fovy, float aspect, float zNear, float zFar) {
 	float d = 1/tan(pi*fovy/360);
 	float a = -(zFar+zNear)/(zFar-zNear);
@@ -69,6 +69,7 @@ mat4 Transform::perspective(float fovy, float aspect, float zNear, float zFar) {
 	mat4 P(d/aspect,0,0,0,0,d,0,0,0,0,a,b,0,0,-1,0);
 	return P;
 }
+*/
 
 mat4 Transform::scale(const float &sx, const float &sy, const float &sz) {
 	mat4 S(sx,0,0,0,0,sy,0,0,0,0,sz,0,0,0,0,1);
