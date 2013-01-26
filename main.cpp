@@ -32,7 +32,7 @@ float pitchInit;
 float yawInit;
 
 bool useLights; // Toggle light shading on and off
-bool passive; // Toggle passive mouse movement
+bool drag; // Toggle passive mouse movement
 bool pictureMode = false; // no movement so you can take picture
 int width, height;  
 GLuint vertexshader, fragmentshader, shaderprogram ; // shaders
@@ -101,17 +101,15 @@ void printHelp() {
 void mouseClick(int button, int state, int x, int y) {
 	if (button == GLUT_LEFT_BUTTON) {
 		if (state == GLUT_UP) {
-			lastx = x ; lasty = y ;
-			passive = true;
+			drag = false;
     	} else if (state == GLUT_DOWN) {
-			passive = false;
+			lastx = x; lasty = y;
+			drag = true;
 		}
 	}
 }
 
 void mouse(int x, int y) {
-	
-	if(!passive || pictureMode) return;
 	
 	int diffx=x-lastx; 
     int diffy=y-lasty; 
@@ -123,6 +121,8 @@ void mouse(int x, int y) {
 
 	if (pitch>80) pitch = 80;
 	if (pitch<-80) pitch = -80;
+	if (yaw>360) yaw -= 360;
+	if (yaw<0) yaw += 360;
 }
 
 
@@ -185,7 +185,7 @@ void def() {
 	fovy = 60;
 	width = 600;
 	height = 400;
-	eyeinit = vec3(0,0,1);
+	eyeinit = vec3(0,0,10);
 	pitch = 0.0;
 	yaw = 0.0;
 }
@@ -197,7 +197,7 @@ void init() {
 	pitch = pitchInit;
 	useLights = true;
 	flyMode = false;
-	passive = false;
+	drag = false;
 	lastx = width/2;
 	lasty = height/2;
 
@@ -331,7 +331,7 @@ int main(int argc, char* argv[]) {
 	//}
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-	glutCreateWindow("HW3: Hedge Maze");
+	glutCreateWindow("Mesh Viewer");
 	//loadObjects(argv[2]);
 	//commands = parseInput(argv[1]);
 	init();
@@ -339,8 +339,8 @@ int main(int argc, char* argv[]) {
 	glutKeyboardFunc(keyboard);
 	glutReshapeFunc(reshape);
 	glutReshapeWindow(width,height);
-	glutIdleFunc (display);
-	glutPassiveMotionFunc(mouse);
+	glutIdleFunc(display);
+	glutMotionFunc(mouse);
 	glutMouseFunc(mouseClick) ;
 	printHelp();
 	glutMainLoop();
