@@ -34,8 +34,8 @@ public:
 	Transform();
 	virtual ~Transform();
 	static vec3 direction(float &yaw, float &pitch, const vec3& dir, const vec3& up, bool fly);
-	static void left(float degrees, vec3& eye, vec3& up);
-	static void up(float degrees, vec3& eye, vec3& up);
+	static void left(float degrees, vec3& eye, const vec3& up);
+	static void up(float degrees, vec3& eye, const vec3& up);
 	static mat4 lookAt(const vec3& eye, const vec3 &center, const vec3& up);
 	static mat4 perspective(float fovy, float aspect, float zNear, float zFar);
 	static mat3 rotate(const float degrees, const vec3& axis) ;

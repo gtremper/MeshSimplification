@@ -49,9 +49,9 @@ void parseLine(string l, vector<command> &commands) {
 		line >> width >> height;
 	} else if(cmd == "camera") {
 		line >> arg1 >> arg2 >> arg3 >> arg4 >> arg5 >> fovy;
-		eyeinit = vec3(arg1,arg2,arg3);
-		yawInit = arg4;
-		pitchInit = arg5;
+		//eyeinit = vec3(arg1,arg2,arg3);
+		//yawInit = arg4;
+		//pitchInit = arg5;
 	} else if(cmd == "light") {
 		if(numLights > 9) {
 			return;

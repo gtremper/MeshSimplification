@@ -3,9 +3,6 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-extern vec3 eyeinit;
-extern float pitchInit;
-extern float yawInit;
 extern int width, height;
 extern float fovy; 
 extern int numLights;

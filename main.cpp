@@ -25,16 +25,10 @@ const vec3 FORWARD = vec3(0.0,0.0,-1.0);
 const vec3 SIDE = vec3(1.0,0.0,0.0);
 
 vec3 eye; 		// The (regularly updated) vector coordinates of the eye location 
-float pitch;
-float yaw;
-vec3 eyeinit;	// Initial eye position, also for resets
-float pitchInit;
-float yawInit;
 
 bool useLights; // Toggle light shading on and off
-bool drag; // Toggle passive mouse movement
 bool pictureMode = false; // no movement so you can take picture
-int width, height;  
+float width, height;  
 GLuint vertexshader, fragmentshader, shaderprogram ; // shaders
 bool flyMode;
 float fovy;    // field of view
@@ -69,16 +63,14 @@ GLuint lightColor;
 /* Uses the Projection matrices (technically deprecated) to set perspective 
    We could also do this in a more modern fashion with glm.	*/ 
 void reshape(int w, int h){
+	glMatrixMode(GL_PROJECTION);
+	
 	width = w;
 	height = h;
-	mat4 mv ; // just like for lookat
-
-	glMatrixMode(GL_PROJECTION);
-	float newFovy = fovy; 
-	float aspect = width / (float) height, zNear = 0.1, zFar = 99.0 ;
-	mv = glm::perspective(newFovy,aspect,zNear,zFar);
-	glLoadMatrixf(&mv[0][0]) ; 
-
+	// zNear=0.1, zFar=99
+	mat4 mv = glm::perspectiveFov(fovy, width, height, 0.1f, 99.0f);
+	
+	glLoadMatrixf(&mv[0][0]); 
 	glViewport(0, 0, width, height);
 }
 
@@ -99,13 +91,9 @@ void printHelp() {
 /* Mouse Functions */
 
 void mouseClick(int button, int state, int x, int y) {
-	if (button == GLUT_LEFT_BUTTON) {
-		if (state == GLUT_UP) {
-			drag = false;
-    	} else if (state == GLUT_DOWN) {
-			lastx = x; lasty = y;
-			drag = true;
-		}
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
+		lastx = x;
+		lasty = y;
 	}
 }
 
@@ -116,51 +104,23 @@ void mouse(int x, int y) {
     lastx=x; //set lastx to the current x position
     lasty=y; //set lasty to the current y position
 	
-    yaw -= diffx*SENSITIVITY; 
-    pitch -= diffy*SENSITIVITY;
-
-	if (pitch>80) pitch = 80;
-	if (pitch<-80) pitch = -80;
-	if (yaw>360) yaw -= 360;
-	if (yaw<0) yaw += 360;
+    float yaw = diffx*SENSITIVITY; 
+    float pitch = diffy*SENSITIVITY;
+	
+	Transform::left(-yaw, eye, UP);
+	Transform::up(pitch, eye, UP);
 }
 
 
 /* Keyboard options */
 void keyboard(unsigned char key, int x, int y) {
 	switch(key) {
-	case 'w': //up
-		eye += WALKSPEED*Transform::direction(yaw,pitch,FORWARD,UP,flyMode);
-		break;
-	case 's': //down
-		eye -= WALKSPEED*Transform::direction(yaw,pitch,FORWARD,UP,flyMode);
-		break;	
-	case 'a': //left
-		eye -= WALKSPEED*Transform::direction(yaw,pitch,SIDE,UP,false);
-		break;
-	case 'd': //right
-		eye += WALKSPEED*Transform::direction(yaw,pitch,SIDE,UP,false);
-		break;
 	case 'h':
 		printHelp();
 		break;
 	case 27:  // Escape to quit
 			exit(0) ;
-			break ;
-	case 'f': // switch between fly and no fly
-		if(!flyMode) {
-			eye = vec3(15,50,20);
-			pitch = -55.0;
-			yaw = 0.0;
-		} else {
-			eye = eyeinit ; 
-			pitch = pitchInit;
-			yaw = yawInit;
-		}
-		useLights = true;
-		flyMode = !flyMode;
-		glUniform1i(islight, useLights) ;
-		break ;	  
+			break ; 
 	case 'l':
 		useLights = !useLights;
 		glUniform1i(islight, useLights) ;
@@ -185,19 +145,12 @@ void def() {
 	fovy = 60;
 	width = 600;
 	height = 400;
-	eyeinit = vec3(0,0,10);
-	pitch = 0.0;
-	yaw = 0.0;
 }
 
 void init() {
-
-	eye = eyeinit ; 
-	yaw = yawInit;
-	pitch = pitchInit;
+	eye = vec3(0,0,-10);
 	useLights = true;
 	flyMode = false;
-	drag = false;
 	lastx = width/2;
 	lasty = height/2;
 
@@ -304,12 +257,12 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	
-	mat4 mv; 
-	vec3 dir = Transform::direction(yaw,pitch,FORWARD,UP,true);
-	//mv = Transform::lookAt(eye,eye+dir,UP) ; 
-	//mv = glm::transpose(mv) ; // accounting for row major	
-	mv = glm::lookAt(eye,eye+dir,UP);
-	glLoadMatrixf(&mv[0][0]) ; 
+	//vec3 dir = Transform::direction(yaw,pitch,FORWARD,UP,true);
+	//mv = glm::lookAt(eye,eye+dir,UP);
+	
+	mat4 mv = glm::lookAt(eye, vec3(0.0,0.0,0.0), UP);
+	
+	glLoadMatrixf(&mv[0][0]); 
 	
 	vec4 light[MAXLIGHTS];
 	for (int i=0; i<numLights; i++){
