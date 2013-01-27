@@ -14,7 +14,7 @@ INCFLAGS = -I./glm-0.9.4.1
 RM = /bin/rm -f 
 all: mesh
 mesh: main.o shaders.o Transform.o parser.o shaders.h Transform.h globals.h
-	$(CC) $(CFLAGS) -o mesh shaders.o main.o Transform.o parser.o $(INCFLAGS) $(LDFLAGS) 
+	$(CC) $(CFLAGS) -o viewer shaders.o main.o Transform.o parser.o $(INCFLAGS) $(LDFLAGS) 
 main.o: main.cpp shaders.h Transform.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c main.cpp
 shaders.o: shaders.cpp shaders.h
@@ -24,7 +24,7 @@ Transform.o: Transform.cpp Transform.h
 parser.o: parser.cpp globals.h 
 	$(CC) $(CFLAGS) $(INCFLAGS) -c parser.cpp 
 clean: 
-	$(RM) *.o mesh
+	$(RM) *.o viewer
 
 
  

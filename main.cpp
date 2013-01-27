@@ -18,11 +18,13 @@
 using namespace std;
 
 const int MAXLIGHTS = 10;
-const float WALKSPEED = 0.35;
+const float WALKSPEED = 0.15;
 const float SENSITIVITY = 0.3;
 const vec3 UP = vec3(0.0,1.0,0.0);
-const vec3 FORWARD = vec3(0.0,0.0,-1.0);
-const vec3 SIDE = vec3(1.0,0.0,0.0);
+const vec3 CENTER = vec3(0.0,0.0,0.0);
+float transX = 0.0;
+float zoom = 1.0;
+float transY = 0.0;
 
 vec3 eye; 		// The (regularly updated) vector coordinates of the eye location 
 
@@ -115,6 +117,24 @@ void mouse(int x, int y) {
 /* Keyboard options */
 void keyboard(unsigned char key, int x, int y) {
 	switch(key) {
+	case 'w':
+		transY += WALKSPEED;
+		break;
+	case 'a':
+		transX -= WALKSPEED;
+		break;
+	case 's':
+		transY -= WALKSPEED;
+		break;
+	case 'd':
+		transX += WALKSPEED;
+		break;
+	case 'q':
+		zoom -= WALKSPEED;
+		break;
+	case 'e':
+		zoom += WALKSPEED;
+		break;
 	case 'h':
 		printHelp();
 		break;
@@ -126,7 +146,7 @@ void keyboard(unsigned char key, int x, int y) {
 		glUniform1i(islight, useLights) ;
 		std::cout << "useLights is now set to" << (useLights ? " true " : " false ") << "\n";
 		break; 
-	case 'q': //wireframe mode for maze
+	case 'f': //wireframe mode for maze
 		wire = !wire;
 		std::cout << "wireframe is now set to" << (wire ? " true " : " false ") << "\n";
 		break;
@@ -257,11 +277,13 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	
-	//vec3 dir = Transform::direction(yaw,pitch,FORWARD,UP,true);
-	//mv = glm::lookAt(eye,eye+dir,UP);
 	
-	mat4 mv = glm::lookAt(eye, vec3(0.0,0.0,0.0), UP);
+	vec3 side = glm::normalize(glm::cross(UP,eye));
+	vec3 forward = glm::cross(side,UP);
+	vec3 dir = glm::normalize(transX*side + transY*forward);
 	
+	mat4 mv = glm::lookAt(zoom*eye, CENTER, UP);
+	mv = glm::translate(mv,vec3(transX,0,transY));
 	glLoadMatrixf(&mv[0][0]); 
 	
 	vec4 light[MAXLIGHTS];
@@ -269,8 +291,8 @@ void display() {
 		light[i] = mv * light_position[i];
 	}
 	glUniform4fv(lightPosn, MAXLIGHTS, (GLfloat*)&light[0]);
-	
 	//drawObjects(commands,mv);	
+	
 	glutSolidTeapot(2.5); //temporarily draw teapot
 	
 	glutSwapBuffers();
