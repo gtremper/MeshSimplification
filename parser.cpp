@@ -169,7 +169,7 @@ void parseOFF(char* filename){
 		}
 	
 	vertex verts[numVerts];
-	GLushort inds[numFaces*3];
+	GLuint inds[numFaces*3];
 	size = numFaces*3;
 	for(int i=0; i<numVerts; i++){
 		verts[i].x = verticies[i][0];
@@ -213,7 +213,7 @@ void draw(){
 	//if (obj==0 && wire) {
 	//	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 	//}
-	glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0));
+	glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
 	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 	//glDisableClientState(GL_NORMAL_ARRAY);
 }
