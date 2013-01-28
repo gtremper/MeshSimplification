@@ -46,7 +46,8 @@ std::vector<command> commands;
 /* Forward Declaration */
 std::vector<command> parseInput(char*);
 void loadObjects(char*);
-void draw(int);
+void draw();
+void parseOFF(char*);
 
 
 /* Variables to set uniform params for lighting fragment shader */
@@ -198,7 +199,8 @@ void init() {
 	glUniform4fv(lightColor, MAXLIGHTS, (GLfloat*)&light_specular[0]);	
 }
 
-/* Draws objects based on list of commands */ 
+
+/* Draws objects based on list of commands 
 void drawObjects(std::vector<command> comms, mat4 mv) {
 	std::stack<mat4> matStack;
 	matStack.push(mat4(1.0));
@@ -270,6 +272,7 @@ void drawObjects(std::vector<command> comms, mat4 mv) {
 		}	
 	}
 }
+*/
 
 /* main display */
 void display() {
@@ -293,7 +296,9 @@ void display() {
 	glUniform4fv(lightPosn, MAXLIGHTS, (GLfloat*)&light[0]);
 	//drawObjects(commands,mv);	
 	
-	glutSolidTeapot(2.5); //temporarily draw teapot
+	//glutSolidTeapot(2.5); //temporarily draw teapot
+	
+	draw();
 	
 	glutSwapBuffers();
 }
@@ -309,6 +314,7 @@ int main(int argc, char* argv[]) {
 	glutCreateWindow("Mesh Viewer");
 	//loadObjects(argv[2]);
 	//commands = parseInput(argv[1]);
+	parseOFF(argv[1]);
 	init();
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);
