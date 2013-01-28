@@ -28,8 +28,10 @@ double transX;
 double transY;
 double transZ;
 
-float yaw;
 float pitch;
+float yaw;
+
+quat orientation;
 
 vec3 eye; 		// The (regularly updated) vector coordinates of the eye location 
 
@@ -112,8 +114,12 @@ void mouse(int x, int y) {
     lastx=x; //set lastx to the current x position
     lasty=y; //set lasty to the current y position
 	
-    yaw += diffx*SENSITIVITY; 
-    pitch += diffy*SENSITIVITY;
+    yaw = diffx*SENSITIVITY; 
+    pitch = diffy*SENSITIVITY;
+	
+	orientation = glm::rotate(orientation,yaw,UP);
+	orientation = glm::rotate(orientation,pitch,LEFT);
+	orientation = glm::normalize(orientation);
 	
 	if (yaw > 360) yaw -= 360.0f;
 	if (yaw < 0) yaw += 360.0f;
@@ -169,7 +175,7 @@ void keyboard(unsigned char key, int x, int y) {
 
 /* Default values so the program doesn't crash with empty input */
 void def() {
-	numLights = 0;
+	numLights = 1;
 	fovy = 60;
 	width = 600;
 	height = 400;
@@ -177,9 +183,12 @@ void def() {
 
 void init() {
 	eye = vec3(0,0,-10);
+	light_position[0] = vec4(0,50,-6,1);
 	transX = 0.0;
 	transY = 0.0;
 	transZ = 0.0;
+	
+	quat orientation(0.0,1.0,0.0,0.0);
 	
 	useLights = true;
 	flyMode = false;
@@ -207,7 +216,25 @@ void init() {
 	glUniform1i(islight, useLights) ;
 	glUniform1i(numLightsShader, numLights);
 	
-	glUniform4fv(lightColor, MAXLIGHTS, (GLfloat*)&light_specular[0]);	
+	
+	
+	light_specular[0] = vec4(.6,.3,0,1);
+	light_position[0] = vec4(0,20,-10,1);
+	glUniform4fv(lightColor, MAXLIGHTS, (GLfloat*)&light_specular[0]);
+	glUniform4fv(lightPosn, MAXLIGHTS, (GLfloat*)&light_position[0]);	
+	
+	
+	vec4 amb(.2,.2,.2,1);
+	vec4 diff(.2,.2,.2,1);
+	vec4 spec(1,1,1,1);
+	vec4 emiss(0,0,0,1); 
+	
+	glUniform4fv(ambient,1,(GLfloat*)&amb);
+	glUniform4fv(diffuse,1,(GLfloat*)&diff);
+	glUniform4fv(specular,1,(GLfloat*)&spec);
+	glUniform4fv(emission,1,(GLfloat*)&emiss);
+	glUniform1f(shininess,20);
+	
 }
 
 
@@ -294,19 +321,22 @@ void display() {
 	
 	mat4 mv = glm::lookAt(eye, CENTER, UP);
 	
+	//vec4 light[MAXLIGHTS];
+	//for (int i=0; i<numLights; i++){
+	//	light[i] = mv * light_position[i];
+	//}
+	//glUniform4fv(lightPosn, MAXLIGHTS, (GLfloat*)&light[0]);
+	
 	vec3 trans(transX,transY,transZ);
 	mv = glm::translate(mv,trans);
 	
-	mv = glm::rotate(mv,yaw,UP);
-	mv = glm::rotate(mv,pitch,LEFT);
+	
+	//mv = glm::rotate(mv,yaw,UP);
+	//mv = glm::rotate(mv,pitch,LEFT);
+	mv = mv * glm::mat4_cast(orientation);
 	
 	glLoadMatrixf(&mv[0][0]); 
 	
-	vec4 light[MAXLIGHTS];
-	for (int i=0; i<numLights; i++){
-		light[i] = mv * light_position[i];
-	}
-	glUniform4fv(lightPosn, MAXLIGHTS, (GLfloat*)&light[0]);
 	//drawObjects(commands,mv);	
 	
 	draw();

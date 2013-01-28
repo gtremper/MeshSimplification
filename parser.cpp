@@ -21,10 +21,13 @@ GLuint meshElementArrayBuffer;
 int size;
 
 struct vertex {
-	GLfloat x, y, z; //position
-	GLfloat nx, ny, nz; //normal
-	GLfloat padding[2]; // padding to be 32bit
+	GLfloat x,y,z; 
+	GLfloat nx,ny,nz; //normal
+	GLfloat faces;
+	GLfloat padding;
 };
+
+
 
 /* Parses a line of input and takes appropriate action */
 void parseLine(string l, vector<command> &commands) {
@@ -171,15 +174,57 @@ void parseOFF(char* filename){
 	vertex verts[numVerts];
 	GLuint inds[numFaces*3];
 	size = numFaces*3;
-	for(int i=0; i<numVerts; i++){
+	for(int i=0; i<numVerts; i+=1){
 		verts[i].x = verticies[i][0];
 		verts[i].y = verticies[i][1];
 		verts[i].z = verticies[i][2];
+		verts[i].nx = 0.0;
+		verts[i].ny = 0.0;
+		verts[i].nz = 0.0;
+		verts[i].faces = 0.0;
 	}
-	for(int i=0; i<numFaces; i++){
-		inds[3*i] = faces[i][0];
-		inds[3*i+1] = faces[i][1];
-		inds[3*i+2] = faces[i][2];
+	for(int i=0; i<numFaces; i+=1){
+		int ind0 = faces[i][0];
+		int ind1 = faces[i][1];
+		int ind2 = faces[i][2];
+		inds[3*i] = ind0;
+		inds[3*i+1] = ind1;
+		inds[3*i+2] = ind2;
+		
+		vec3 v0 = verticies[ind0];
+		vec3 v1 = verticies[ind1];
+		vec3 v2 = verticies[ind2];
+		vec3 normal = glm::cross(v1-v0,v2-v0);
+		
+		verts[ind0].faces += 1.0f;
+		float prob = 1.0f/verts[ind0].faces;
+		vec3 oldNormal = vec3(verts[ind0].nx,verts[ind0].ny,verts[ind0].nz);
+		vec3 newNormal = (1.0f-prob)*oldNormal + prob*normal;
+		newNormal = glm::normalize(newNormal);
+		verts[ind0].nx = newNormal[0];
+		verts[ind0].ny = newNormal[1];
+		verts[ind0].nz = newNormal[2];
+		
+		
+		verts[ind1].faces += 1.0f;
+		prob = 1.0f/verts[ind1].faces;
+		oldNormal = vec3(verts[ind1].nx,verts[ind1].ny,verts[ind1].nz);
+		newNormal = oldNormal*(1.0f-prob) + normal*prob;
+		newNormal = glm::normalize(newNormal);
+		verts[ind1].nx = newNormal[0];
+		verts[ind1].ny = newNormal[1];
+		verts[ind1].nz = newNormal[2];
+		
+		verts[ind2].faces += 1.0f;
+		prob = 1.0f/verts[ind2].faces;
+		oldNormal = vec3(verts[ind2].nx,verts[ind2].ny,verts[ind2].nz);
+		newNormal = (1.0f-prob)*oldNormal + prob*normal;
+		newNormal = glm::normalize(newNormal);
+		verts[ind2].nx = newNormal[0];
+		verts[ind2].ny = newNormal[1];
+		verts[ind2].nz = newNormal[2];
+		
+		
 	}
 	
 	cout << "Num Verts" << numVerts << endl;
