@@ -200,6 +200,20 @@ void parseOFF(char* filename){
 
 /* Draw object number "obj" */
 void draw(){
+	glBindBuffer(GL_ARRAY_BUFFER, meshArrayBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshElementArrayBuffer);
+	
+	glVertexPointer(3, GL_FLOAT, 32, BUFFER_OFFSET(0));
+	//glEnableClientState(GL_VERTEX_ARRAY);
+	
+	//if(normals[obj]){
+	//	glNormalPointer(GL_FLOAT, 32, BUFFER_OFFSET(12));
+	//	glEnableClientState(GL_NORMAL_ARRAY);
+	//}
+	//if (obj==0 && wire) {
+	//	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+	//}
 	glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0));
 	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+	//glDisableClientState(GL_NORMAL_ARRAY);
 }
