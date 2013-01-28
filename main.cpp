@@ -309,8 +309,6 @@ void display() {
 	glUniform4fv(lightPosn, MAXLIGHTS, (GLfloat*)&light[0]);
 	//drawObjects(commands,mv);	
 	
-	//glutSolidTeapot(2.5); //temporarily draw teapot
-	
 	draw();
 	
 	glutSwapBuffers();
