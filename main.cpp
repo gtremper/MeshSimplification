@@ -18,13 +18,18 @@
 using namespace std;
 
 const int MAXLIGHTS = 10;
-const float WALKSPEED = 0.15;
+const double WALKSPEED = 0.15;
 const float SENSITIVITY = 0.3;
 const vec3 UP = vec3(0.0,1.0,0.0);
+const vec3 LEFT = vec3(-1.0,0.0,0.0);
 const vec3 CENTER = vec3(0.0,0.0,0.0);
-float transX = 0.0;
-float zoom = 1.0;
-float transY = 0.0;
+
+double transX;
+double transY;
+double transZ;
+
+float yaw;
+float pitch;
 
 vec3 eye; 		// The (regularly updated) vector coordinates of the eye location 
 
@@ -107,11 +112,13 @@ void mouse(int x, int y) {
     lastx=x; //set lastx to the current x position
     lasty=y; //set lasty to the current y position
 	
-    float yaw = diffx*SENSITIVITY; 
-    float pitch = diffy*SENSITIVITY;
+    yaw += diffx*SENSITIVITY; 
+    pitch += diffy*SENSITIVITY;
 	
-	Transform::left(-yaw, eye, UP);
-	Transform::up(pitch, eye, UP);
+	if (yaw > 360) yaw -= 360.0f;
+	if (yaw < 0) yaw += 360.0f;
+	if (pitch > 180) pitch -= 360.0f;
+	if (pitch < -180) pitch += 360.0f;
 }
 
 
@@ -119,22 +126,22 @@ void mouse(int x, int y) {
 void keyboard(unsigned char key, int x, int y) {
 	switch(key) {
 	case 'w':
-		transY += WALKSPEED;
+		transZ += WALKSPEED;
 		break;
 	case 'a':
-		transX -= WALKSPEED;
-		break;
-	case 's':
-		transY -= WALKSPEED;
-		break;
-	case 'd':
 		transX += WALKSPEED;
 		break;
+	case 's':
+		transZ -= WALKSPEED;
+		break;
+	case 'd':
+		transX -= WALKSPEED;
+		break;
 	case 'q':
-		zoom -= WALKSPEED;
+		transY -= WALKSPEED;
 		break;
 	case 'e':
-		zoom += WALKSPEED;
+		transY += WALKSPEED;
 		break;
 	case 'h':
 		printHelp();
@@ -170,6 +177,10 @@ void def() {
 
 void init() {
 	eye = vec3(0,0,-10);
+	transX = 0.0;
+	transY = 0.0;
+	transZ = 0.0;
+	
 	useLights = true;
 	flyMode = false;
 	lastx = width/2;
@@ -281,12 +292,14 @@ void display() {
 	glMatrixMode(GL_MODELVIEW);
 	
 	
-	vec3 side = glm::normalize(glm::cross(UP,eye));
-	vec3 forward = glm::cross(side,UP);
-	vec3 dir = glm::normalize(transX*side + transY*forward);
+	mat4 mv = glm::lookAt(eye, CENTER, UP);
 	
-	mat4 mv = glm::lookAt(zoom*eye, CENTER, UP);
-	mv = glm::translate(mv,vec3(transX,0,transY));
+	vec3 trans(transX,transY,transZ);
+	mv = glm::translate(mv,trans);
+	
+	mv = glm::rotate(mv,yaw,UP);
+	mv = glm::rotate(mv,pitch,LEFT);
+	
 	glLoadMatrixf(&mv[0][0]); 
 	
 	vec4 light[MAXLIGHTS];
