@@ -153,6 +153,7 @@ void parseOFF(char* filename){
 	stringstream firstln(line);
 	firstln >> numVerts >> numFaces;
 	
+	vertex verts[numVerts];
 	for (int i=0; i<numVerts; i+=1){
 		float x,y,z;
 		getline(myfile, line);
@@ -160,6 +161,8 @@ void parseOFF(char* filename){
 		ln >> x >> y >> z;
 		vec3 v(x,y,z);
 		verticies.push_back(v);
+        verts[i] = (vertex){ v[0], v[1], v[2],
+                             0.0, 0.0, 0.0, 0.0};
 	}
 	
 	for (int i=0; i<numFaces; i+=1){
@@ -171,18 +174,8 @@ void parseOFF(char* filename){
 		faces.push_back(f);
 		}
 	
-	vertex verts[numVerts];
 	GLuint inds[numFaces*3];
 	size = numFaces*3;
-	for(int i=0; i<numVerts; i+=1){
-		verts[i].x = verticies[i][0];
-		verts[i].y = verticies[i][1];
-		verts[i].z = verticies[i][2];
-		verts[i].nx = 0.0;
-		verts[i].ny = 0.0;
-		verts[i].nz = 0.0;
-		verts[i].faces = 0.0;
-	}
 	for(int i=0; i<numFaces; i+=1){
 		int ind0 = faces[i][0];
 		int ind1 = faces[i][1];
