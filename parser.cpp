@@ -161,8 +161,7 @@ void parseOFF(char* filename){
 		ln >> x >> y >> z;
 		vec3 v(x,y,z);
 		verticies.push_back(v);
-        verts[i] = (vertex){ v[0], v[1], v[2],
-                             0.0, 0.0, 0.0, 0.0};
+        verts[i] = (vertex){ v[0], v[1], v[2], 0.0, 0.0, 0.0, 0.0};
 	}
 	
 	for (int i=0; i<numFaces; i+=1){
