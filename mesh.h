@@ -8,10 +8,9 @@
 using namespace std;
 
 struct vertex {
-	GLfloat x,y,z; 
-	GLfloat nx,ny,nz; //normal
-	GLfloat faces;
-	GLfloat padding;
+	GLfloat position[3]; 
+	GLfloat normal[3]; //normal
+	GLfloat padding[2];
 };
 
 /********* Data Structures for Winged Edges ***********/
