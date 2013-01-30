@@ -2,12 +2,10 @@
 #include <sstream>
 #include <fstream>
 #include <stack>
-#include <vector>
 #include <string>
 #include <map>
-#include <GLUT/glut.h>
 #include "Transform.h"
-#include "globals.h"
+#include "mesh.h"
 
 using namespace std;
 
@@ -20,11 +18,111 @@ GLuint meshArrayBuffer;
 GLuint meshElementArrayBuffer;
 int size;
 
-struct vertex {
-	GLfloat position[3]; 
-	GLfloat normal[3]; //normal
-	GLfloat padding[2];
-};
+/* Parses a line of input and takes appropriate action */
+void parseLine(string l, vector<command> &commands) {
+	float arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8;
+	stringstream line(l);
+	string cmd;
+	line >> cmd;
+	if(cmd[0] == '#') { // comment
+		return;
+	} else if(cmd == "") { // blank line
+		return;
+	} else if(cmd == "size") {
+		line >> width >> height;
+	} else if(cmd == "camera") {
+		line >> arg1 >> arg2 >> arg3 >> arg4 >> arg5 >> fovy;
+		//eyeinit = vec3(arg1,arg2,arg3);
+		//yawInit = arg4;
+		//pitchInit = arg5;
+	} else if(cmd == "light") {
+		if(numLights > 9) {
+			return;
+		} else {
+			line >> arg1 >> arg2 >> arg3 >> arg4 >> arg5 >> arg6 >> arg7 >> arg8;
+			light_position[numLights] = vec4(arg1,arg2,arg3,arg4);
+			light_specular[numLights] = vec4(arg5,arg6,arg7,arg8);
+			numLights++;
+		}
+	} else if(cmd == "ambient") {
+		line >> arg1 >> arg2 >> arg3 >> arg4; //r g b a
+		command com;
+		com.op = amb;
+		com.args = vec4(arg1,arg2,arg3,arg4);
+		commands.push_back(com);
+	} else if(cmd == "diffuse") {
+		line >> arg1 >> arg2 >> arg3 >> arg4; //r g b a
+		command com;
+		com.op = diff;
+		com.args = vec4(arg1,arg2,arg3,arg4);
+		commands.push_back(com);
+	} else if(cmd == "specular") {
+		line >> arg1 >> arg2 >> arg3 >> arg4; //r g b a
+		command com;
+		com.op = spec;
+		com.args = vec4(arg1,arg2,arg3,arg4);
+		commands.push_back(com);
+	} else if(cmd == "emission") {
+		line >> arg1 >> arg2 >> arg3 >> arg4; //r g b a
+		command com;
+		com.op = emis;
+		com.args = vec4(arg1,arg2,arg3,arg4);
+		commands.push_back(com);
+	} else if(cmd == "shininess") {
+		line >> arg1; //s
+		command com;
+		com.op = shin;
+		com.args = vec4(arg1,0.0,0.0,0.0);
+		commands.push_back(com);
+	} else if(cmd == "translate") {
+		line >> arg1 >> arg2 >> arg3; //x y z
+		command com;
+		com.op = trans;
+		com.args = vec4(arg1,arg2,arg3,0.0);
+		commands.push_back(com);
+	} else if(cmd == "rotate") {
+		line >> arg1 >> arg2 >> arg3 >> arg4; //x y z theta
+		command com;
+		com.op = rot;
+		com.args = vec4(arg1,arg2,arg3,arg4);
+		commands.push_back(com);
+	} else if(cmd == "scale") {
+		line >> arg1 >> arg2 >> arg3; //x y z
+		command com;
+		com.op = scal;
+		com.args = vec4(arg1,arg2,arg3,0.0);
+		commands.push_back(com);
+	} else if(cmd == "pushTransform") {
+		command com;
+		com.op = push;
+		commands.push_back(com);
+	} else if(cmd == "popTransform") {
+		command com;
+		com.op = pop;
+		commands.push_back(com);
+	} else {
+		cerr << "Command \""<< cmd <<"\" not supported\n";
+		exit(1);
+	}
+}
+
+/* Parse the whole file */
+vector<command> parseInput(char* filename) {
+	ifstream myfile(filename,ifstream::in);
+	string line;
+	vector<command> commands;
+	if(myfile.is_open()) {
+		while(myfile.good()) {
+			getline(myfile, line);
+			parseLine(line,commands);
+		}
+	} else { 
+		cerr << "Unable to open file " << filename << endl;
+		exit(1);
+	}
+	myfile.close();
+	return commands;
+}
 
 void parseOFF(char* filename){
 	
