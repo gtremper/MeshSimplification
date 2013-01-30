@@ -5,11 +5,9 @@
 // in vec4 mynormal ; 
 // in vec4 myvertex ;
 // That is certainly more modern
-
-varying vec4 color ;
 varying vec3 mynormal ; 
 varying vec4 myvertex ; 
-uniform int islight ; // are we lighting. 
+uniform int wire ; // are we lighting. 
 uniform int numLights;
 
 /* Color and Position for lights */
@@ -39,10 +37,10 @@ vec4 ComputeLight (const in vec3 direction, const in vec4 lightcolor, const in v
         return retval ;            
 }       
 
-void main (void) 
-{       
-    if (islight == 0) gl_FragColor = color ; 
-    else { 
+void main() {       
+    if (wire==1) {
+		gl_FragColor = vec4(1,1,1,1) ; 
+	} else { 
         /* They eye is always at (0,0,0) looking down -z axis 
            Also compute current fragment position and direction to eye */ 
         const vec3 eyepos = vec3(0,0,0) ; 
@@ -70,6 +68,6 @@ void main (void)
 	        totalCol += ComputeLight(direction, lightColor[i], normal, halfAngle, diffuse, specular, shininess);
 		}
 		
-		gl_FragColor = totalCol;		
+		gl_FragColor = totalCol;	
 	}
 }

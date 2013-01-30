@@ -21,119 +21,11 @@ GLuint meshElementArrayBuffer;
 int size;
 
 struct vertex {
-	GLfloat x,y,z; 
-	GLfloat nx,ny,nz; //normal
+	GLfloat position[3]; 
+	GLfloat normal[3]; //normal
 	GLfloat faces;
 	GLfloat padding;
 };
-
-
-
-/* Parses a line of input and takes appropriate action */
-void parseLine(string l, vector<command> &commands) {
-	float arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8;
-	stringstream line(l);
-	string cmd;
-	line >> cmd;
-	if(cmd[0] == '#') { // comment
-		return;
-	} else if(cmd == "") { // blank line
-		return;
-	} else if(cmd == "size") {
-		line >> width >> height;
-	} else if(cmd == "camera") {
-		line >> arg1 >> arg2 >> arg3 >> arg4 >> arg5 >> fovy;
-		//eyeinit = vec3(arg1,arg2,arg3);
-		//yawInit = arg4;
-		//pitchInit = arg5;
-	} else if(cmd == "light") {
-		if(numLights > 9) {
-			return;
-		} else {
-			line >> arg1 >> arg2 >> arg3 >> arg4 >> arg5 >> arg6 >> arg7 >> arg8;
-			light_position[numLights] = vec4(arg1,arg2,arg3,arg4);
-			light_specular[numLights] = vec4(arg5,arg6,arg7,arg8);
-			numLights++;
-		}
-	} else if(cmd == "ambient") {
-		line >> arg1 >> arg2 >> arg3 >> arg4; //r g b a
-		command com;
-		com.op = amb;
-		com.args = vec4(arg1,arg2,arg3,arg4);
-		commands.push_back(com);
-	} else if(cmd == "diffuse") {
-		line >> arg1 >> arg2 >> arg3 >> arg4; //r g b a
-		command com;
-		com.op = diff;
-		com.args = vec4(arg1,arg2,arg3,arg4);
-		commands.push_back(com);
-	} else if(cmd == "specular") {
-		line >> arg1 >> arg2 >> arg3 >> arg4; //r g b a
-		command com;
-		com.op = spec;
-		com.args = vec4(arg1,arg2,arg3,arg4);
-		commands.push_back(com);
-	} else if(cmd == "emission") {
-		line >> arg1 >> arg2 >> arg3 >> arg4; //r g b a
-		command com;
-		com.op = emis;
-		com.args = vec4(arg1,arg2,arg3,arg4);
-		commands.push_back(com);
-	} else if(cmd == "shininess") {
-		line >> arg1; //s
-		command com;
-		com.op = shin;
-		com.args = vec4(arg1,0.0,0.0,0.0);
-		commands.push_back(com);
-	} else if(cmd == "translate") {
-		line >> arg1 >> arg2 >> arg3; //x y z
-		command com;
-		com.op = trans;
-		com.args = vec4(arg1,arg2,arg3,0.0);
-		commands.push_back(com);
-	} else if(cmd == "rotate") {
-		line >> arg1 >> arg2 >> arg3 >> arg4; //x y z theta
-		command com;
-		com.op = rot;
-		com.args = vec4(arg1,arg2,arg3,arg4);
-		commands.push_back(com);
-	} else if(cmd == "scale") {
-		line >> arg1 >> arg2 >> arg3; //x y z
-		command com;
-		com.op = scal;
-		com.args = vec4(arg1,arg2,arg3,0.0);
-		commands.push_back(com);
-	} else if(cmd == "pushTransform") {
-		command com;
-		com.op = push;
-		commands.push_back(com);
-	} else if(cmd == "popTransform") {
-		command com;
-		com.op = pop;
-		commands.push_back(com);
-	} else {
-		cerr << "Command \""<< cmd <<"\" not supported\n";
-		exit(1);
-	}
-}
-
-/* Parse the whole file */
-vector<command> parseInput(char* filename) {
-	ifstream myfile(filename,ifstream::in);
-	string line;
-	vector<command> commands;
-	if(myfile.is_open()) {
-		while(myfile.good()) {
-			getline(myfile, line);
-			parseLine(line,commands);
-		}
-	} else { 
-		cerr << "Unable to open file " << filename << endl;
-		exit(1);
-	}
-	myfile.close();
-	return commands;
-}
 
 void parseOFF(char* filename){
 	
@@ -186,40 +78,11 @@ void parseOFF(char* filename){
 		vec3 v0 = verticies[ind0];
 		vec3 v1 = verticies[ind1];
 		vec3 v2 = verticies[ind2];
-		vec3 normal = glm::cross(v1-v0,v2-v0);
-		verts[ind0].nx = normal[0];
-		verts[ind1].ny = normal[1]; 
-		verts[ind2].nz = normal[2]; 
-		
-		/*
-		verts[ind0].faces += 1.0f;
-		float prob = 1.0f/verts[ind0].faces;
-		vec3 oldNormal = vec3(verts[ind0].nx,verts[ind0].ny,verts[ind0].nz);
-		vec3 newNormal = (1.0f-prob)*oldNormal + prob*normal;
-		newNormal = glm::normalize(newNormal);
-		verts[ind0].nx = newNormal[0];
-		verts[ind0].ny = newNormal[1];
-		verts[ind0].nz = newNormal[2];
-		
-		
-		verts[ind1].faces += 1.0f;
-		prob = 1.0f/verts[ind1].faces;
-		oldNormal = vec3(verts[ind1].nx,verts[ind1].ny,verts[ind1].nz);
-		newNormal = oldNormal*(1.0f-prob) + normal*prob;
-		newNormal = glm::normalize(newNormal);
-		verts[ind1].nx = newNormal[0];
-		verts[ind1].ny = newNormal[1];
-		verts[ind1].nz = newNormal[2];
-		
-		verts[ind2].faces += 1.0f;
-		prob = 1.0f/verts[ind2].faces;
-		oldNormal = vec3(verts[ind2].nx,verts[ind2].ny,verts[ind2].nz);
-		newNormal = (1.0f-prob)*oldNormal + prob*normal;
-		newNormal = glm::normalize(newNormal);
-		verts[ind2].nx = newNormal[0];
-		verts[ind2].ny = newNormal[1];
-		verts[ind2].nz = newNormal[2];
-		*/
+		vec3 norm = glm::normalize(glm::cross(v1-v0,v2-v0));
+		GLfloat normal[] = {norm[0],norm[1],norm[2]};
+		memcpy(verts[ind0].normal,normal,sizeof(normal));
+		memcpy(verts[ind1].normal,normal,sizeof(normal));
+		memcpy(verts[ind2].normal,normal,sizeof(normal));
 		
 		
 	}
@@ -229,6 +92,7 @@ void parseOFF(char* filename){
 	
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_INDEX_ARRAY);
+	glEnableClientState(GL_NORMAL_ARRAY);
 	
 	glGenBuffers(1, &meshArrayBuffer);
 	glGenBuffers(1, &meshElementArrayBuffer);
@@ -242,20 +106,8 @@ void parseOFF(char* filename){
 
 /* Draw object number "obj" */
 void draw(){
-	glBindBuffer(GL_ARRAY_BUFFER, meshArrayBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshElementArrayBuffer);
 	
 	glVertexPointer(3, GL_FLOAT, 32, BUFFER_OFFSET(0));
-	//glEnableClientState(GL_VERTEX_ARRAY);
-	
-	//if(normals[obj]){
-	//	glNormalPointer(GL_FLOAT, 32, BUFFER_OFFSET(12));
-	//	glEnableClientState(GL_NORMAL_ARRAY);
-	//}
-	//if (obj==0 && wire) {
-	//	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-	//}
+	glNormalPointer(GL_FLOAT, 32, BUFFER_OFFSET(12));
 	glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
-	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-	//glDisableClientState(GL_NORMAL_ARRAY);
 }
