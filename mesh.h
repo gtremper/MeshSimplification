@@ -46,6 +46,7 @@ class Mesh {
   public:
     /** const vector vertices (type vertex), const vector faces (type vec3) */
     Mesh(const vector<vertex>& vertices, const vector<vec3>& faces);
+    vertex* to_vertex_list();
 };
 
 #endif
