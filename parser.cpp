@@ -70,7 +70,7 @@ void parseOFF(char* filename){
 		vec3 v0 = verticies[ind0];
 		vec3 v1 = verticies[ind1];
 		vec3 v2 = verticies[ind2];
-		vec3 norm = glm::normalize(glm::cross(v1-v0,v2-v0));
+		vec3 norm = glm::cross(v1-v0,v2-v0);
 		verts[ind0].normal[0] += norm[0];
 		verts[ind0].normal[1] += norm[1];
 		verts[ind0].normal[2] += norm[2];
