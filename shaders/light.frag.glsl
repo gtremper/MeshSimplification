@@ -7,7 +7,9 @@
 // That is certainly more modern
 varying vec3 mynormal ; 
 varying vec4 myvertex ; 
-uniform int wire ; // are we lighting. 
+varying vec3 ec_pos;
+uniform int wire ;
+uniform int flat ; 
 uniform int numLights;
 
 /* Color and Position for lights */
@@ -39,7 +41,7 @@ vec4 ComputeLight (const in vec3 direction, const in vec4 lightcolor, const in v
 
 void main() {       
     if (wire==1) {
-		gl_FragColor = vec4(1,1,1,1) ; 
+		gl_FragColor = vec4(1,1,1,1) ;
 	} else { 
         /* They eye is always at (0,0,0) looking down -z axis 
            Also compute current fragment position and direction to eye */ 
@@ -49,8 +51,12 @@ void main() {
         vec3 eyedirn = normalize(eyepos - mypos) ; 
 
         /* Compute normal, needed for shading. */
-         vec3 normal = normalize(gl_NormalMatrix * mynormal) ; 
-
+		vec3 normal;
+		if (flat==1){
+			normal = normalize(cross(dFdx(ec_pos), dFdy(ec_pos)));
+		} else {
+        	normal = normalize(gl_NormalMatrix * mynormal) ; 
+		}
 		/* Initialize variables */
 		vec3 position, direction, halfAngle;
 		vec4 totalCol = vec4(0,0,0,0);

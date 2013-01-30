@@ -23,8 +23,7 @@ int size;
 struct vertex {
 	GLfloat position[3]; 
 	GLfloat normal[3]; //normal
-	GLfloat faces;
-	GLfloat padding;
+	GLfloat padding[2];
 };
 
 void parseOFF(char* filename){
@@ -53,7 +52,7 @@ void parseOFF(char* filename){
 		ln >> x >> y >> z;
 		vec3 v(x,y,z);
 		verticies.push_back(v);
-        verts[i] = (vertex){ v[0], v[1], v[2], 0.0, 0.0, 0.0, 0.0};
+        verts[i] = (vertex){ v[0], v[1], v[2], 0.0, 0.0, 0.0, 0.0,0.0};
 	}
 	
 	for (int i=0; i<numFaces; i+=1){
@@ -79,12 +78,22 @@ void parseOFF(char* filename){
 		vec3 v1 = verticies[ind1];
 		vec3 v2 = verticies[ind2];
 		vec3 norm = glm::normalize(glm::cross(v1-v0,v2-v0));
-		GLfloat normal[] = {norm[0],norm[1],norm[2]};
-		memcpy(verts[ind0].normal,normal,sizeof(normal));
-		memcpy(verts[ind1].normal,normal,sizeof(normal));
-		memcpy(verts[ind2].normal,normal,sizeof(normal));
-		
-		
+		verts[ind0].normal[0] += norm[0];
+		verts[ind0].normal[1] += norm[1];
+		verts[ind0].normal[2] += norm[2];
+		verts[ind1].normal[0] += norm[0];
+		verts[ind1].normal[1] += norm[1];
+		verts[ind1].normal[2] += norm[2];
+		verts[ind2].normal[0] += norm[0];
+		verts[ind2].normal[1] += norm[1];
+		verts[ind2].normal[2] += norm[2];
+	}
+	for (int i=0; i<numVerts; i+=1){
+		vec3 normal(verts[i].normal[0],verts[i].normal[1],verts[i].normal[2]);
+		normal = glm::normalize(normal);
+		verts[i].normal[0] = normal[0];
+		verts[i].normal[1] = normal[1];
+		verts[i].normal[2] = normal[2];
 	}
 	
 	cout << "Num Verts" << numVerts << endl;

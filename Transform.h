@@ -23,12 +23,6 @@ typedef glm::vec4 vec4 ;
 typedef glm::quat quat ;
 const float pi = 3.14159265 ; // For portability across platforms
 
-enum {amb,diff,spec,emis,shin,teapot,sphere,cube,trans,rot,scal,push,pop,anim,constanim};
-
-struct command {
-	int op;
-	vec4 args;
-};
 
 class Transform	 
 {

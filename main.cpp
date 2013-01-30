@@ -45,7 +45,6 @@ bool useWire;
 bool useFlat; // Toggle light shading on and off
 
 /* Forward Declaration */
-std::vector<command> parseInput(char*);
 void loadObjects(char*);
 void draw();
 void parseOFF(char*);
@@ -53,6 +52,7 @@ void parseOFF(char*);
 
 /* Variables to set uniform params for lighting fragment shader */
 GLuint isWire;
+GLuint isFlat;
 GLuint numLightsShader;
 
 GLuint ambient ; 
@@ -143,11 +143,7 @@ void keyboard(unsigned char key, int x, int y) {
 		break; 
 	case 'p':
 		useFlat = !useFlat;
-		if (useFlat){
-			glShadeModel(GL_FLAT);
-		} else {
-			glShadeModel(GL_SMOOTH);
-		}
+		glUniform1i(isFlat, useFlat);
 		std::cout << "Flat shading is now set to" << (useFlat ? " true " : " false ") << "\n";
 		break; 
 	case 'f': //wireframe mode for maze
@@ -187,6 +183,7 @@ void init() {
 	fragmentshader = initshaders(GL_FRAGMENT_SHADER, "shaders/light.frag.glsl");
 	shaderprogram = initprogram(vertexshader, fragmentshader);
 	isWire = glGetUniformLocation(shaderprogram,"wire");
+	isFlat = glGetUniformLocation(shaderprogram,"flat");
 	numLightsShader = glGetUniformLocation(shaderprogram,"numLights");
 	
 	ambient = glGetUniformLocation(shaderprogram,"ambient");
@@ -198,13 +195,14 @@ void init() {
 	lightPosn = glGetUniformLocation(shaderprogram,"lightPosn");
 	lightColor = glGetUniformLocation(shaderprogram,"lightColor");
 	
+	glUniform1i(isFlat, useFlat);
 	glUniform1i(isWire, useWire) ;
 	glUniform1i(numLightsShader, numLights);
 	
 	
 	
 	light_specular[0] = vec4(.6,.3,0,1);
-	light_position[0] = vec4(0,20,-10,1);
+	light_position[0] = vec4(0,10,-10,1);
 	glUniform4fv(lightColor, MAXLIGHTS, (GLfloat*)&light_specular[0]);
 	glUniform4fv(lightPosn, MAXLIGHTS, (GLfloat*)&light_position[0]);	
 	
