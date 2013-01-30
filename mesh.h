@@ -48,4 +48,16 @@ class Mesh {
     vertex* to_vertex_list();
 };
 
+/**
+ * We take in two vectors, one representing the vertices of the mesh, the other
+ * representing the faces of the mesh (in terms of the vertex indices).
+ */
+Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
+
+  for (unsigned int i=0; i < faces.size(); i++) {
+
+  }
+
+}
+
 #endif
