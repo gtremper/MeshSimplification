@@ -42,7 +42,7 @@ class Mesh {
   const vector<vec3>& faces;
   public:
     /** const vector vertices (type vertex), const vector faces (type vec3) */
-    Mesh(const vector<vertex> &, const vector<vec3> &);
+    Mesh(const vector<vertex>&, const vector<vec3>&);
 };
 
 #endif
