@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <GLUT/glut.h>
+#include "globals.h"
 
 using namespace std;
 
