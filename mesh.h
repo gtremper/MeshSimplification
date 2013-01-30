@@ -38,8 +38,8 @@ struct winged_edge {
 /********* Comprehensive Mesh definition **********/
 
 class Mesh {
-  const vector<vertex>& vertex_reference;
-  const vector<vec3>& face_reference;
+  const vector<vertex>* vertex_reference;
+  const vector<vec3>* face_reference;
   vector<winged_edge> winged_edges;
   vector<winged_vertex> winged_vertices;
   vector<winged_face> winged_faces;
