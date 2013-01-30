@@ -13,9 +13,9 @@ endif
 INCFLAGS = -I./glm-0.9.4.1
 RM = /bin/rm -f 
 all: mesh
-mesh: main.o shaders.o Transform.o parser.o shaders.h Transform.h globals.h
+mesh: main.o shaders.o Transform.o parser.o shaders.h Transform.h globals.h mesh.h
 	$(CC) $(CFLAGS) -o viewer shaders.o main.o Transform.o parser.o $(INCFLAGS) $(LDFLAGS) 
-main.o: main.cpp shaders.h Transform.h
+main.o: main.cpp shaders.h Transform.h mesh.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c main.cpp
 shaders.o: shaders.cpp shaders.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c shaders.cpp
