@@ -5,11 +5,13 @@
 
 using namespace std; 
 
-// This is a basic program to initiate a shader
-// The textFileRead function reads in a filename into a string
-// programerrors and shadererrors output compilation errors
-// initshaders initiates a vertex or fragment shader
-// initprogram initiates a program with vertex and fragment shaders
+/*
+This is a basic program to initiate a shader
+The textFileRead function reads in a filename into a string
+programerrors and shadererrors output compilation errors
+initshaders initiates a vertex or fragment shader
+initprogram initiates a program with vertex and fragment shaders
+*/
 
 string textFileRead (const char * filename) {
 	string str,ret = ""; 

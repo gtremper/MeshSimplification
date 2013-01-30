@@ -31,6 +31,7 @@ void parseOFF(char* filename){
 	ifstream myfile(filename, ifstream::in);
 	if(!myfile.is_open()){
 		cout << "Unable to open file " << filename << endl;
+		exit(1);
 	}
 	
 	vector<vec3> verticies; // vectors

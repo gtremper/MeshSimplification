@@ -253,15 +253,13 @@ void display() {
 
 int main(int argc, char* argv[]) {
 	def();
-	//if (argc != 2) {
-	//	std::cerr << "You need a mesh file as an argument";
-	//	exit(1);
-	//}
+	if (argc != 2) {
+		std::cerr << "You need a mesh file as an argument";
+		exit(1);
+	}
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	glutCreateWindow("Mesh Viewer");
-	//loadObjects(argv[2]);
-	//commands = parseInput(argv[1]);
 	parseOFF(argv[1]);
 	init();
 	glutDisplayFunc(display);
