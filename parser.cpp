@@ -187,7 +187,11 @@ void parseOFF(char* filename){
 		vec3 v1 = verticies[ind1];
 		vec3 v2 = verticies[ind2];
 		vec3 normal = glm::cross(v1-v0,v2-v0);
+		verts[ind0].nx = normal[0];
+		verts[ind1].ny = normal[1]; 
+		verts[ind2].nz = normal[2]; 
 		
+		/*
 		verts[ind0].faces += 1.0f;
 		float prob = 1.0f/verts[ind0].faces;
 		vec3 oldNormal = vec3(verts[ind0].nx,verts[ind0].ny,verts[ind0].nz);
@@ -215,6 +219,7 @@ void parseOFF(char* filename){
 		verts[ind2].nx = newNormal[0];
 		verts[ind2].ny = newNormal[1];
 		verts[ind2].nz = newNormal[2];
+		*/
 		
 		
 	}
@@ -251,6 +256,6 @@ void draw(){
 	//	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 	//}
 	glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
-	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 	//glDisableClientState(GL_NORMAL_ARRAY);
 }

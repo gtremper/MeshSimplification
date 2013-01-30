@@ -114,12 +114,12 @@ void mouse(int x, int y) {
     lastx=x; //set lastx to the current x position
     lasty=y; //set lasty to the current y position
 	
-    yaw = diffx*SENSITIVITY; 
-    pitch = diffy*SENSITIVITY;
+    yaw += diffx*SENSITIVITY; 
+    pitch += diffy*SENSITIVITY;
 	
-	orientation = glm::rotate(orientation,yaw,UP);
-	orientation = glm::rotate(orientation,pitch,LEFT);
-	orientation = glm::normalize(orientation);
+	//orientation = glm::rotate(orientation,yaw,UP);
+	//orientation = glm::rotate(orientation,pitch,LEFT);
+	//orientation = glm::normalize(orientation);
 	
 	if (yaw > 360) yaw -= 360.0f;
 	if (yaw < 0) yaw += 360.0f;
@@ -331,9 +331,9 @@ void display() {
 	mv = glm::translate(mv,trans);
 	
 	
-	//mv = glm::rotate(mv,yaw,UP);
-	//mv = glm::rotate(mv,pitch,LEFT);
-	mv = mv * glm::mat4_cast(orientation);
+	mv = glm::rotate(mv,yaw,UP);
+	mv = glm::rotate(mv,pitch,LEFT);
+	//mv = mv * glm::mat4_cast(orientation);
 	
 	glLoadMatrixf(&mv[0][0]); 
 	
