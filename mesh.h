@@ -45,6 +45,7 @@ class Mesh {
   public:
     /** const vector vertices (type vertex), const vector faces (type vec3) */
     Mesh(const vector<vertex>& vertices, const vector<vec3>& faces);
+    int add_vertex(int face_index, int vertex_index);
     vertex* to_vertex_list();
 };
 
@@ -58,6 +59,24 @@ Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
 
   }
 
+}
+
+/** Takes in an index into the faces vector and an index into that face's
+ * vector of vertices and constructs a winged_vertex that is inserted into the
+ * vector of wigned_vertices at the appropriate index. This ensures that the
+ * indices of the original vertices are the same as the winged_vertices.
+ * => Returns an index into winged_vertices
+ *
+ * To create the winged_vertex for the 1st vertex in the 10th face, use
+ * : winged_vertex x = winged_vertices[add_vertex(10,0)];
+ */
+int
+Mesh::add_vertex(int face_index, int vertex_index) {
+  winged_vertex wv;
+  int idx = (*face_reference)[face_index][vertex_index];
+  winged_vertices[idx] = wv;
+  wv.v = &(*vertex_reference)[idx];
+  return idx;
 }
 
 #endif
