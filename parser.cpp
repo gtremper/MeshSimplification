@@ -14,13 +14,78 @@ GLuint meshArrayBuffer;
 GLuint meshElementArrayBuffer;
 int size;
 
-void parseConfig(char* filename){
+extern vec3 eye;
+extern vec3 lookat;
+extern float fovy;
+extern int numLights;
+extern GLuint ambient ; 
+extern GLuint diffuse ; 
+extern GLuint specular ; 
+extern GLuint shininess ;
+extern GLuint emission ;
+extern vec4 light_specular[];
+extern vec4 light_position[];
+extern int MAXLIGHTS;
+
+void parseConfig(const char* filename){
 	ifstream file(filename, ifstream::in);
 	if(!file.is_open()){
 		cout << "Unable to open file " << filename << endl;
 		exit(1);
 	}
-	
+	string linetxt;
+	numLights = 0;
+	while(file.good()){
+		getline(file,linetxt);
+		string cmd;
+		stringstream line(linetxt);
+		line >> cmd;
+		if (cmd[0] == '#') {
+			continue;
+		} else if (cmd == "") {
+			continue;
+		} else if (cmd == "camera"){
+			float x,y,z,lx,ly,lz,fov;
+			line >> x >> y >> z >> lx >> ly >> lz >> fov;
+			eye = vec3(x,y,z);
+			lookat = vec3(lx,ly,lz);
+			fovy = fov;
+		} else if (cmd=="light"){
+			if(numLights > 9) {
+				return;
+			} else {
+				float x,y,z,w,r,g,b,a;
+				line >> x >> y >> z >> w >> r >> g >> b >> a;
+				light_position[numLights] = vec4(x,y,z,w);
+				light_specular[numLights] = vec4(r,g,b,a);
+				numLights++;
+			}
+		} else if(cmd == "ambient") {
+			float r,g,b,a;
+			line >> r >> g >> b >> a;
+			GLfloat vec[] = {r,g,b,a};
+			glUniform4fv(ambient,1,vec);
+		} else if(cmd == "diffuse") {
+			float r,g,b,a;
+			line >> r >> g >> b >> a;
+			GLfloat vec[] = {r,g,b,a};
+			glUniform4fv(diffuse,1,vec);
+		} else if(cmd == "specular") {
+			float r,g,b,a;
+			line >> r >> g >> b >> a;
+			GLfloat vec[] = {r,g,b,a};
+			glUniform4fv(specular,1,vec);
+		} else if(cmd == "emission") {
+			float r,g,b,a;
+			line >> r >> g >> b >> a;
+			GLfloat vec[] = {r,g,b,a};
+			glUniform4fv(emission,1,vec);
+		} else if(cmd == "shininess") {
+			float shine;
+			line >> shine;
+			glUniform1f(shininess,shine);
+		}	
+	}
 }
 
 void parseOFF(char* filename){

@@ -22,7 +22,7 @@ const double WALKSPEED = 0.15;
 const float SENSITIVITY = 0.3;
 const vec3 UP = vec3(0.0,1.0,0.0);
 const vec3 LEFT = vec3(-1.0,0.0,0.0);
-const vec3 CENTER = vec3(0.0,0.0,0.0);
+const char * CONFIG = "config.txt";
 
 /***  UPDATE FREQUENTLY  ***/
 vec3 trans;
@@ -37,12 +37,13 @@ GLuint vertexshader, fragmentshader, shaderprogram ; // shaders
 vec4 light_position[MAXLIGHTS]; //current position of the 10 lights
 vec4 light_specular[MAXLIGHTS]; //color of lights
 vec3 eye; 
+vec3 lookat;
 float fovy; 
 int numLights;
 
 
 /* Forward Declaration */
-void parseConfig(char*);
+void parseConfig(const char*);
 void draw();
 void parseOFF(char*);
 
@@ -151,12 +152,13 @@ void keyboard(unsigned char key, int x, int y) {
 }
 
 void init() {
+	/* Default Values */
 	eye = vec3(0,0,-10);
 	trans = vec3(0,0,0);
+	numLights = 0;
+	fovy = 60;
 	useWire = false;
 	useFlat = false;
-	numLights = 1;
-	fovy = 60;
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -176,34 +178,20 @@ void init() {
 	lightPosn = glGetUniformLocation(shaderprogram,"lightPosn");
 	lightColor = glGetUniformLocation(shaderprogram,"lightColor");
 	
-	glUniform1i(isFlat, useFlat);
-	glUniform1i(isWire, useWire) ;
-	glUniform1i(numLightsShader, numLights);
-	
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_INDEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glVertexPointer(3, GL_FLOAT, 32, BUFFER_OFFSET(0));
 	glNormalPointer(GL_FLOAT, 32, BUFFER_OFFSET(12));
 	
+	glUniform1i(isFlat, useFlat);
+	glUniform1i(isWire, useWire);
 	
-	light_specular[0] = vec4(.6,.3,0,1);
-	light_position[0] = vec4(0,10,-10,1);
+	parseConfig(CONFIG);
+	
 	glUniform4fv(lightColor, MAXLIGHTS, (GLfloat*)&light_specular[0]);
-	glUniform4fv(lightPosn, MAXLIGHTS, (GLfloat*)&light_position[0]);	
-	
-	
-	vec4 amb(.2,.2,.2,1);
-	vec4 diff(.2,.2,.2,1);
-	vec4 spec(1,1,1,1);
-	vec4 emiss(0,0,0,1); 
-	
-	glUniform4fv(ambient,1,(GLfloat*)&amb);
-	glUniform4fv(diffuse,1,(GLfloat*)&diff);
-	glUniform4fv(specular,1,(GLfloat*)&spec);
-	glUniform4fv(emission,1,(GLfloat*)&emiss);
-	glUniform1f(shininess,20);
-	
+	glUniform4fv(lightPosn, MAXLIGHTS, (GLfloat*)&light_position[0]);
+	glUniform1i(numLightsShader, numLights);
 }
 
 /* main display */
@@ -216,7 +204,7 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	
-	mat4 mv = glm::lookAt(eye, CENTER, UP);
+	mat4 mv = glm::lookAt(eye, lookat, UP);
 	mv = glm::translate(mv,trans);
 	
 	vec4 light[MAXLIGHTS];
