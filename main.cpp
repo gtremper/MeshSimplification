@@ -187,7 +187,6 @@ void init() {
 	glNormalPointer(GL_FLOAT, 32, BUFFER_OFFSET(12));
 	
 	
-	
 	light_specular[0] = vec4(.6,.3,0,1);
 	light_position[0] = vec4(0,10,-10,1);
 	glUniform4fv(lightColor, MAXLIGHTS, (GLfloat*)&light_specular[0]);

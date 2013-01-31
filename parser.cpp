@@ -94,20 +94,10 @@ void parseOFF(char* filename){
 		verts[i].normal[2] = normal[2];
 	}
 	
-	cout << "Num Verts" << numVerts << endl;
-	cout << "Num Faces" << numFaces << endl;
-	
-	//glEnableClientState(GL_VERTEX_ARRAY);
-	//glEnableClientState(GL_INDEX_ARRAY);
-	//glEnableClientState(GL_NORMAL_ARRAY);
-	
 	glGenBuffers(1, &meshArrayBuffer);
 	glGenBuffers(1, &meshElementArrayBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, meshArrayBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
-	//glVertexPointer(3, GL_FLOAT, 32, BUFFER_OFFSET(0));
-	//glNormalPointer(GL_FLOAT, 32, BUFFER_OFFSET(12));
-	
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshElementArrayBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(inds), inds, GL_STATIC_DRAW);
 }
