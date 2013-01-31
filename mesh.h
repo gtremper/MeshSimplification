@@ -29,7 +29,9 @@ bool operator==(winged_vertex const& wv1, winged_vertex const& wv2) {
 }
 
 struct winged_face {
-    vector<winged_edge> edges;
+    vector<winged_edge*> edges;
+    /* reference to the indices of the included vertices */
+    const vec3 *f;
 };
 
 struct winged_edge {
