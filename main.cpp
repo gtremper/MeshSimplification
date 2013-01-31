@@ -109,27 +109,27 @@ void mouse(int x, int y) {
 void keyboard(unsigned char key, int x, int y) {
 	switch(key) {
 	case 'w':
-		if (moveLight) light_position[currentLight] += vec4(0,0,1,0);
+		if (moveLight) light_position[currentLight] += vec4(0,0,SENSITIVITY,0);
 		else trans += vec3(0,0,WALKSPEED);
 		break;
 	case 'a':
-		if (moveLight) light_position[currentLight] += vec4(1,0,0,0);
+		if (moveLight) light_position[currentLight] += vec4(SENSITIVITY,0,0,0);
 		else trans += vec3(WALKSPEED,0,0);
 		break;
 	case 's':
-		if (moveLight) light_position[currentLight] -= vec4(0,0,1,0);
+		if (moveLight) light_position[currentLight] -= vec4(0,0,SENSITIVITY,0);
 		else trans -= vec3(0,0,WALKSPEED);
 		break;
 	case 'd':
-		if (moveLight) light_position[currentLight] -= vec4(1,0,0,0);
+		if (moveLight) light_position[currentLight] -= vec4(SENSITIVITY,0,0,0);
 		else trans -= vec3(WALKSPEED,0,0);
 		break;
 	case 'q':
-		if (moveLight) light_position[currentLight] += vec4(0,1,0,0);
+		if (moveLight) light_position[currentLight] += vec4(0,SENSITIVITY,0,0);
 		else trans += vec3(0,WALKSPEED,0);
 		break;
 	case 'e':
-		if (moveLight) light_position[currentLight] -= vec4(0,1,0,0);
+		if (moveLight) light_position[currentLight] -= vec4(0,SENSITIVITY,0,0);
 		else trans -= vec3(0,WALKSPEED,0);
 		break;
 	case 'h':
@@ -241,6 +241,11 @@ void display() {
 	vec4 light[MAXLIGHTS];
 	for (int i=0; i<numLights; i++){
 		light[i] = mv * light_position[i];
+		if (moveLight) {
+			mat4 lightTrans = glm::translate(mv,vec3(light_position[i]));
+			glLoadMatrixf(&lightTrans[0][0]);
+			glutSolidSphere(.5,20,20);
+		}
 	}
 	glUniform4fv(lightPosn, MAXLIGHTS, (GLfloat*)&light[0]);
 	
