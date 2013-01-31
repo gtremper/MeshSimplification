@@ -63,7 +63,7 @@ class Mesh {
  * of the faces. For each face f, create the relevant winged_vertices,
  * winged_edges, and winged_face and add them to the appropriate lists. For each
  * edge created by this face, we set the edge vertices, the appropriate edge face,
- * and appropriate edge successor/predecessors for the edges connected to the 
+ * and appropriate edge successor/predecessors for the edges connected to the
  * current one.
  */
 Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
