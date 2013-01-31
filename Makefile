@@ -12,16 +12,16 @@ else
 endif
 INCFLAGS = -I./glm-0.9.4.1
 RM = /bin/rm -f 
-all: mesh
-mesh: main.o shaders.o Transform.o parser.o shaders.h Transform.h globals.h mesh.h
-	$(CC) $(CFLAGS) -o viewer shaders.o main.o Transform.o parser.o $(INCFLAGS) $(LDFLAGS) 
-main.o: main.cpp shaders.h Transform.h mesh.h
+all: viewer
+viewer: main.o shaders.o mesh.o parser.o shaders.h mesh.h
+	$(CC) $(CFLAGS) -o viewer shaders.o main.o mesh.o parser.o $(INCFLAGS) $(LDFLAGS) 
+main.o: main.cpp shaders.h mesh.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c main.cpp
 shaders.o: shaders.cpp shaders.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c shaders.cpp
-Transform.o: Transform.cpp Transform.h 
-	$(CC) $(CFLAGS) $(INCFLAGS) -c Transform.cpp 
-parser.o: parser.cpp globals.h 
+mesh.o: mesh.cpp mesh.h 
+	$(CC) $(CFLAGS) $(INCFLAGS) -c mesh.cpp 
+parser.o: parser.cpp mesh.h 
 	$(CC) $(CFLAGS) $(INCFLAGS) -c parser.cpp 
 clean: 
 	$(RM) *.o viewer

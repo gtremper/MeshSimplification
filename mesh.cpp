@@ -4,46 +4,9 @@ using namespace std;
 
 /********* Data Structures for Winged Edges ***********/
 
-/** forward declaration for winged_vertex and winged_edge */
-struct winged_edge;
-
-struct winged_vertex {
-    vector<winged_edge*> edges;
-    /* reference to vertex struct above -- avoid copying information! */
-    const vertex *v;
-};
-
 bool operator==(winged_vertex const& wv1, winged_vertex const& wv2) {
     return wv1.v == wv1.v;
 }
-
-struct winged_face {
-    vector<winged_edge*> edges;
-    /* reference to the indices of the included vertices */
-    const vec3 *f;
-};
-
-struct winged_edge {
-    winged_vertex *x_vert, *y_vert;
-    winged_face *a_face, *b_face;
-    winged_edge *a_pred, *a_succ, *b_pred, *b_succ; //clockwise ordering
-};
-
-/********* Comprehensive Mesh definition **********/
-
-class Mesh {
-  const vector<vertex>* vertex_reference;
-  const vector<vec3>* face_reference;
-  vector<winged_edge> winged_edges;
-  vector<winged_vertex> winged_vertices;
-  vector<winged_face> winged_faces;
-  public:
-    /** const vector vertices (type vertex), const vector faces (type vec3) */
-    Mesh(const vector<vertex>& vertices, const vector<vec3>& faces);
-    int add_vertex(int face_index, int vertex_index);
-    void add_face(int idx, winged_edge* we1, winged_edge* we2, winged_edge* we3);
-    vertex* to_vertex_list();
-};
 
 /** We take in two vectors, one representing the vertices of the mesh, the
  * other representing the faces of the mesh (in terms of the vertex indices).
