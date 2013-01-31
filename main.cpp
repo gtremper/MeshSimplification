@@ -258,10 +258,10 @@ void display() {
 	mat4 mv;
 	cout << cameraYaw << cameraPitch << endl;
 	if (cameraMode) {
-		mat4 cameraRot = glm::translate(mat4(1.0f),eye-lookat);
+		mat4 cameraRot = glm::translate(mat4(1.0f),-eye);
 		cameraRot = glm::rotate(cameraRot,cameraYaw,UP);
 		cameraRot = glm::rotate(cameraRot,cameraPitch,LEFT);
-		cameraRot = glm::translate(cameraRot,lookat-eye);
+		cameraRot = glm::translate(cameraRot,eye);
 		glm::lookAt(eye, vec3(cameraRot*vec4(lookat,1.0f)), UP);
 	} else {
 		mv = glm::lookAt(eye, lookat, UP);
