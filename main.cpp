@@ -28,7 +28,6 @@ const vec3 CENTER = vec3(0.0,0.0,0.0);
 vec3 trans;
 float pitch;
 float yaw;
-float width, height; 
 int lastx, lasty; // For mouse motion
 bool useWire;
 bool useFlat;
@@ -67,13 +66,13 @@ GLuint lightColor;
 void reshape(int w, int h){
 	glMatrixMode(GL_PROJECTION);
 	
-	width = w;
-	height = h;
+	float width = w;
+	float height = h;
 	// zNear=0.1, zFar=99
 	mat4 mv = glm::perspectiveFov(fovy, width, height, 0.1f, 99.0f);
 	
 	glLoadMatrixf(&mv[0][0]); 
-	glViewport(0, 0, width, height);
+	glViewport(0, 0, w, h);
 }
 
 
@@ -162,8 +161,6 @@ void keyboard(unsigned char key, int x, int y) {
 void def() {
 	numLights = 1;
 	fovy = 60;
-	width = 600;
-	height = 400;
 }
 
 void init() {
@@ -257,7 +254,7 @@ int main(int argc, char* argv[]) {
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);
 	glutReshapeFunc(reshape);
-	glutReshapeWindow(width,height);
+	glutReshapeWindow(600,400);
 	glutIdleFunc(display);
 	glutMotionFunc(mouse);
 	glutMouseFunc(mouseClick) ;

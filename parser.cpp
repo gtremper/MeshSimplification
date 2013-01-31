@@ -1,14 +1,12 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
-#include <stack>
 #include <string>
-#include <map>
 #include "mesh.h"
 
 using namespace std;
 
-// COLORS: sky: (135/225.0, 206/255.0, 250/255) forest green: (34/255.0, 139/255.0, 34/255.0)
+// COLORS: sky: (135/225.0, 206/255.0, 250/255)
 
 #define BUFFER_OFFSET(i) (reinterpret_cast<void*>(i))
 #define NumberOf(array) (sizeof(array)/sizeof(array[0]))
