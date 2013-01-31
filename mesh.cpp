@@ -105,6 +105,31 @@ Mesh::edit_edge_wings(winged_edge* we, winged_face* wf, winged_edge* succ, winge
     }
 }
 
+/** Given two vertex indices v1, v2 as well as a winged_face and two winged_edges,
+ * constructs a winged_edge with the appropriate fields populated OR edits a
+ * previously created winged_edge to include the other face/edges
+ */
+
+void
+Mesh::add_edge(int v1, int v2, winged_face* wf, winged_edge* succ, winged_edge* pred) {
+    winged_edge we;
+    pair<int, int> edge_key = make_vertex_pair(v1, v2);
+    /** check if edge is already in winged_edges */
+    bool exists = winged_edges.find(edge_key) != winged_edges.end();
+    if (exists) { // not in winged_edges
+        we.x_vert = &winged_vertices[v1];
+        we.y_vert = &winged_vertices[v2];
+    } else { // pre-existing edge
+        we = winged_edges[edge_key];
+    }
+    /** populate the struct with either its left or right face,succ,pred */
+    edit_edge_wings(&we, wf, succ, pred, (v1 < v2));
+    /** if edge didn't exist, add it to the map */
+    if (!exists)
+      winged_edges[edge_key] = we;
+}
+
+void
 Mesh::draw() {
 	glDrawElements(GL_TRIANGLES, numIndicies, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
 }
