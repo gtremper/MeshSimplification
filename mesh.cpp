@@ -92,6 +92,10 @@ Mesh::make_vertex_pair(int v1, int v2) {
     return (v1 < v2) ? pair<int, int>(v1, v2) : pair<int, int>(v2, v1);
 }
 
+/** Because we can determine by the ordering of the vertices which side of an edge
+ * our current face is, we pass in the boolean left = vertex_a < vertex_b and
+ * populate the appropriate elements of the winged_edge */
+
 void
 Mesh::edit_edge_wings(winged_edge* we, winged_face* wf, winged_edge* succ, winged_edge* pred, bool left) {
     if (left) {
