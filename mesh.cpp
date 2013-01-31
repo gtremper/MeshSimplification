@@ -18,6 +18,17 @@ bool operator==(winged_vertex const& wv1, winged_vertex const& wv2) {
  * edge created by this face, we set the edge vertices, the appropriate edge face,
  * and appropriate edge successor/predecessors for the edges connected to the
  * current one.
+ *
+ * For reference:
+ *       wv3
+ *        *
+ *       /  \
+ *      /    \
+ * we3 /      \ we2
+ *    /   wf   \
+ *   /          \
+ *  *------------*
+ * wv1    we1     wv2
  */
 
 Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
