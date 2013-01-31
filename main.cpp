@@ -16,6 +16,7 @@
 
 using namespace std;
 
+/*** CONSTANTS  ***/
 const int MAXLIGHTS = 10;
 const double WALKSPEED = 0.15;
 const float SENSITIVITY = 0.3;
@@ -23,28 +24,26 @@ const vec3 UP = vec3(0.0,1.0,0.0);
 const vec3 LEFT = vec3(-1.0,0.0,0.0);
 const vec3 CENTER = vec3(0.0,0.0,0.0);
 
-double transX;
-double transY;
-double transZ;
-
+/***  UPDATE FREQUENTLY  ***/
+vec3 trans;
 float pitch;
 float yaw;
+float width, height; 
+int lastx, lasty; // For mouse motion
+bool useWire;
+bool useFlat;
 
-vec3 eye;
-
-float width, height;  
+/***  SCENE PARAMETERS  ***/
 GLuint vertexshader, fragmentshader, shaderprogram ; // shaders
-float fovy;    // field of view
 vec4 light_position[MAXLIGHTS]; //current position of the 10 lights
 vec4 light_specular[MAXLIGHTS]; //color of lights
+vec3 eye; 
+float fovy; 
 int numLights;
-int lastx, lasty ; // For mouse motion
 
-bool useWire;
-bool useFlat; // Toggle light shading on and off
 
 /* Forward Declaration */
-void loadObjects(char*);
+void parseConfig(char*);
 void draw();
 void parseOFF(char*);
 
@@ -83,8 +82,7 @@ void printHelp() {
 			<< "press 'f' to toggle wireframe.\n"
 			<< "press 'p' to toggle flat shading.\n"
 			<< "use 'wasd' to move object.\n"
-			<< "press ESC to quit.\n";
-	
+			<< "press ESC to quit.\n";	
 }
 
 /* Mouse Functions */
@@ -117,22 +115,22 @@ void mouse(int x, int y) {
 void keyboard(unsigned char key, int x, int y) {
 	switch(key) {
 	case 'w':
-		transZ += WALKSPEED;
+		trans += vec3(0,0,WALKSPEED);
 		break;
 	case 'a':
-		transX += WALKSPEED;
+		trans += vec3(WALKSPEED,0,0);
 		break;
 	case 's':
-		transZ -= WALKSPEED;
+		trans += vec3(0,0,WALKSPEED);
 		break;
 	case 'd':
-		transX -= WALKSPEED;
+		trans += vec3(WALKSPEED,0,0);
 		break;
 	case 'q':
-		transY -= WALKSPEED;
+		trans += vec3(0,WALKSPEED,0);
 		break;
 	case 'e':
-		transY += WALKSPEED;
+		trans += vec3(0,WALKSPEED,0);
 		break;
 	case 'h':
 		printHelp();
@@ -170,9 +168,7 @@ void def() {
 
 void init() {
 	eye = vec3(0,0,-10);
-	transX = 0.0;
-	transY = 0.0;
-	transZ = 0.0;
+	trans = vec3(0,0,0);
 	useWire = false;
 	useFlat = false;
 
@@ -229,9 +225,7 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	
-	
 	mat4 mv = glm::lookAt(eye, CENTER, UP);
-	vec3 trans(transX,transY,transZ);
 	mv = glm::translate(mv,trans);
 	
 	vec4 light[MAXLIGHTS];
@@ -242,7 +236,6 @@ void display() {
 	
 	mv = glm::rotate(mv,yaw,UP);
 	mv = glm::rotate(mv,pitch,LEFT);
-	
 	glLoadMatrixf(&mv[0][0]); 
 	
 	draw();

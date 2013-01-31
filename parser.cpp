@@ -17,6 +17,15 @@ GLuint meshArrayBuffer;
 GLuint meshElementArrayBuffer;
 int size;
 
+void parseConfig(char* filename){
+	ifstream file(filename, ifstream::in);
+	if(!file.is_open()){
+		cout << "Unable to open file " << filename << endl;
+		exit(1);
+	}
+	
+}
+
 void parseOFF(char* filename){
 	
 	ifstream myfile(filename, ifstream::in);
