@@ -160,14 +160,25 @@ Mesh::draw() {
 	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
 }
 
+/** test the construction of the Mesh */
 
+bool
+Mesh::run_tests() {
+    bool status = true;
+    test_winged_vertices_populated(status);
+    return status;
+}
 
-
-
-
-
-
-
-
-
-//hello Gabe
+void
+Mesh::test_winged_vertices_populated(bool& status) {
+    status = winged_vertices.size() != 0 ? status : false;
+    for (unsigned int i = 0; i < winged_vertices.size(); i += 1) {
+        winged_vertex wv = winged_vertices[i];
+        status = wv.edges.size() == 3 ? status : false;
+        status = wv.v->position != NULL ? status : false;
+        status = wv.v->normal != NULL ? status : false;
+        status = wv.v->padding != NULL ? status : false;
+    }
+    if (!status)
+      cout << "Mesh failed test_winged_vertices_populated test" << endl;
+}

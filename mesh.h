@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
+#include <iostream>
 #include <utility>
 #include <map>
 
@@ -70,6 +71,7 @@ class Mesh {
     void edit_edge_wings(winged_edge* we, winged_face* wf, winged_edge* succ, winged_edge* pred, bool left);
     pair<int, int> make_vertex_pair(int v1, int v2);
     bool run_tests();
+    void test_winged_vertices_populated(bool&);
     vertex* to_vertex_list();
 	void draw();
 };
