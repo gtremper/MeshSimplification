@@ -93,6 +93,8 @@ void parseOFF(char* filename){
 		verts[i].normal[1] = normal[1];
 		verts[i].normal[2] = normal[2];
 	}
+    vector<vertex> tmp_verts = vector<vertex>(verts, verts+numVerts);
+    Mesh m = Mesh( tmp_verts, faces );
 	
 	glGenBuffers(1, &meshArrayBuffer);
 	glGenBuffers(1, &meshElementArrayBuffer);
