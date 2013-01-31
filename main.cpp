@@ -61,20 +61,15 @@ GLuint emission ;
 GLuint lightPosn;
 GLuint lightColor;
 
-/* Uses the Projection matrices (technically deprecated) to set perspective 
-   We could also do this in a more modern fashion with glm.	*/ 
 void reshape(int w, int h){
 	glMatrixMode(GL_PROJECTION);
-	
 	float width = w;
 	float height = h;
 	// zNear=0.1, zFar=99
 	mat4 mv = glm::perspectiveFov(fovy, width, height, 0.1f, 99.0f);
-	
 	glLoadMatrixf(&mv[0][0]); 
 	glViewport(0, 0, w, h);
 }
-
 
 void printHelp() {
   std::cout << "\npress 'h' to print this message again.\n"
@@ -108,7 +103,6 @@ void mouse(int x, int y) {
 	if (pitch > 180) pitch -= 360.0f;
 	if (pitch < -180) pitch += 360.0f;
 }
-
 
 /* Keyboard options */
 void keyboard(unsigned char key, int x, int y) {
@@ -156,18 +150,13 @@ void keyboard(unsigned char key, int x, int y) {
 	glutPostRedisplay();
 }
 
-
-/* Default values so the program doesn't crash with empty input */
-void def() {
-	numLights = 1;
-	fovy = 60;
-}
-
 void init() {
 	eye = vec3(0,0,-10);
 	trans = vec3(0,0,0);
 	useWire = false;
 	useFlat = false;
+	numLights = 1;
+	fovy = 60;
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -190,6 +179,12 @@ void init() {
 	glUniform1i(isFlat, useFlat);
 	glUniform1i(isWire, useWire) ;
 	glUniform1i(numLightsShader, numLights);
+	
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_INDEX_ARRAY);
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glVertexPointer(3, GL_FLOAT, 32, BUFFER_OFFSET(0));
+	glNormalPointer(GL_FLOAT, 32, BUFFER_OFFSET(12));
 	
 	
 	
@@ -241,7 +236,6 @@ void display() {
 }
 
 int main(int argc, char* argv[]) {
-	def();
 	if (argc != 2) {
 		std::cerr << "You need a mesh file as an argument";
 		exit(1);
