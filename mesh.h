@@ -5,6 +5,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
+#include <utility>
+#include <map>
 
 #define BUFFER_OFFSET(i) (reinterpret_cast<void*>(i))
 
@@ -51,7 +53,7 @@ struct winged_edge {
 class Mesh {
   const vector<vertex>* vertex_reference;
   const vector<vec3>* face_reference;
-  vector<winged_edge> winged_edges;
+  map< pair<int, int>, winged_edge > winged_edges;
   vector<winged_vertex> winged_vertices;
   vector<winged_face> winged_faces;
   GLuint arrayBuffer;
