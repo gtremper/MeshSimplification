@@ -57,6 +57,7 @@ GLuint diffuse ;
 GLuint specular ; 
 GLuint shininess ;
 GLuint emission ;
+vec4 emis; //emission data
 
 GLuint lightPosn;
 GLuint lightColor;
@@ -242,11 +243,13 @@ void display() {
 	for (int i=0; i<numLights; i++){
 		light[i] = mv * light_position[i];
 		if (moveLight) {
+			glUniform4fv(emission,1,&light_specular[i][0]);
 			mat4 lightTrans = glm::translate(mv,vec3(light_position[i]));
 			glLoadMatrixf(&lightTrans[0][0]);
-			glutSolidSphere(.5,20,20);
+			glutSolidSphere(.4,20,20);
 		}
 	}
+	glUniform4fv(emission,1,&emis[0]);
 	glUniform4fv(lightPosn, MAXLIGHTS, (GLfloat*)&light[0]);
 	
 	mv = glm::rotate(mv,yaw,UP);

@@ -23,6 +23,7 @@ extern GLuint diffuse ;
 extern GLuint specular ; 
 extern GLuint shininess ;
 extern GLuint emission ;
+extern vec4 emis;
 extern vec4 light_specular[];
 extern vec4 light_position[];
 extern int MAXLIGHTS;
@@ -78,6 +79,7 @@ void parseConfig(const char* filename){
 			float r,g,b,a;
 			line >> r >> g >> b >> a;
 			GLfloat vec[] = {r,g,b,a};
+			emis = vec4(r,g,b,a);
 			glUniform4fv(emission,1,vec);
 		} else if(cmd == "shininess") {
 			float shine;
