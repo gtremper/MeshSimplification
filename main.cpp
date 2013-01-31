@@ -89,8 +89,6 @@ void mouseClick(int button, int state, int x, int y) {
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
 		lastx = x;
 		lasty = y;
-		cameraPitch=0;
-		cameraYaw=0;
 	}
 }
 
@@ -165,6 +163,8 @@ void keyboard(unsigned char key, int x, int y) {
 		break;
 	case 'c':
 		cameraMode = !cameraMode;
+		cameraPitch=0;
+		cameraYaw=0;
 		cout << "Camera rotation is now set to" << (cameraMode ? " true " : " false ") << "\n";
 		break;
 	case 'm':
@@ -256,8 +256,10 @@ void display() {
 	glMatrixMode(GL_MODELVIEW);
 	
 	mat4 mv;
+	cout << cameraYaw << cameraPitch << endl;
 	if (cameraMode) {
-		mat4 cameraRot = glm::rotate(mat4(1.0f),cameraYaw,UP);
+		mat4 cameraRot = glm::translate(mat4(1.0f),eye-lookat);
+		cameraRot = glm::rotate(cameraRot,cameraYaw,UP);
 		cameraRot = glm::rotate(cameraRot,cameraPitch,LEFT);
 		cameraRot = glm::translate(cameraRot,lookat-eye);
 		glm::lookAt(eye, vec3(cameraRot*vec4(lookat,1.0f)), UP);
