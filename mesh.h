@@ -44,8 +44,8 @@ struct winged_face {
 
 struct winged_edge {
     winged_vertex *x_vert, *y_vert;
-    winged_face *a_face, *b_face;
-    winged_edge *a_pred, *a_succ, *b_pred, *b_succ; //clockwise ordering
+    winged_face *left_face, *right_face;
+    winged_edge *left_pred, *left_succ, *right_pred, *right_succ; //clockwise ordering
 };
 
 /********* Comprehensive Mesh definition **********/
