@@ -26,6 +26,9 @@ float yaw;
 int lastx, lasty; // For mouse motion
 bool useWire;
 bool useFlat;
+bool moveLight;
+int currentLight;
+
 
 /***  SCENE PARAMETERS  ***/
 GLuint vertexshader, fragmentshader, shaderprogram ; // shaders
@@ -35,6 +38,7 @@ vec3 eye;
 vec3 lookat;
 float fovy; 
 int numLights;
+
 
 
 /* Forward Declaration */
@@ -72,6 +76,7 @@ void printHelp() {
 			<< "press 'f' to toggle wireframe.\n"
 			<< "press 'p' to toggle flat shading.\n"
 			<< "use 'wasd' to move object.\n"
+			<< "use '1-9' to move lights.\n"
 			<< "press ESC to quit.\n\n";	
 }
 
@@ -104,22 +109,28 @@ void mouse(int x, int y) {
 void keyboard(unsigned char key, int x, int y) {
 	switch(key) {
 	case 'w':
-		trans += vec3(0,0,WALKSPEED);
+		if (moveLight) light_position[currentLight] += vec4(0,0,1,0);
+		else trans += vec3(0,0,WALKSPEED);
 		break;
 	case 'a':
-		trans += vec3(WALKSPEED,0,0);
+		if (moveLight) light_position[currentLight] += vec4(1,0,0,0);
+		else trans += vec3(WALKSPEED,0,0);
 		break;
 	case 's':
-		trans += vec3(0,0,WALKSPEED);
+		if (moveLight) light_position[currentLight] -= vec4(0,0,1,0);
+		else trans -= vec3(0,0,WALKSPEED);
 		break;
 	case 'd':
-		trans += vec3(WALKSPEED,0,0);
+		if (moveLight) light_position[currentLight] -= vec4(1,0,0,0);
+		else trans -= vec3(WALKSPEED,0,0);
 		break;
 	case 'q':
-		trans += vec3(0,WALKSPEED,0);
+		if (moveLight) light_position[currentLight] += vec4(0,1,0,0);
+		else trans += vec3(0,WALKSPEED,0);
 		break;
 	case 'e':
-		trans += vec3(0,WALKSPEED,0);
+		if (moveLight) light_position[currentLight] -= vec4(0,1,0,0);
+		else trans -= vec3(0,WALKSPEED,0);
 		break;
 	case 'h':
 		printHelp();
@@ -142,6 +153,30 @@ void keyboard(unsigned char key, int x, int y) {
 		}
 		std::cout << "Wireframe is now set to" << (useWire ? " true " : " false ") << "\n";
 		break;
+	case 48:
+	case 49:
+	case 50:
+	case 51:
+	case 52:
+	case 53:
+	case 54:
+	case 55:
+	case 56:
+	case 57:
+		int num = key-49;
+		if (num == -1) {
+			moveLight = false;
+			cout << "Controlling Model" << endl;
+			break;
+		} else if (num >= numLights) {
+			moveLight = false;
+			cout << "That light does not exist" << endl;
+			break;
+		}
+		moveLight = true;
+		currentLight = num;
+		cout << "Now controlling light "<<num<<"\n";
+		break;
 	}
 	glutPostRedisplay();
 }
@@ -154,6 +189,7 @@ void init() {
 	fovy = 60;
 	useWire = false;
 	useFlat = false;
+	moveLight = false;
 
 	glEnable(GL_DEPTH_TEST);
 
