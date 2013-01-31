@@ -24,6 +24,10 @@ struct winged_vertex {
     const vertex *v;
 };
 
+bool operator==(winged_vertex const& wv1, winged_vertex const& wv2) {
+    return wv1.v == wv1.v;
+}
+
 struct winged_face {
     vector<winged_edge> edges;
 };
