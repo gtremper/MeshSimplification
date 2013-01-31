@@ -34,7 +34,6 @@ void parseConfig(const char* filename){
 		exit(1);
 	}
 	string linetxt;
-	numLights = 0;
 	while(file.good()){
 		getline(file,linetxt);
 		string cmd;

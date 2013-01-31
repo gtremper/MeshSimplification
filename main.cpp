@@ -77,7 +77,7 @@ void printHelp() {
 			<< "press 'f' to toggle wireframe.\n"
 			<< "press 'p' to toggle flat shading.\n"
 			<< "use 'wasd' to move object.\n"
-			<< "press ESC to quit.\n";	
+			<< "press ESC to quit.\n\n";	
 }
 
 /* Mouse Functions */
