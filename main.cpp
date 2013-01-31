@@ -31,6 +31,7 @@ bool useWire;
 bool useFlat;
 bool moveLight;
 bool cameraMode;
+bool animate;
 
 /***  SCENE PARAMETERS  ***/
 GLuint vertexshader, fragmentshader, shaderprogram ; // shaders
@@ -76,7 +77,8 @@ void printHelp() {
 			<< "press 'f' to toggle wireframe.\n"
 			<< "press 'p' to toggle flat shading.\n"
 			<< "use 'wasd' to move object.\n"
-			<< "use 'wasd' to move object.\n"
+			<< "use 'c' to move camera.\n"
+			<< "use 'm' to animate.\n"
 			<< "use '1-9' to move lights.\n"
 			<< "press ESC to quit.\n\n";	
 }
@@ -163,7 +165,11 @@ void keyboard(unsigned char key, int x, int y) {
 		break;
 	case 'c':
 		cameraMode = !cameraMode;
-		cout << "Camera rotation is now set to" << (useWire ? " true " : " false ") << "\n";
+		cout << "Camera rotation is now set to" << (cameraMode ? " true " : " false ") << "\n";
+		break;
+	case 'm':
+		animate = !animate;
+		cout << "Animate is now set to" << (animate ? " true " : " false ") << "\n";
 		break;
 	case 48:
 	case 49:
@@ -203,6 +209,7 @@ void init() {
 	useFlat = false;
 	moveLight = false;
 	cameraMode = false;
+	animate = false;
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -273,6 +280,8 @@ void display() {
 	glUniform4fv(emission,1,&emis[0]);
 	glUniform4fv(lightPosn, MAXLIGHTS, (GLfloat*)&light[0]);
 	
+	
+	if (animate) yaw += 1;
 	mv = glm::rotate(mv,yaw,UP);
 	mv = glm::rotate(mv,pitch,LEFT);
 	glLoadMatrixf(&mv[0][0]); 
