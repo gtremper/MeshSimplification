@@ -24,6 +24,7 @@ Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
 
   vertex_reference = &vertices;
   face_reference = &faces;
+  int numIndices = vertices.size();
 
   for (unsigned int i=0; i < faces.size(); i+=1) {
     /** forward declaration of edges */
@@ -135,7 +136,7 @@ Mesh::add_edge(int v1, int v2, winged_face* wf, winged_edge* succ, winged_edge* 
 
 void
 Mesh::draw() {
-	glDrawElements(GL_TRIANGLES, numIndicies, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
+	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
 }
 
 

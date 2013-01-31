@@ -60,7 +60,7 @@ class Mesh {
   vertex* bufferVerts;
   GLuint elementArrayBuffer;
   GLuint* bufferInds;
-  int numIndicies;
+  int numIndices;
   public:
     /** const vector vertices (type vertex), const vector faces (type vec3) */
     Mesh(const vector<vertex>& vertices, const vector<vec3>& faces);
