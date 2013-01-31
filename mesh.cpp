@@ -22,8 +22,8 @@ bool operator==(winged_vertex const& wv1, winged_vertex const& wv2) {
 
 Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
 
-  vertex_reference = &vertices;
-  face_reference = &faces;
+  //vertex_reference = &vertices;
+  //face_reference = &faces;
 
   for (unsigned int i=0; i < faces.size(); i+=1) {
     /** forward declaration of edges */
