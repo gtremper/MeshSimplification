@@ -21,7 +21,7 @@ struct winged_edge;
 struct winged_vertex {
     vector<winged_edge> edges;
     /* reference to vertext struct above -- avoid copying information! */
-    vertex *v;
+    const vertex *v;
 };
 
 struct winged_face {
