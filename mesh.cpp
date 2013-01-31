@@ -93,6 +93,18 @@ make_vertex_pair(int v1, int v2) {
 }
 
 void
+Mesh::edit_edge_wings(winged_edge* we, winged_face* wf, winged_edge* succ, winged_edge* pred, bool left) {
+    if (left) {
+        we->left_face = wf;
+        we->left_succ = succ;
+        we->left_pred = pred;
+    } else {
+        we->right_face = wf;
+        we->right_succ = succ;
+        we->right_pred = pred;
+    }
+}
+
 Mesh::draw() {
 	glDrawElements(GL_TRIANGLES, numIndicies, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
 }
