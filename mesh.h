@@ -52,6 +52,7 @@ class Mesh {
     /** const vector vertices (type vertex), const vector faces (type vec3) */
     Mesh(const vector<vertex>& vertices, const vector<vec3>& faces);
     int add_vertex(int face_index, int vertex_index);
+    void add_face(int idx, winged_edge* we1, winged_edge* we2, winged_edge* we3);
     vertex* to_vertex_list();
 };
 
@@ -93,6 +94,15 @@ Mesh::add_vertex(int face_index, int vertex_index) {
   winged_vertices[idx] = wv;
   wv.v = &(*vertex_reference)[idx];
   return idx;
+}
+
+void
+Mesh::add_face(int idx, winged_edge* we1, winged_edge* we2, winged_edge* we3) {
+    winged_face wf;
+    wf.edges.push_back(we1);
+    wf.edges.push_back(we2);
+    wf.edges.push_back(we3);
+    winged_faces[idx] = wf;
 }
 
 #endif
