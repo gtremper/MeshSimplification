@@ -101,10 +101,10 @@ void mouse(int x, int y) {
 
 	if (cameraMode) {
 		cameraYaw += diffx*SENSITIVITY; 
-	    cameraPitch += diffy*SENSITIVITY;
+	    cameraPitch -= diffy*SENSITIVITY;
 	} else {
 		yaw += diffx*SENSITIVITY; 
-	    pitch += diffy*SENSITIVITY;
+	    pitch -= diffy*SENSITIVITY;
 	}
 	
 	if (yaw > 360) yaw -= 360.0f;
@@ -117,20 +117,20 @@ void mouse(int x, int y) {
 void keyboard(unsigned char key, int x, int y) {
 	switch(key) {
 	case 'w':
-		if (moveLight) light_position[currentLight] += vec4(0,0,SENSITIVITY,0);
-		else trans += vec3(0,0,WALKSPEED);
-		break;
-	case 'a':
-		if (moveLight) light_position[currentLight] += vec4(SENSITIVITY,0,0,0);
-		else trans += vec3(WALKSPEED,0,0);
-		break;
-	case 's':
 		if (moveLight) light_position[currentLight] -= vec4(0,0,SENSITIVITY,0);
 		else trans -= vec3(0,0,WALKSPEED);
 		break;
-	case 'd':
+	case 'a':
 		if (moveLight) light_position[currentLight] -= vec4(SENSITIVITY,0,0,0);
 		else trans -= vec3(WALKSPEED,0,0);
+		break;
+	case 's':
+		if (moveLight) light_position[currentLight] += vec4(0,0,SENSITIVITY,0);
+		else trans += vec3(0,0,WALKSPEED);
+		break;
+	case 'd':
+		if (moveLight) light_position[currentLight] += vec4(SENSITIVITY,0,0,0);
+		else trans += vec3(WALKSPEED,0,0);
 		break;
 	case 'q':
 		if (moveLight) light_position[currentLight] += vec4(0,SENSITIVITY,0,0);
@@ -245,6 +245,20 @@ void init() {
 	glUniform1i(numLightsShader, numLights);
 }
 
+
+vec3 direction(float &yaw, float &pitch, const vec3& dir) {
+	mat4 M = mat4(1.0f);
+	M = glm::rotate(M,yaw,UP);
+	vec3 final = mat3(M)*dir;
+	vec3 cross = glm::cross(vec3(final),UP);
+	M = glm::rotate(M,pitch,cross);
+	final = mat3(M)*final;
+	return final;
+}
+
+
+
+
 /* main display */
 void display() {
 	if (useWire){
@@ -256,13 +270,9 @@ void display() {
 	glMatrixMode(GL_MODELVIEW);
 	
 	mat4 mv;
-	cout << cameraYaw << cameraPitch << endl;
 	if (cameraMode) {
-		mat4 cameraRot = glm::translate(mat4(1.0f),-eye);
-		cameraRot = glm::rotate(cameraRot,cameraYaw,UP);
-		cameraRot = glm::rotate(cameraRot,cameraPitch,LEFT);
-		cameraRot = glm::translate(cameraRot,eye);
-		glm::lookAt(eye, vec3(cameraRot*vec4(lookat,1.0f)), UP);
+		vec3 dir = direction(cameraYaw,cameraPitch, lookat-eye);
+		glm::lookAt(eye, eye+dir, UP);
 	} else {
 		mv = glm::lookAt(eye, lookat, UP);
 	}
@@ -282,8 +292,8 @@ void display() {
 	glUniform4fv(emission,1,&emis[0]);
 	glUniform4fv(lightPosn, MAXLIGHTS, (GLfloat*)&light[0]);
 	
-	
 	if (animate) yaw += 1;
+	
 	mv = glm::rotate(mv,yaw,UP);
 	mv = glm::rotate(mv,pitch,LEFT);
 	glLoadMatrixf(&mv[0][0]); 
