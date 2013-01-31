@@ -100,6 +100,7 @@ void parseOFF(char* filename){
 	glBindBuffer(GL_ARRAY_BUFFER, meshArrayBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
 	glVertexPointer(3, GL_FLOAT, 32, BUFFER_OFFSET(0));
+	glNormalPointer(GL_FLOAT, 32, BUFFER_OFFSET(12));
 	
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshElementArrayBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(inds), inds, GL_STATIC_DRAW);
@@ -107,8 +108,5 @@ void parseOFF(char* filename){
 
 /* Draw object number "obj" */
 void draw(){
-	
-	glVertexPointer(3, GL_FLOAT, 32, BUFFER_OFFSET(0));
-	glNormalPointer(GL_FLOAT, 32, BUFFER_OFFSET(12));
 	glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
 }

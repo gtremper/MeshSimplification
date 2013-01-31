@@ -6,6 +6,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
 
+#define BUFFER_OFFSET(i) (reinterpret_cast<void*>(i))
+
 typedef glm::mat3 mat3 ;
 typedef glm::mat4 mat4 ; 
 typedef glm::vec3 vec3 ; 
@@ -52,12 +54,18 @@ class Mesh {
   vector<winged_edge> winged_edges;
   vector<winged_vertex> winged_vertices;
   vector<winged_face> winged_faces;
+  GLuint arrayBuffer;
+  vertex* bufferVerts;
+  GLuint elementArrayBuffer;
+  GLuint* bufferInds;
+  int numIndicies;
   public:
     /** const vector vertices (type vertex), const vector faces (type vec3) */
     Mesh(const vector<vertex>& vertices, const vector<vec3>& faces);
     int add_vertex(int face_index, int vertex_index);
     void add_face(int idx, winged_edge* we1, winged_edge* we2, winged_edge* we3);
     vertex* to_vertex_list();
+	draw();
 };
 
 #endif //MESH_H

@@ -82,3 +82,20 @@ Mesh::add_face(int idx, winged_edge* we1, winged_edge* we2, winged_edge* we3) {
     wf.edges.push_back(we3);
     winged_faces[idx] = wf;
 }
+
+void
+Mesh::draw() {
+	//glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
+}
+
+
+
+
+
+
+
+
+
+
+
+//hello Gabe
