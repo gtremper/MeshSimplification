@@ -100,8 +100,8 @@ void mouse(int x, int y) {
     lasty=y; //set lasty to the current y position
 
 	if (cameraMode) {
-		cameraYaw += diffx*SENSITIVITY; 
-	    cameraPitch -= diffy*SENSITIVITY;
+		cameraYaw += diffx*SENSITIVITY*0.5f; 
+	    cameraPitch += diffy*SENSITIVITY*0.5f;
 	} else {
 		yaw += diffx*SENSITIVITY; 
 	    pitch -= diffy*SENSITIVITY;
@@ -272,7 +272,8 @@ void display() {
 	mat4 mv;
 	if (cameraMode) {
 		vec3 dir = direction(cameraYaw,cameraPitch, lookat-eye);
-		glm::lookAt(eye, eye+dir, UP);
+		//vec3 dir = glm::normalize(lookat-eye);
+		mv = glm::lookAt(eye, eye+dir, UP);
 	} else {
 		mv = glm::lookAt(eye, lookat, UP);
 	}
