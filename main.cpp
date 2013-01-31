@@ -3,11 +3,6 @@
 /*************************************************************************/
 
 #include <iostream>
-#include <sstream>
-#include <fstream>
-#include <stack>
-#include <map>
-#include <string>
 #include <GLUT/glut.h>
 #include "shaders.h"
 #include "mesh.h"
