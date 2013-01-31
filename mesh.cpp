@@ -68,6 +68,12 @@ Mesh::add_vertex(int face_index, int vertex_index) {
   return idx;
 }
 
+/** Takes in an index into the faces vector as well as 3 pointers to the edges
+ * comprising the relevant face. Constructs a winged_face and inserts it
+ * appropriately into the winged_faces vector. Does not return an index like
+ * add_vertex, because the index 'idx' is known at the time of calling
+ */
+
 void
 Mesh::add_face(int idx, winged_edge* we1, winged_edge* we2, winged_edge* we3) {
     winged_face wf;
