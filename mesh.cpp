@@ -55,13 +55,16 @@ Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
     winged_vertex wv1 = winged_vertices[wv1_index];
     winged_vertex wv2 = winged_vertices[wv2_index];
     winged_vertex wv3 = winged_vertices[wv3_index];
-    /** create winged_edges for current face */
-    //we1.x_vert = &wv1;
-    //we1.y_vert = &wv3;
-    //we1.b_face = &wf; // or a_face? need method to figure out
-    //we1.b_succ = &we2;
-    //we1.b_pred = &we3;
 
+    //TODO: check the math on add_edge
+    /** create winged_edges for current face */
+    pair<int,int> index;
+    index = add_edge(wv1_index, wv2_index, &wf, &we2, &we3);
+    we1 = winged_edges[index];
+    index = add_edge(wv2_index, wv3_index, &wf, &we3, &we1);
+    we2 = winged_edges[index];
+    index = add_edge(wv3_index, wv1_index, &wf, &we1, &we2);
+    we3 = winged_edges[index];
   }
 
 }
