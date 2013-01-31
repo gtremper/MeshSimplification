@@ -7,11 +7,10 @@
 #include <fstream>
 #include <stack>
 #include <map>
-#include <vector>
 #include <string>
 #include <GLUT/glut.h>
 #include "shaders.h"
-#include "Transform.h"
+#include "mesh.h"
 
 #define BUFFER_OFFSET(i) (reinterpret_cast<void*>(i))
 

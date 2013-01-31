@@ -4,7 +4,6 @@
 #include <stack>
 #include <string>
 #include <map>
-#include "Transform.h"
 #include "mesh.h"
 
 using namespace std;
