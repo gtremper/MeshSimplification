@@ -83,6 +83,15 @@ Mesh::add_face(int idx, winged_edge* we1, winged_edge* we2, winged_edge* we3) {
     winged_faces[idx] = wf;
 }
 
+/** given two vertex indices, returns a pair (a,b),
+ * where a < b and and a,b are both ints
+ */
+
+pair<int, int>
+make_vertex_pair(int v1, int v2) {
+    return (v1 < v2) ? pair<int, int>(v1, v2) : pair<int, int>(v2, v1);
+}
+
 void
 Mesh::draw() {
 	glDrawElements(GL_TRIANGLES, numIndicies, GL_UNSIGNED_INT, BUFFER_OFFSET(0));

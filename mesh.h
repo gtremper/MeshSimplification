@@ -66,6 +66,7 @@ class Mesh {
     Mesh(const vector<vertex>& vertices, const vector<vec3>& faces);
     int add_vertex(int face_index, int vertex_index);
     void add_face(int idx, winged_edge* we1, winged_edge* we2, winged_edge* we3);
+    pair<int, int> make_vertex_pair(int v1, int v2);
     vertex* to_vertex_list();
 	void draw();
 };
