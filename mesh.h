@@ -65,7 +65,7 @@ class Mesh {
     int add_vertex(int face_index, int vertex_index);
     void add_face(int idx, winged_edge* we1, winged_edge* we2, winged_edge* we3);
     vertex* to_vertex_list();
-	draw();
+	void draw();
 };
 
 #endif //MESH_H
