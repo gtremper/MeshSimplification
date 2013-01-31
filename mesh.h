@@ -68,7 +68,8 @@ class Mesh {
  */
 Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
 
-  for (unsigned int i=0; i < faces.size(); i++) {
+  vertex_reference = &vertices;
+  face_reference = &faces;
 
   }
 
