@@ -88,7 +88,7 @@ Mesh::add_face(int idx, winged_edge* we1, winged_edge* we2, winged_edge* we3) {
  */
 
 pair<int, int>
-make_vertex_pair(int v1, int v2) {
+Mesh::make_vertex_pair(int v1, int v2) {
     return (v1 < v2) ? pair<int, int>(v1, v2) : pair<int, int>(v2, v1);
 }
 
