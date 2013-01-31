@@ -23,12 +23,14 @@ const char * CONFIG = "config.txt";
 vec3 trans;
 float pitch;
 float yaw;
+float cameraPitch;
+float cameraYaw;
 int lastx, lasty; // For mouse motion
+int currentLight;
 bool useWire;
 bool useFlat;
 bool moveLight;
-int currentLight;
-
+bool cameraMode;
 
 /***  SCENE PARAMETERS  ***/
 GLuint vertexshader, fragmentshader, shaderprogram ; // shaders
@@ -39,13 +41,10 @@ vec3 lookat;
 float fovy; 
 int numLights;
 
-
-
 /* Forward Declaration */
 void parseConfig(const char*);
 void draw();
 void parseOFF(char*);
-
 
 /* Variables to set uniform params for lighting fragment shader */
 GLuint isWire;
@@ -77,6 +76,7 @@ void printHelp() {
 			<< "press 'f' to toggle wireframe.\n"
 			<< "press 'p' to toggle flat shading.\n"
 			<< "use 'wasd' to move object.\n"
+			<< "use 'wasd' to move object.\n"
 			<< "use '1-9' to move lights.\n"
 			<< "press ESC to quit.\n\n";	
 }
@@ -87,6 +87,8 @@ void mouseClick(int button, int state, int x, int y) {
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
 		lastx = x;
 		lasty = y;
+		cameraPitch=0;
+		cameraYaw=0;
 	}
 }
 
@@ -96,9 +98,14 @@ void mouse(int x, int y) {
     int diffy=y-lasty; 
     lastx=x; //set lastx to the current x position
     lasty=y; //set lasty to the current y position
-	
-    yaw += diffx*SENSITIVITY; 
-    pitch += diffy*SENSITIVITY;
+
+	if (cameraMode) {
+		cameraYaw += diffx*SENSITIVITY; 
+	    cameraPitch += diffy*SENSITIVITY;
+	} else {
+		yaw += diffx*SENSITIVITY; 
+	    pitch += diffy*SENSITIVITY;
+	}
 	
 	if (yaw > 360) yaw -= 360.0f;
 	if (yaw < 0) yaw += 360.0f;
@@ -152,7 +159,11 @@ void keyboard(unsigned char key, int x, int y) {
 		} else {
 			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 		}
-		std::cout << "Wireframe is now set to" << (useWire ? " true " : " false ") << "\n";
+		cout << "Wireframe is now set to" << (useWire ? " true " : " false ") << "\n";
+		break;
+	case 'c':
+		cameraMode = !cameraMode;
+		cout << "Camera rotation is now set to" << (useWire ? " true " : " false ") << "\n";
 		break;
 	case 48:
 	case 49:
@@ -191,6 +202,7 @@ void init() {
 	useWire = false;
 	useFlat = false;
 	moveLight = false;
+	cameraMode = false;
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -236,7 +248,16 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	
-	mat4 mv = glm::lookAt(eye, lookat, UP);
+	mat4 mv;
+	if (cameraMode) {
+		mat4 cameraRot = glm::rotate(mat4(1.0f),cameraYaw,UP);
+		cameraRot = glm::rotate(cameraRot,cameraPitch,LEFT);
+		cameraRot = glm::translate(cameraRot,lookat-eye);
+		glm::lookAt(eye, vec3(cameraRot*vec4(lookat,1.0f)), UP);
+	} else {
+		mv = glm::lookAt(eye, lookat, UP);
+	}
+	
 	mv = glm::translate(mv,trans);
 	
 	vec4 light[MAXLIGHTS];
