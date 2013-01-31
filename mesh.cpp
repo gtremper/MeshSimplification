@@ -115,10 +115,11 @@ Mesh::edit_edge_wings(winged_edge* we, winged_face* wf, winged_edge* succ, winge
 
 /** Given two vertex indices v1, v2 as well as a winged_face and two winged_edges,
  * constructs a winged_edge with the appropriate fields populated OR edits a
- * previously created winged_edge to include the other face/edges
+ * previously created winged_edge to include the other face/edges.
+ * Returns the edge_key pair for the edge
  */
 
-void
+pair<int,int>
 Mesh::add_edge(int v1, int v2, winged_face* wf, winged_edge* succ, winged_edge* pred) {
     winged_edge we;
     pair<int, int> edge_key = make_vertex_pair(v1, v2);
@@ -135,6 +136,7 @@ Mesh::add_edge(int v1, int v2, winged_face* wf, winged_edge* succ, winged_edge* 
     /** if edge didn't exist, add it to the map */
     if (!exists)
       winged_edges[edge_key] = we;
+    return edge_key;
 }
 
 void
