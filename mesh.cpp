@@ -25,6 +25,9 @@ Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
   vertex_reference = &vertices;
   face_reference = &faces;
   int numIndices = vertices.size();
+  int numFaces = faces.size();
+  winged_faces.reserve( numFaces );
+  winged_vertices.reserve( numIndices );
 
   for (unsigned int i=0; i < faces.size(); i+=1) {
     /** forward declaration of edges */
