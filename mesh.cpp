@@ -1,12 +1,5 @@
 #include "mesh.h"
-
 using namespace std;
-
-/********* Data Structures for Winged Edges ***********/
-
-bool operator==(winged_vertex const& wv1, winged_vertex const& wv2) {
-    return wv1.v == wv1.v;
-}
 
 /** We take in two vectors, one representing the vertices of the mesh, the
  * other representing the faces of the mesh (in terms of the vertex indices).
@@ -21,6 +14,11 @@ bool operator==(winged_vertex const& wv1, winged_vertex const& wv2) {
  * and appropriate edge successor/predecessors for the edges connected to the
  * current one.
  */
+
+bool operator==(winged_vertex const& wv1, winged_vertex const& wv2) {
+    return wv1.v == wv1.v;
+}
+
 Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
 
   vertex_reference = &vertices;
