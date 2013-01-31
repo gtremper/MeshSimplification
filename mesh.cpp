@@ -49,10 +49,12 @@ Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
     winged_face wf = winged_faces[i];
 
     /** create winged_vertices for current face */
-    winged_vertex wv1 = winged_vertices[add_vertex(i,0)];
-    winged_vertex wv2 = winged_vertices[add_vertex(i,1)];
-    winged_vertex wv3 = winged_vertices[add_vertex(i,2)];
-
+    int wv1_index = add_vertex(i,0);
+    int wv2_index = add_vertex(i,1);
+    int wv3_index = add_vertex(i,2);
+    winged_vertex wv1 = winged_vertices[wv1_index];
+    winged_vertex wv2 = winged_vertices[wv2_index];
+    winged_vertex wv3 = winged_vertices[wv3_index];
     /** create winged_edges for current face */
     //we1.x_vert = &wv1;
     //we1.y_vert = &wv3;
