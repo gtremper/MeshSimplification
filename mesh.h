@@ -53,9 +53,18 @@ class Mesh {
     vertex* to_vertex_list();
 };
 
-/**
- * We take in two vectors, one representing the vertices of the mesh, the other
- * representing the faces of the mesh (in terms of the vertex indices).
+/** We take in two vectors, one representing the vertices of the mesh, the
+ * other representing the faces of the mesh (in terms of the vertex indices).
+ * For each of the winged faces and vertices, we want to keep track of which
+ * edges they are associated with. For each winged edge, we want to track what
+ * is component faces and vertices are as well as its neighboring edges.
+ *
+ * Proper construction of the winged_edges is as follows: Iterate through all
+ * of the faces. For each face f, create the relevant winged_vertices,
+ * winged_edges, and winged_face and add them to the appropriate lists. For each
+ * edge created by this face, we set the edge vertices, the appropriate edge face,
+ * and appropriate edge successor/predecessors for the edges connected to the 
+ * current one.
  */
 Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
 
