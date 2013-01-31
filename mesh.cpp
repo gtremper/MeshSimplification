@@ -1,6 +1,11 @@
 #include "mesh.h"
 using namespace std;
 
+/** Custom operators for the winged_* structs */
+bool operator==(winged_vertex const& wv1, winged_vertex const& wv2) {
+    return wv1.v == wv1.v;
+}
+
 /** We take in two vectors, one representing the vertices of the mesh, the
  * other representing the faces of the mesh (in terms of the vertex indices).
  * For each of the winged faces and vertices, we want to keep track of which
@@ -14,10 +19,6 @@ using namespace std;
  * and appropriate edge successor/predecessors for the edges connected to the
  * current one.
  */
-
-bool operator==(winged_vertex const& wv1, winged_vertex const& wv2) {
-    return wv1.v == wv1.v;
-}
 
 Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
 
