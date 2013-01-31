@@ -74,6 +74,26 @@ Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
   vertex_reference = &vertices;
   face_reference = &faces;
 
+  for (unsigned int i=0; i < faces.size(); i+=1) {
+    /** forward declaration of edges */
+    winged_edge we1, we2, we3;
+
+    /** create winged_face of current face */
+    add_face(i, &we1, &we2, &we3);
+    winged_face wf = winged_faces[i];
+
+    /** create winged_vertices for current face */
+    winged_vertex wv1 = winged_vertices[add_vertex(i,0)];
+    winged_vertex wv2 = winged_vertices[add_vertex(i,1)];
+    winged_vertex wv3 = winged_vertices[add_vertex(i,2)];
+
+    /** create winged_edges for current face */
+    //we1.x_vert = &wv1;
+    //we1.y_vert = &wv3;
+    //we1.b_face = &wf; // or a_face? need method to figure out
+    //we1.b_succ = &we2;
+    //we1.b_pred = &we3;
+
   }
 
 }
