@@ -196,3 +196,15 @@ Mesh::test_winged_vertices_populated(bool& status) {
     if (!status)
       cout << "Mesh failed test_winged_vertices_populated test" << endl;
 }
+
+void
+Mesh::test_winged_faces_populated(bool& status) {
+    status = winged_faces.size() != 0 ? status : false;
+    for (unsigned int i = 0; i < winged_faces.size(); i += 1) {
+        winged_face wf = winged_faces[i];
+        status  = wf.edges.size() == 3 ? status : false;
+    }
+    if (!status)
+      cout << "Mesh failed test_winged_faces_populated" << endl;
+
+}

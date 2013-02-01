@@ -72,6 +72,7 @@ class Mesh {
     pair<int, int> make_vertex_pair(int v1, int v2);
     bool run_tests();
     void test_winged_vertices_populated(bool&);
+    void test_winged_faces_populated(bool&);
     vertex* to_vertex_list();
 	void draw();
 };
