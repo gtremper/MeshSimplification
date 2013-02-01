@@ -89,7 +89,6 @@ Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
 void
 Mesh::add_vertex(int vertex_index, winged_edge* we1, winged_edge* we2, winged_edge* we3) {
   if (winged_vertices[vertex_index].edges.size() == 3) {
-      vector<winged_edge*>::iterator it = winged_vertices[vertex_index].edges.begin();
       winged_vertices[vertex_index].edges[0] = we1;
       winged_vertices[vertex_index].edges[1] = we2;
       winged_vertices[vertex_index].edges[2] = we3;
@@ -152,22 +151,21 @@ Mesh::edit_edge_wings(winged_edge* we, winged_face* wf, winged_edge* succ, winge
  */
 
 pair<int,int>
-Mesh::add_edge(int v1, int v2, winged_face* wf, winged_edge* succ, winged_edge* pred) {
-    winged_edge we;
+Mesh::add_edge(int v1, int v2, winged_edge* we, winged_face* wf, winged_edge* succ, winged_edge* pred) {
     pair<int, int> edge_key = make_vertex_pair(v1, v2);
     /** check if edge is already in winged_edges */
     bool exists = winged_edges.find(edge_key) != winged_edges.end();
-    if (exists) { // not in winged_edges
-        we.x_vert = &winged_vertices[v1];
-        we.y_vert = &winged_vertices[v2];
-    } else { // pre-existing edge
-        we = winged_edges[edge_key];
+    if (exists) { // pre-existing winged_edges
+        we = &winged_edges[edge_key];
+    } else { // edge nonexistant
+        we->x_vert = &winged_vertices[v1];
+        we->y_vert = &winged_vertices[v2];
     }
     /** populate the struct with either its left or right face,succ,pred */
-    edit_edge_wings(&we, wf, succ, pred, (v1 < v2));
+    edit_edge_wings(we, wf, succ, pred, (v1 < v2));
     /** if edge didn't exist, add it to the map */
     if (!exists)
-      winged_edges[edge_key] = we;
+      winged_edges[edge_key] = (*we);
     return edge_key;
 }
 
