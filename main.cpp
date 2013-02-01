@@ -27,6 +27,7 @@ float cameraPitch;
 float cameraYaw;
 int lastx, lasty; // For mouse motion
 int currentLight;
+int lastTime;
 bool useWire;
 bool useFlat;
 bool moveLight;
@@ -170,6 +171,7 @@ void keyboard(unsigned char key, int x, int y) {
 		break;
 	case 'm':
 		animate = !animate;
+		lastTime = glutGet(GLUT_ELAPSED_TIME);
 		cout << "Animate is now set to" << (animate ? " true " : " false ") << "\n";
 		break;
 	case 48: //0
@@ -290,7 +292,11 @@ void display() {
 	glUniform4fv(emission,1,&emis[0]);
 	glUniform4fv(lightPosn, MAXLIGHTS, (GLfloat*)&light[0]);
 	
-	if (animate) yaw += 1;
+	if (animate) {
+		float newTime = glutGet(GLUT_ELAPSED_TIME);
+		yaw += (newTime-lastTime)/100.0f;
+		lastTime=newTime;
+	}
 	
 	mv = glm::rotate(mv,yaw,UP);
 	mv = glm::rotate(mv,pitch,LEFT);
