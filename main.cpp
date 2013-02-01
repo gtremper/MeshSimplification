@@ -151,8 +151,9 @@ void keyboard(unsigned char key, int x, int y) {
 		glUniform1i(isFlat, useFlat);
 		std::cout << "Flat shading is now set to" << (useFlat ? " true " : " false ") << "\n";
 		break; 
-	case 'f': //wireframe mode for maze
+	case 'f':
 		useWire = !useWire;
+		moveLight = false;
 		glUniform1i(isWire, useWire);
 		if (useWire){
 			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
@@ -171,16 +172,16 @@ void keyboard(unsigned char key, int x, int y) {
 		animate = !animate;
 		cout << "Animate is now set to" << (animate ? " true " : " false ") << "\n";
 		break;
-	case 48:
-	case 49:
-	case 50:
-	case 51:
-	case 52:
-	case 53:
-	case 54:
-	case 55:
-	case 56:
-	case 57:
+	case 48: //0
+	case 49: //1
+	case 50: //2
+	case 51: //3
+	case 52: //4
+	case 53: //5
+	case 54: //6
+	case 55: //7
+	case 56: //8
+	case 57: //9
 		int num = key-49;
 		if (num == -1) {
 			moveLight = false;
