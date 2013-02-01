@@ -65,16 +65,13 @@ Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
     winged_vertex wv1 = winged_vertices[wv1_index];
     winged_vertex wv2 = winged_vertices[wv2_index];
     winged_vertex wv3 = winged_vertices[wv3_index];
-//
-//    //TODO: check the math on add_edge
-//    /** create winged_edges for current face */
-//    pair<int,int> index;
-//    index = add_edge(wv1_index, wv2_index, &wf, &we2, &we3);
-//    we1 = winged_edges[index];
-//    index = add_edge(wv2_index, wv3_index, &wf, &we3, &we1);
-//    we2 = winged_edges[index];
-//    index = add_edge(wv3_index, wv1_index, &wf, &we1, &we2);
-//    we3 = winged_edges[index];
+
+    //TODO: check the math on add_edge
+    /** create winged_edges for current face */
+    pair<int,int> index;
+    add_edge(wv1_index, wv2_index, &we1, &wf, &we2, &we3);
+    add_edge(wv2_index, wv3_index, &we2, &wf, &we3, &we1);
+    add_edge(wv3_index, wv1_index, &we3, &wf, &we1, &we2);
   }
 
 }
@@ -111,9 +108,15 @@ Mesh::add_vertex(int vertex_index, winged_edge* we1, winged_edge* we2, winged_ed
 
 void
 Mesh::add_face(int idx, winged_edge* we1, winged_edge* we2, winged_edge* we3) {
-    winged_faces[idx].edges.push_back(we1);
-    winged_faces[idx].edges.push_back(we2);
-    winged_faces[idx].edges.push_back(we3);
+    if (winged_faces[idx].edges.size() == 3) {
+      winged_faces[idx].edges[0] = we1;
+      winged_faces[idx].edges[1] = we2;
+      winged_faces[idx].edges[2] = we3;
+    } else {
+      winged_faces[idx].edges.push_back(we1);
+      winged_faces[idx].edges.push_back(we2);
+      winged_faces[idx].edges.push_back(we3);
+    }
 }
 
 /** given two vertex indices, returns a pair (a,b),
