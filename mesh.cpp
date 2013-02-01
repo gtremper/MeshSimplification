@@ -49,10 +49,11 @@ Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
   for (unsigned int i=0; i < faces.size(); i+=1) {
     /** forward declaration of edges */
     winged_edge we1, we2, we3;
+    winged_face wf;
 
     /** create winged_face of current face */
+    winged_faces.push_back(wf);
     add_face(i, &we1, &we2, &we3);
-    winged_face wf = winged_faces[i];
 
     /** create winged_vertices for current face */
     int wv1_index = faces[i][0];
@@ -110,11 +111,9 @@ Mesh::add_vertex(int vertex_index, winged_edge* we1, winged_edge* we2, winged_ed
 
 void
 Mesh::add_face(int idx, winged_edge* we1, winged_edge* we2, winged_edge* we3) {
-    winged_face wf;
-    wf.edges.push_back(we1);
-    wf.edges.push_back(we2);
-    wf.edges.push_back(we3);
-    winged_faces[idx] = wf;
+    winged_faces[idx].edges.push_back(we1);
+    winged_faces[idx].edges.push_back(we2);
+    winged_faces[idx].edges.push_back(we3);
 }
 
 /** given two vertex indices, returns a pair (a,b),
