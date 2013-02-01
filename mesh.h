@@ -73,6 +73,7 @@ class Mesh {
     bool run_tests();
     void test_winged_vertices_populated(bool&);
     void test_winged_faces_populated(bool&);
+    void test_winged_edges_populated(bool&);
     vertex* to_vertex_list();
 	void draw();
 };

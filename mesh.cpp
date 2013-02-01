@@ -181,6 +181,7 @@ Mesh::run_tests() {
     bool status = true;
     test_winged_vertices_populated(status);
     test_winged_faces_populated(status);
+    test_winged_edges_populated(status);
     return status;
 }
 
@@ -207,5 +208,24 @@ Mesh::test_winged_faces_populated(bool& status) {
     }
     if (!status)
       cout << "Mesh failed test_winged_faces_populated" << endl;
+}
 
+void
+Mesh::test_winged_edges_populated(bool& status) {
+    status = winged_edges.size() != 0 ? status : false;
+    map< pair<int,int>, winged_edge>::iterator it;
+    for (it = winged_edges.begin(); it != winged_edges.end(); it++) {
+        winged_edge we = it->second;
+        status = we.x_vert->v->position != NULL ? status : false;
+        status = we.x_vert->v->normal != NULL ? status : false;
+        status = we.x_vert->v->padding != NULL ? status : false;
+        //status = we.left_face->edges.size() == 3 ? status : false;
+        //status = we.right_face->edges.size() == 3 ? status : false;
+        //status = we.left_pred != NULL ? status : false;
+        //status = we.right_pred != NULL ? status : false;
+        //status = we.left_succ != NULL ? status : false;
+        //status = we.right_succ != NULL ? status : false;
+    }
+    if (!status)
+      cout << "Mesh failed test_winged_edges_populated" << endl;
 }
