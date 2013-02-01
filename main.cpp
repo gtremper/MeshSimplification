@@ -246,19 +246,15 @@ void init() {
 	glUniform1i(numLightsShader, numLights);
 }
 
-
 vec3 direction(float &yaw, float &pitch, const vec3& dir) {
 	mat4 M = mat4(1.0f);
 	M = glm::rotate(M,yaw,UP);
 	vec3 final = mat3(M)*dir;
-	vec3 cross = glm::cross(vec3(final),UP);
+	vec3 cross = glm::cross(final,UP);
 	M = glm::rotate(M,pitch,cross);
 	final = mat3(M)*final;
 	return final;
 }
-
-
-
 
 /* main display */
 void display() {

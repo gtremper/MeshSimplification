@@ -108,7 +108,7 @@ void parseOFF(char* filename){
 	stringstream firstln(line);
 	firstln >> numVerts >> numFaces;
 	
-	vertex verts[numVerts];
+	vertex* verts = new vertex[numVerts];
 	for (int i=0; i<numVerts; i+=1){
 		float x,y,z;
 		getline(myfile, line);
@@ -128,7 +128,7 @@ void parseOFF(char* filename){
 		faces.push_back(f);
 		}
 	
-	GLuint inds[numFaces*3];
+	GLuint* inds = new GLuint[numFaces*3];
 	size = numFaces*3;
 	for(int i=0; i<numFaces; i+=1){
 		int ind0 = faces[i][0];
@@ -168,9 +168,12 @@ void parseOFF(char* filename){
 	glGenBuffers(1, &meshArrayBuffer);
 	glGenBuffers(1, &meshElementArrayBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, meshArrayBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex)*numVerts, verts, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshElementArrayBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(inds), inds, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*3*numFaces, inds, GL_STATIC_DRAW);
+	
+	delete [] inds;
+	delete [] verts;
 }
 
 /* Draw object number "obj" */
