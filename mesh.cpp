@@ -180,6 +180,7 @@ bool
 Mesh::run_tests() {
     bool status = true;
     test_winged_vertices_populated(status);
+    test_winged_faces_populated(status);
     return status;
 }
 
