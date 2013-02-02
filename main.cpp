@@ -309,7 +309,7 @@ void display() {
 
 int main(int argc, char* argv[]) {
 	if (argc != 2) {
-		std::cerr << "You need a mesh file as an argument";
+		std::cerr << "You need a mesh file as an argument\n";
 		exit(1);
 	}
 	glutInit(&argc, argv);
