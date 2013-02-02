@@ -49,6 +49,7 @@ Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
   for (unsigned int i=0; i < faces.size(); i+=1) {
     /** forward declaration of edges */
     winged_edge we1, we2, we3;
+    winged_vertex wv1, wv2, wv3;
     winged_face wf;
 
     /** create winged_face of current face */
@@ -62,9 +63,9 @@ Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
     add_vertex(wv1_index, &we1, &we2, &we3);
     add_vertex(wv2_index, &we1, &we2, &we3);
     add_vertex(wv3_index, &we1, &we2, &we3);
-    winged_vertex wv1 = winged_vertices[wv1_index];
-    winged_vertex wv2 = winged_vertices[wv2_index];
-    winged_vertex wv3 = winged_vertices[wv3_index];
+    wv1 = winged_vertices[wv1_index];
+    wv2 = winged_vertices[wv2_index];
+    wv3 = winged_vertices[wv3_index];
 
     //TODO: check the math on add_edge
     /** create winged_edges for current face */
