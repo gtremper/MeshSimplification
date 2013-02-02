@@ -222,10 +222,10 @@ Mesh::test_winged_edges_populated(bool& status) {
         status = we.x_vert->v->padding != NULL ? status : false;
         //status = we.left_face->edges.size() == 3 ? status : false;
         //status = we.right_face->edges.size() == 3 ? status : false;
-        //status = we.left_pred != NULL ? status : false;
-        //status = we.right_pred != NULL ? status : false;
-        //status = we.left_succ != NULL ? status : false;
-        //status = we.right_succ != NULL ? status : false;
+        status = we.left_pred != NULL ? status : false;
+        status = we.right_pred != NULL ? status : false;
+        status = we.left_succ != NULL ? status : false;
+        status = we.right_succ != NULL ? status : false;
     }
     if (!status)
       cout << "Mesh failed test_winged_edges_populated" << endl;
