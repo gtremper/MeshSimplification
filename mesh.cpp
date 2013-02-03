@@ -69,6 +69,19 @@ Mesh::get_vertex_key(int v0, int v1) {
      return pair<int, int> (v1, v0);
 }
 
+/** given a half_edge pointer he, return a vector of pointers
+ * to all the neighboring edges */
+
+vector<half_edge*>
+Mesh::get_neighboring_edges(half_edge* he) {
+  vector<half_edge*> res;
+  half_edge* loop = he;
+  do {
+    res.push_back(loop);
+    loop = loop->next->sym;
+  } while (loop != he);
+}
+
 void
 Mesh::draw() {
 	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
