@@ -110,14 +110,21 @@ Mesh::get_vertex_key(int v0, int v1) {
 /** given a half_edge pointer he, return a vector of pointers
  * to all the neighboring edges */
 //TODO: do this for both vertices
-//TODO: change to base vertex, not end vertex
 void
 Mesh::get_neighboring_edges(vector<half_edge*> &res, half_edge* he) {
   half_edge* loop = he;
+  /** add one vertex of the half_edge */
   do {
     res.push_back(loop);
     loop = loop->next->sym;
   } while (loop != he);
+  /** now add the other */
+  loop = he->next->next;
+  half_edge* other = loop;
+  do {
+    res.push_back(loop);
+    loop = loop->next->sym;
+  } while (loop != he && loop != other);
 }
 
 void
