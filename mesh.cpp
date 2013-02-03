@@ -3,8 +3,8 @@ using namespace std;
 
 Mesh::Mesh(vector<vertex*>& vertices, vector<vec3>& faces) {
 
-  numIndices = vertices.size();
   unsigned int numFaces = faces.size();
+  numIndices = numFaces*3;
   
   existing_edges = boost::unordered_map< pair<int, int>, half_edge* >();
 
@@ -40,6 +40,9 @@ Mesh::Mesh(vector<vertex*>& vertices, vector<vec3>& faces) {
     edges.push_back(e1);
     edges.push_back(e2);
   }
+
+  glGenBuffers(1, &arrayBuffer);
+  glGenBuffers(1, &elementArrayBuffer);
 
 }
 
@@ -114,6 +117,11 @@ Mesh::get_neighboring_vertices(vector<vertex*> &res, half_edge* he) {
       res.push_back((vertex*)loop->v);
       loop = loop->next->sym;
     } while (loop != he);
+}
+
+void
+Mesh::update_buffer() {
+	
 }
 
 void
