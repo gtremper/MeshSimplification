@@ -43,13 +43,15 @@ Mesh::populate_symmetric_edge(half_edge* e, int v0, int v1) {
   pair<int, int> key = get_vertex_key(v0, v1);
   boost::unordered_map< pair<int, int>, half_edge* >::iterator it = 
         existing_edges.find(key);
+  bool res = true;
   if (it != existing_edges.end() ) { // exists
     e->sym = it->second;
     it->second = e;
   } else {
     existing_edges[key] = e;
+    res = false;
   }
-    
+  return res;
 }
 
 pair<int, int>
