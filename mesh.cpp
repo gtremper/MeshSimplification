@@ -80,6 +80,18 @@ Mesh::get_neighboring_edges(half_edge* he) {
     res.push_back(loop);
     loop = loop->next->sym;
   } while (loop != he);
+  return res;
+}
+
+vector<vertex*>
+Mesh::get_neighboring_vertices(half_edge* he) {
+    vector<vertex*> res;
+    half_edge* loop = he;
+    do {
+      res.push_back((vertex*)loop->v);
+      loop = loop->next->sym;
+    } while (loop != he);
+    return res;
 }
 
 void
