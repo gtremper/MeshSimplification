@@ -253,6 +253,10 @@ Mesh* parseOFFmesh(char* filename){
 		vec3 pos = glm::make_vec3(vertices[i]->position);
 		pos = (pos - makeMiddle) * ratio;
 		memcpy(vertices[i]->position, &pos, sizeof(float)*3);
+		
+		vec3 normal = glm::make_vec3(vertices[i]->normal);
+		normal = glm::normalize(normal);
+		memcpy(vertices[i]->normal, &normal, sizeof(float)*3);
 	}
 	
     return new Mesh(vertices, faces);
