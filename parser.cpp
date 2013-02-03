@@ -234,11 +234,9 @@ Mesh* parseOFFmesh(char* filename){
 	vec3 moveMiddle((maxx+minx)/2.0, (maxy+miny)/2.0, (maxz+minz)/2.0);
 	float ratio = 2.0/max(max(maxx-minx, maxy-miny), maxz-minz);
 	
-	for(int i=0; i<numVerts; i+=1){
+	for (int i=0; i<numVerts; i+=1) {
 		vertices[i] = (vertices[i] - moveMiddle) * ratio;
 	}
-	
-	
 	
     return new Mesh(vertices, faces);
 }

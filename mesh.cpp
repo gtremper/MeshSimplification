@@ -49,11 +49,13 @@ Mesh::Mesh(vector<vec3>& vertices, vector<vec3>& faces) {
 }
 
 Mesh::~Mesh(){
-	
+	for (int i=0; i<edges.size(); i+=1) {
+		delete edges[i];
+	}
 }
 
 half_edge::~half_edge(){
-	
+	delete v;
 }
 
 /** Given a half_edge [e] and its two defining vertices [v0,v1], we check if
