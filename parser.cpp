@@ -161,9 +161,6 @@ void parseOFF(char* filename){
 	}
     vector<vertex> tmp_verts = vector<vertex>(verts, verts+numVerts);
     Mesh m = Mesh( tmp_verts, faces );
-    if (!m.run_tests()) {
-      exit(0);
-    }
 	
 	glGenBuffers(1, &meshArrayBuffer);
 	glGenBuffers(1, &meshElementArrayBuffer);
