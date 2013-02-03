@@ -47,8 +47,7 @@ int numLights;
 /* Forward Declaration */
 void parseConfig(const char*);
 void draw();
-//void parseOFF(char*);
-Mesh* parseOFFmesh(char*);
+Mesh* parseOFF(char*);
 
 /* Variables to set uniform params for lighting fragment shader */
 GLuint isWire;
@@ -205,7 +204,7 @@ void keyboard(unsigned char key, int x, int y) {
 }
 
 void init(char* filename) {
-	mesh = parseOFFmesh(filename);
+	mesh = parseOFF(filename);
 	
 	/* Default Values */
 	eye = vec3(0,0,-10);
@@ -275,7 +274,6 @@ void display() {
 	mat4 mv;
 	if (cameraMode) {
 		vec3 dir = direction(cameraYaw,cameraPitch, lookat-eye);
-		//vec3 dir = glm::normalize(lookat-eye);
 		mv = glm::lookAt(eye, eye+dir, UP);
 	} else {
 		mv = glm::lookAt(eye, lookat, UP);
@@ -306,7 +304,6 @@ void display() {
 	mv = glm::rotate(mv,pitch,LEFT);
 	glLoadMatrixf(&mv[0][0]); 
 	
-	//draw();
 	mesh->draw();
 	
 	glutSwapBuffers();
@@ -320,7 +317,6 @@ int main(int argc, char* argv[]) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	glutCreateWindow("Mesh Viewer");
-	//parseOFF(argv[1]);
 	init(argv[1]);
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);
