@@ -36,6 +36,7 @@ bool animate;
 
 /***  SCENE PARAMETERS  ***/
 GLuint vertexshader, fragmentshader, shaderprogram ; // shaders
+Mesh* mesh;
 vec4 light_position[MAXLIGHTS]; //current position of the 10 lights
 vec4 light_specular[MAXLIGHTS]; //color of lights
 vec3 eye; 
@@ -202,7 +203,9 @@ void keyboard(unsigned char key, int x, int y) {
 	glutPostRedisplay();
 }
 
-void init() {
+void init(char* filename) {
+	//mesh = parseOFF(filename);
+	
 	/* Default Values */
 	eye = vec3(0,0,-10);
 	trans = vec3(0,0,0);
@@ -303,6 +306,7 @@ void display() {
 	glLoadMatrixf(&mv[0][0]); 
 	
 	draw();
+	//mesh->draw();
 	
 	glutSwapBuffers();
 }
@@ -316,7 +320,7 @@ int main(int argc, char* argv[]) {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	glutCreateWindow("Mesh Viewer");
 	parseOFF(argv[1]);
-	init();
+	init(argv[1]);
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);
 	glutReshapeFunc(reshape);

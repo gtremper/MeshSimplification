@@ -176,6 +176,47 @@ void parseOFF(char* filename){
 	delete [] verts;
 }
 
+void parseOFFmesh(char* filename){
+	ifstream myfile(filename, ifstream::in);
+	if(!myfile.is_open()){
+		cout << "Unable to open file " << filename << endl;
+		exit(1);
+	}
+	
+	vector<vec3> vertices; // vectors
+	vector<vec3> faces; // faces
+	int numVerts, numFaces;
+	string line;
+	
+	getline(myfile, line); //skip first line
+	getline(myfile, line);
+	stringstream firstln(line);
+	firstln >> numVerts >> numFaces;
+	
+	vertices.reserve(numVerts);
+	faces.reserve(numFaces);
+	
+	for (int i=0; i<numVerts; i+=1){
+		float x,y,z;
+		getline(myfile, line);
+		stringstream ln(line);
+		ln >> x >> y >> z;
+		vec3 v(x,y,z);
+		vertices.push_back(v);
+	}
+	
+	for (int i=0; i<numFaces; i+=1){
+		int v1,v2,v3,junk;
+		getline(myfile, line);
+		stringstream ln(line);
+		ln >> junk >> v1 >> v2 >> v3;
+		vec3 f(v1,v2,v3);
+		faces.push_back(f);
+		}
+	
+    Mesh m = Mesh(vertices, faces);
+}
+
 /* Draw object number "obj" */
 void draw(){
 	glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
