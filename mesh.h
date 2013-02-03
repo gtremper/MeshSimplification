@@ -54,7 +54,6 @@ class Mesh {
     bool populate_symmetric_edge(half_edge* e, int v0, int v1);
     pair<int, int> get_vertex_key(int v0, int v1);
     vector<half_edge*> get_neighboring_edges(half_edge* he);
-    vector<vertex*> get_neighboring_vertices(half_edge* he);
 	void draw();
 };
 
