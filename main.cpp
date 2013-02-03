@@ -197,7 +197,7 @@ void keyboard(unsigned char key, int x, int y) {
 		}
 		moveLight = true;
 		currentLight = num;
-		cout << "Now controlling light "<<num<<"\n";
+		cout << "Now controlling light "<<num+1<<"\n";
 		break;
 	}
 	glutPostRedisplay();

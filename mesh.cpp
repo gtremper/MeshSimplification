@@ -179,7 +179,7 @@ Mesh::update_buffer() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementArrayBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*elements.size(), &elements[0], GL_STATIC_DRAW);
 	
-	cout <<"Time to draw: " << glutGet(GLUT_ELAPSED_TIME)-gtime << endl;
+	cout <<"Time to update buffer: " << glutGet(GLUT_ELAPSED_TIME)-gtime << endl;
 }
 
 void
