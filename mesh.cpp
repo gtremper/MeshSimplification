@@ -5,11 +5,13 @@ Mesh::Mesh(vector<vec3>& vertices, vector<vec3>& faces) {
 
   numIndices = vertices.size();
   unsigned int numFaces = faces.size();
+  
+  existing_edges = boost::unordered_map< pair<int, int>, half_edge* >();
 
   for (unsigned int i=0; i < numFaces; i+=1) {
-    half_edge* e0 = new half_edge;
-    half_edge* e1 = new half_edge;
-    half_edge* e2 = new half_edge;
+    half_edge* e0 = new half_edge();
+    half_edge* e1 = new half_edge();
+    half_edge* e2 = new half_edge();
 
     /** populate next/prev edges for each edge in this face */
     e0->prev = e2;
@@ -24,17 +26,19 @@ Mesh::Mesh(vector<vec3>& vertices, vector<vec3>& faces) {
 	unsigned int v1 = faces[i][1];
 	unsigned int v2 = faces[i][2];
 	
-	e0->v = new vertex();
-	memcpy(e0->v, &(vertices[v0]), sizeof(float)*3);
-	e1->v = new vertex();
-	memcpy(e1->v, &(vertices[v1]), sizeof(float)*3);
-	e2->v = new vertex();
-	memcpy(e2->v, &(vertices[v2]), sizeof(float)*3);
-	
     /** populate the symmetric edge for the given edge */
-    populate_symmetric_edge(e0, v0, v1);
-    populate_symmetric_edge(e1, v1, v2);
-    populate_symmetric_edge(e2, v2, v0);
+    if (!populate_symmetric_edge(e0, v0, v1)){
+		e0->v = new vertex();
+		memcpy(e0->v, &vertices[v0], sizeof(float)*3);
+	}
+    if (!populate_symmetric_edge(e1, v1, v2)) {
+		e1->v = new vertex();
+		memcpy(e1->v, &vertices[v1], sizeof(float)*3);
+    }
+    if (!populate_symmetric_edge(e2, v2, v0)) {
+		e2->v = new vertex();
+	    memcpy(e2->v, &vertices[v2], sizeof(float)*3);
+    }
 
     /** add edges to vector */
     edges.push_back(e0);
@@ -59,7 +63,7 @@ Mesh::populate_symmetric_edge(half_edge* e, int v0, int v1) {
   bool res = true;
   if (it != existing_edges.end() ) { // exists
     e->sym = it->second;
-    it->second = e;
+    e->sym->sym = e;
   } else {
     existing_edges[key] = e;
     res = false;
