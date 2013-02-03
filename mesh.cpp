@@ -109,7 +109,6 @@ Mesh::get_vertex_key(int v0, int v1) {
 
 /** given a half_edge pointer he, return a vector of pointers
  * to all the neighboring edges */
-//TODO: do this for both vertices
 void
 Mesh::get_neighboring_edges(vector<half_edge*> &res, half_edge* he) {
   half_edge* loop = he;
