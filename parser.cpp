@@ -119,7 +119,7 @@ void parseOFF(char* filename){
 		ln >> x >> y >> z;
 		vec3 v(x,y,z);
 		vertices.push_back(v);
-        verts[i] = (vertex){ v[0], v[1], v[2], 0.0, 0.0, 0.0, 0.0,0.0};
+        verts[i] = vertex(v[0],v[1],v[2]);
 	}
 	
 	for (int i=0; i<numFaces; i+=1){
@@ -163,7 +163,7 @@ void parseOFF(char* filename){
 		verts[i].normal[2] = normal[2];
 	}
 	
-    Mesh m = Mesh(vertices, faces);
+    //Mesh m = Mesh(vertices, faces);
 	
 	glGenBuffers(1, &meshArrayBuffer);
 	glGenBuffers(1, &meshElementArrayBuffer);
@@ -183,7 +183,7 @@ Mesh* parseOFFmesh(char* filename){
 		exit(1);
 	}
 	
-	vector<vec3> vertices; // vectors
+	vector<vertex*> vertices; // vectors
 	vector<vec3> faces; // faces
 	int numVerts, numFaces;
 	string line;
@@ -203,7 +203,7 @@ Mesh* parseOFFmesh(char* filename){
 	float minz = 999999;
 	float maxz = -999999;
 	
-	for (unsigned int i=0; i<numVerts; i+=1){
+	for (int i=0; i<numVerts; i+=1){
 		float x,y,z;
 		getline(myfile, line);
 		stringstream ln(line);
@@ -214,11 +214,11 @@ Mesh* parseOFFmesh(char* filename){
 		maxy = max(y,maxy);
 		minz = min(z,minz);
 		maxz = max(z,maxz);
-		vec3 v(x,y,z);
+		vertex* v = new vertex(x,y,z);
 		vertices.push_back(v);
 	}
 	
-	for (unsigned int i=0; i<numFaces; i+=1){
+	for (int i=0; i<numFaces; i+=1){
 		int v1,v2,v3,junk;
 		getline(myfile, line);
 		stringstream ln(line);
@@ -231,11 +231,15 @@ Mesh* parseOFFmesh(char* filename){
 	/*** Center model around origin  ***/
 	
 	myfile.close();
-	vec3 moveMiddle((maxx+minx)/2.0, (maxy+miny)/2.0, (maxz+minz)/2.0);
+	float middlex = (maxx+minx)/2.0;
+	float middley = (maxy+miny)/2.0;
+	float middlez = (maxz+minz)/2.0;
 	float ratio = 2.0/max(max(maxx-minx, maxy-miny), maxz-minz);
 	
 	for (int i=0; i<numVerts; i+=1) {
-		vertices[i] = (vertices[i] - moveMiddle) * ratio;
+		vertices[i]->position[0] = (vertices[i]->position[0] - middlex) * ratio;
+		vertices[i]->position[1] = (vertices[i]->position[1] - middley) * ratio;
+		vertices[i]->position[2] = (vertices[i]->position[2] - middlez) * ratio;
 	}
 	
     return new Mesh(vertices, faces);

@@ -1,7 +1,7 @@
 #include "mesh.h"
 using namespace std;
 
-Mesh::Mesh(vector<vec3>& vertices, vector<vec3>& faces) {
+Mesh::Mesh(vector<vertex*>& vertices, vector<vec3>& faces) {
 
   numIndices = vertices.size();
   unsigned int numFaces = faces.size();
@@ -27,18 +27,9 @@ Mesh::Mesh(vector<vec3>& vertices, vector<vec3>& faces) {
 	unsigned int v2 = faces[i][2];
 	
     /** populate the symmetric edge for the given edge */
-    if (!populate_symmetric_edge(e0, v0, v1)){
-		e0->v = new vertex();
-		memcpy(e0->v, &vertices[v0], sizeof(float)*3);
-	}
-    if (!populate_symmetric_edge(e1, v1, v2)) {
-		e1->v = new vertex();
-		memcpy(e1->v, &vertices[v1], sizeof(float)*3);
-    }
-    if (!populate_symmetric_edge(e2, v2, v0)) {
-		e2->v = new vertex();
-	    memcpy(e2->v, &vertices[v2], sizeof(float)*3);
-    }
+	populate_symmetric_edge(e0, v0, v1);
+	populate_symmetric_edge(e1, v1, v2);
+	populate_symmetric_edge(e2, v2, v0);
 
     /** add edges to vector */
     edges.push_back(e0);
@@ -57,6 +48,13 @@ Mesh::~Mesh(){
 half_edge::~half_edge(){
 	delete v;
 }
+
+vertex::vertex(float x, float y, float z) {
+	position[0] = x;
+	position[1] = y;
+	position[2] = z;
+}
+vertex::vertex(){};
 
 /** Given a half_edge [e] and its two defining vertices [v0,v1], we check if
  * the pair [v0,v1] already exists in the existing_edges map, where v0 < v1.

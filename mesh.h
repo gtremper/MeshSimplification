@@ -24,6 +24,8 @@ struct vertex {
 	GLfloat position[3]; 
 	GLfloat normal[3];
 	GLfloat padding[2];
+	vertex(float,float,float);
+	vertex();
 };
 
 struct half_edge {
@@ -44,7 +46,7 @@ class Mesh {
   unsigned int numIndices;
   public:
     /** const vector vertices (type vertex), const vector faces (type vec3) **/
-    Mesh(vector<vec3>& vertices, vector<vec3>& faces);
+    Mesh(vector<vertex*>& vertices, vector<vec3>& faces);
 	~Mesh();
     bool populate_symmetric_edge(half_edge* e, int v0, int v1);
     pair<int, int> get_vertex_key(int v0, int v1);
