@@ -57,6 +57,9 @@ vertex::vertex(float x, float y, float z) {
 	position[0] = x;
 	position[1] = y;
 	position[2] = z;
+	normal[0] = 0.0;
+	normal[1] = 0.0;
+	normal[2] = 0.0;
 }
 vertex::vertex(){};
 

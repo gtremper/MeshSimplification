@@ -240,6 +240,7 @@ Mesh* parseOFFmesh(char* filename){
 		vertices[i]->position[0] = (vertices[i]->position[0] - middlex) * ratio;
 		vertices[i]->position[1] = (vertices[i]->position[1] - middley) * ratio;
 		vertices[i]->position[2] = (vertices[i]->position[2] - middlez) * ratio;
+		
 	}
 	
     return new Mesh(vertices, faces);
