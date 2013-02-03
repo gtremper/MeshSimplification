@@ -176,7 +176,7 @@ void parseOFF(char* filename){
 	delete [] verts;
 }
 
-void parseOFFmesh(char* filename){
+Mesh* parseOFFmesh(char* filename){
 	ifstream myfile(filename, ifstream::in);
 	if(!myfile.is_open()){
 		cout << "Unable to open file " << filename << endl;
@@ -214,7 +214,7 @@ void parseOFFmesh(char* filename){
 		faces.push_back(f);
 		}
 	
-    Mesh m = Mesh(vertices, faces);
+    return new Mesh(vertices, faces);
 }
 
 /* Draw object number "obj" */

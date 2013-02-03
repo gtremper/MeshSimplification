@@ -16,25 +16,20 @@ typedef glm::mat4 mat4 ;
 typedef glm::vec3 vec3 ; 
 typedef glm::vec4 vec4 ;
 
-
 using namespace std;
 
 /********* Data Structures for Winged Edges ***********/
 
 struct vertex {
 	GLfloat position[3]; 
-	GLfloat normal[3]; //normal
+	GLfloat normal[3];
 	GLfloat padding[2];
-};
-
-struct face {
-    GLuint face[3];
 };
 
 struct half_edge {
     vertex *v;
-    face *f;
     half_edge *prev, *next, *sym; //anti-clockwise ordering
+	~half_edge();
 };
 
 /********* Comprehensive Mesh definition **********/
@@ -48,8 +43,9 @@ class Mesh {
   GLuint* bufferInds;
   unsigned int numIndices;
   public:
-    /** const vector vertices (type vertex), const vector faces (type vec3) */
+    /** const vector vertices (type vertex), const vector faces (type vec3) **/
     Mesh(vector<vec3>& vertices, vector<vec3>& faces);
+	~Mesh();
     bool populate_symmetric_edge(half_edge* e, int v0, int v1);
     pair<int, int> get_vertex_key(int v0, int v1);
     void get_neighboring_edges(vector<half_edge*> &res, half_edge* he);

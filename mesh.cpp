@@ -48,6 +48,14 @@ Mesh::Mesh(vector<vec3>& vertices, vector<vec3>& faces) {
 
 }
 
+Mesh::~Mesh(){
+	
+}
+
+half_edge::~half_edge(){
+	
+}
+
 /** Given a half_edge [e] and its two defining vertices [v0,v1], we check if
  * the pair [v0,v1] already exists in the existing_edges map, where v0 < v1.
  * If it doesn't exist, we set the value in the map to be our current edge*,
