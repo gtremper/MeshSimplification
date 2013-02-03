@@ -118,7 +118,7 @@ Mesh::get_neighboring_edges(vector<half_edge*> &res, half_edge* he) {
     loop = loop->next->sym;
   } while (loop != he);
   /** now add the other */
-  loop = he->next->next;
+  loop = he->sym;
   half_edge* other = loop;
   do {
     res.push_back(loop);
