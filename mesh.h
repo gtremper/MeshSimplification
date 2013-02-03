@@ -32,7 +32,7 @@ struct face {
 };
 
 struct half_edge {
-    vertex *v;
+    const vertex *v;
     face *f;
     half_edge *prev, *next, *sym; //clockwise ordering
 };
@@ -43,6 +43,7 @@ class Mesh {
   boost::unordered_map< pair<int, int>, half_edge* > existing_edges;
   vector<half_edge*> edges;
   GLuint arrayBuffer;
+  vertex* verts;
   vertex* bufferVerts;
   GLuint elementArrayBuffer;
   GLuint* bufferInds;

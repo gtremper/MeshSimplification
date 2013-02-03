@@ -5,6 +5,9 @@ Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
 
   int numIndices = vertices.size();
   int numFaces = faces.size();
+  verts = new vertex[numIndices];
+
+  memcpy( &verts, &vertices, sizeof(vertices) );
 
   for (unsigned int i=0; i < faces.size(); i+=1) {
     half_edge* e0 = new half_edge;
@@ -17,6 +20,10 @@ Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
     e1->next = e2;
     e2->prev = e1;
     e2->next = e0;
+
+    e0->v = &vertices[faces[i][0]];
+    e1->v = &vertices[faces[i][1]];
+    e2->v = &vertices[faces[i][2]];
 
     vec3 current_face = faces[i];
 
