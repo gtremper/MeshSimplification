@@ -26,6 +26,7 @@ struct vertex {
 	GLfloat normal[3];
 	GLfloat padding[2];
 	vertex(float,float,float);
+	vertex(vertex*);
 	vertex();
 };
 

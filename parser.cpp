@@ -247,7 +247,7 @@ Mesh* parseOFFmesh(char* filename){
 	float middley = (maxy+miny)/2.0;
 	float middlez = (maxz+minz)/2.0;
 	vec3 makeMiddle(middlex,middley,middlez);
-	float ratio = 2.0/max(max(maxx-minx, maxy-miny), maxz-minz);
+	float ratio = 8.0/max(max(maxx-minx, maxy-miny), maxz-minz);
 	
 	for (int i=0; i<numVerts; i+=1) {
 		vec3 pos = glm::make_vec3(vertices[i]->position);

@@ -43,7 +43,7 @@ Mesh::Mesh(vector<vertex*>& vertices, vector<vec3>& faces) {
 
   glGenBuffers(1, &arrayBuffer);
   glGenBuffers(1, &elementArrayBuffer);
-
+  update_buffer();
 }
 
 Mesh::~Mesh(){
@@ -64,6 +64,16 @@ vertex::vertex(float x, float y, float z) {
 	normal[1] = 0.0;
 	normal[2] = 0.0;
 }
+
+vertex::vertex(vertex* v) {
+	position[0] = v->position[0];
+	position[1] = v->position[1];
+	position[2] = v->position[2];
+	normal[0] = v->normal[0];
+	normal[1] = v->normal[1];
+	normal[2] = v->normal[2];
+}
+
 vertex::vertex(){};
 
 /** Given a half_edge [e] and its two defining vertices [v0,v1], we check if
@@ -121,7 +131,28 @@ Mesh::get_neighboring_vertices(vector<vertex*> &res, half_edge* he) {
 
 void
 Mesh::update_buffer() {
+	vector<GLuint> elements;
+	vector<vertex> verts;
 	
+	boost::unordered_map<vertex*, GLuint> vertMap = boost::unordered_map<vertex*, GLuint>();
+	
+	GLuint counter = 0;
+	for (int i = 0; i<edges.size(); i+=1) {
+		boost::unordered_map<vertex*, GLuint>::iterator 
+			it = vertMap.find(edges[i]->v);
+		if (it != vertMap.end() ) { 
+			elements.push_back(it->second);
+		} else {
+			vertMap[edges[i]->v] = counter;
+			verts.push_back(edges[i]->v);
+			elements.push_back(counter);
+			counter += 1;
+		}
+	}
+	glBindBuffer(GL_ARRAY_BUFFER, arrayBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex)*verts.size(), &verts[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementArrayBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*elements.size(), &elements[0], GL_STATIC_DRAW);
 }
 
 void
