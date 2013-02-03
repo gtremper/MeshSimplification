@@ -32,7 +32,7 @@ struct face {
 };
 
 struct half_edge {
-    const vertex *v;
+    vertex *v;
     face *f;
     half_edge *prev, *next, *sym; //clockwise ordering
 };

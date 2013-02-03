@@ -21,9 +21,9 @@ Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
     e2->prev = e1;
     e2->next = e0;
 
-    e0->v = &vertices[faces[i][0]];
-    e1->v = &vertices[faces[i][1]];
-    e2->v = &vertices[faces[i][2]];
+    e0->v = (vertex*)(&vertices[faces[i][0]]);
+    e1->v = (vertex*)(&vertices[faces[i][1]]);
+    e2->v = (vertex*)(&vertices[faces[i][2]]);
 
     vec3 current_face = faces[i];
 
