@@ -7,6 +7,7 @@ Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
   int numFaces = faces.size();
   verts = new vertex[numIndices];
 
+  /** create local copy of vertices */
   memcpy( &verts, &vertices, sizeof(vertices) );
 
   for (unsigned int i=0; i < faces.size(); i+=1) {
@@ -14,6 +15,7 @@ Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
     half_edge* e1 = new half_edge;
     half_edge* e2 = new half_edge;
 
+    /** populate next/prev edges for each edge in this face */
     e0->prev = e2;
     e0->next = e1;
     e1->prev = e0;
@@ -21,16 +23,19 @@ Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
     e2->prev = e1;
     e2->next = e0;
 
+    /** populate end-vertex for each edge */
     e0->v = (vertex*)(&vertices[faces[i][0]]);
     e1->v = (vertex*)(&vertices[faces[i][1]]);
     e2->v = (vertex*)(&vertices[faces[i][2]]);
 
     vec3 current_face = faces[i];
 
+    /** populate the symmetric edge for the given edge */
     populate_symmetric_edge(e0, current_face[0], current_face[1]);
     populate_symmetric_edge(e1, current_face[1], current_face[2]);
     populate_symmetric_edge(e2, current_face[2], current_face[0]);
 
+    /** add edges to vector */
     edges.push_back(e0);
     edges.push_back(e1);
     edges.push_back(e2);
