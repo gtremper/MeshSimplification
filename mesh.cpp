@@ -59,7 +59,7 @@ Mesh::get_vertex_key(int v0, int v1) {
    if (v0 < v1) 
      return pair<int, int> (v0, v1);
    else
-     return pair<int, int> (v0, v1);
+     return pair<int, int> (v1, v0);
 }
 
 void
