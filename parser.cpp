@@ -196,23 +196,49 @@ Mesh* parseOFFmesh(char* filename){
 	vertices.reserve(numVerts);
 	faces.reserve(numFaces);
 	
-	for (int i=0; i<numVerts; i+=1){
+	float minx = 999999;
+	float maxx = -999999;
+	float miny = 999999;
+	float maxy = -999999;
+	float minz = 999999;
+	float maxz = -999999;
+	
+	for (unsigned int i=0; i<numVerts; i+=1){
 		float x,y,z;
 		getline(myfile, line);
 		stringstream ln(line);
 		ln >> x >> y >> z;
+		minx = min(x,minx);
+		maxx = max(x,maxx);
+		miny = min(y,miny);
+		maxy = max(y,maxy);
+		minz = min(z,minz);
+		maxz = max(z,maxz);
 		vec3 v(x,y,z);
 		vertices.push_back(v);
 	}
 	
-	for (int i=0; i<numFaces; i+=1){
+	for (unsigned int i=0; i<numFaces; i+=1){
 		int v1,v2,v3,junk;
 		getline(myfile, line);
 		stringstream ln(line);
 		ln >> junk >> v1 >> v2 >> v3;
 		vec3 f(v1,v2,v3);
 		faces.push_back(f);
-		}
+	}
+	myfile.close();
+	
+	/*** Center model around origin  ***/
+	
+	myfile.close();
+	vec3 moveMiddle((maxx+minx)/2.0, (maxy+miny)/2.0, (maxz+minz)/2.0);
+	float ratio = 2.0/max(max(maxx-minx, maxy-miny), maxz-minz);
+	
+	for(int i=0; i<numVerts; i+=1){
+		vertices[i] = (vertices[i] - moveMiddle) * ratio;
+	}
+	
+	
 	
     return new Mesh(vertices, faces);
 }
