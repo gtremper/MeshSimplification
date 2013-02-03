@@ -34,7 +34,7 @@ struct face {
 struct half_edge {
     vertex *v;
     face *f;
-    half_edge *prev, *next, *sym; //clockwise ordering
+    half_edge *prev, *next, *sym; //anti-clockwise ordering
 };
 
 /********* Comprehensive Mesh definition **********/
@@ -46,10 +46,10 @@ class Mesh {
   vertex* bufferVerts;
   GLuint elementArrayBuffer;
   GLuint* bufferInds;
-  int numIndices;
+  unsigned int numIndices;
   public:
     /** const vector vertices (type vertex), const vector faces (type vec3) */
-    Mesh(const vector<vertex>& vertices, const vector<vec3>& faces);
+    Mesh(vector<vec3>& vertices, vector<vec3>& faces);
     bool populate_symmetric_edge(half_edge* e, int v0, int v1);
     pair<int, int> get_vertex_key(int v0, int v1);
     void get_neighboring_edges(vector<half_edge*> &res, half_edge* he);

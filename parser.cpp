@@ -97,7 +97,7 @@ void parseOFF(char* filename){
 		exit(1);
 	}
 	
-	vector<vec3> verticies; // vectors
+	vector<vec3> vertices; // vectors
 	vector<vec3> faces; // faces
 	int numVerts, numFaces;
 	string line;
@@ -108,6 +108,9 @@ void parseOFF(char* filename){
 	stringstream firstln(line);
 	firstln >> numVerts >> numFaces;
 	
+	vertices.reserve(numVerts);
+	faces.reserve(numFaces);
+	
 	vertex* verts = new vertex[numVerts];
 	for (int i=0; i<numVerts; i+=1){
 		float x,y,z;
@@ -115,7 +118,7 @@ void parseOFF(char* filename){
 		stringstream ln(line);
 		ln >> x >> y >> z;
 		vec3 v(x,y,z);
-		verticies.push_back(v);
+		vertices.push_back(v);
         verts[i] = (vertex){ v[0], v[1], v[2], 0.0, 0.0, 0.0, 0.0,0.0};
 	}
 	
@@ -138,9 +141,9 @@ void parseOFF(char* filename){
 		inds[3*i+1] = ind1;
 		inds[3*i+2] = ind2;
 		
-		vec3 v0 = verticies[ind0];
-		vec3 v1 = verticies[ind1];
-		vec3 v2 = verticies[ind2];
+		vec3 v0 = vertices[ind0];
+		vec3 v1 = vertices[ind1];
+		vec3 v2 = vertices[ind2];
 		vec3 norm = glm::cross(v1-v0,v2-v0);
 		verts[ind0].normal[0] += norm[0];
 		verts[ind0].normal[1] += norm[1];
@@ -159,8 +162,8 @@ void parseOFF(char* filename){
 		verts[i].normal[1] = normal[1];
 		verts[i].normal[2] = normal[2];
 	}
-    vector<vertex> tmp_verts = vector<vertex>(verts, verts+numVerts);
-    Mesh m = Mesh( tmp_verts, faces );
+	
+    Mesh m = Mesh(vertices, faces);
 	
 	glGenBuffers(1, &meshArrayBuffer);
 	glGenBuffers(1, &meshElementArrayBuffer);

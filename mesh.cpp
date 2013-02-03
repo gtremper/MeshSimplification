@@ -1,12 +1,12 @@
 #include "mesh.h"
 using namespace std;
 
-Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
+Mesh::Mesh(vector<vec3>& vertices, vector<vec3>& faces) {
 
-  int numIndices = vertices.size();
-  int numFaces = faces.size();
+  numIndices = vertices.size();
+  unsigned int numFaces = faces.size();
 
-  for (unsigned int i=0; i < faces.size(); i+=1) {
+  for (unsigned int i=0; i < numFaces; i+=1) {
     half_edge* e0 = new half_edge;
     half_edge* e1 = new half_edge;
     half_edge* e2 = new half_edge;
@@ -20,16 +20,21 @@ Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
     e2->next = e0;
 
     /** populate end-vertex for each edge */
-    e0->v = (vertex*)(&vertices[faces[i][0]]);
-    e1->v = (vertex*)(&vertices[faces[i][1]]);
-    e2->v = (vertex*)(&vertices[faces[i][2]]);
-
-    vec3 current_face = faces[i];
-
+	unsigned int v0 = faces[i][0];
+	unsigned int v1 = faces[i][1];
+	unsigned int v2 = faces[i][2];
+	
+	e0->v = new vertex();
+	memcpy(e0->v, &(vertices[v0]), sizeof(float)*3);
+	e1->v = new vertex();
+	memcpy(e1->v, &(vertices[v1]), sizeof(float)*3);
+	e2->v = new vertex();
+	memcpy(e2->v, &(vertices[v2]), sizeof(float)*3);
+	
     /** populate the symmetric edge for the given edge */
-    populate_symmetric_edge(e0, current_face[0], current_face[1]);
-    populate_symmetric_edge(e1, current_face[1], current_face[2]);
-    populate_symmetric_edge(e2, current_face[2], current_face[0]);
+    populate_symmetric_edge(e0, v0, v1);
+    populate_symmetric_edge(e1, v1, v2);
+    populate_symmetric_edge(e2, v2, v0);
 
     /** add edges to vector */
     edges.push_back(e0);
