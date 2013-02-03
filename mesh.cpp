@@ -26,6 +26,10 @@ Mesh::Mesh(vector<vertex*>& vertices, vector<vec3>& faces) {
 	unsigned int v1 = faces[i][1];
 	unsigned int v2 = faces[i][2];
 	
+	e0->v = vertices[v0];
+	e1->v = vertices[v1];
+	e2->v = vertices[v2];
+	
     /** populate the symmetric edge for the given edge */
 	populate_symmetric_edge(e0, v0, v1);
 	populate_symmetric_edge(e1, v1, v2);
