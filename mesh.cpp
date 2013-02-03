@@ -82,6 +82,16 @@ Mesh::get_neighboring_edges(half_edge* he) {
   } while (loop != he);
 }
 
+vector<vertex*>
+Mesh::get_neighboring_vertices(half_edge* he) {
+    vector<vertex*> res;
+    half_edge* loop = he;
+    do {
+      res.push_back(loop->v);
+      loop = loop->next->sym;
+    } while (loop != he);
+}
+
 void
 Mesh::draw() {
 	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
