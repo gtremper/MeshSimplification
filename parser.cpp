@@ -219,28 +219,40 @@ Mesh* parseOFFmesh(char* filename){
 	}
 	
 	for (int i=0; i<numFaces; i+=1){
-		int v1,v2,v3,junk;
+		int vid0,vid1,vid2,junk;
 		getline(myfile, line);
 		stringstream ln(line);
-		ln >> junk >> v1 >> v2 >> v3;
-		vec3 f(v1,v2,v3);
+		ln >> junk >> vid0 >> vid1 >> vid2;
+		vec3 f(vid0,vid1,vid2);
 		faces.push_back(f);
+		vec3 v0 = glm::make_vec3(vertices[vid0]->position);
+		vec3 v1 = glm::make_vec3(vertices[vid1]->position);
+		vec3 v2 = glm::make_vec3(vertices[vid2]->position);
+		vec3 norm = glm::cross(v1-v0,v2-v0);
+		vertices[vid0]->normal[0] += norm[0];
+		vertices[vid0]->normal[1] += norm[1];
+		vertices[vid0]->normal[2] += norm[2];
+		vertices[vid1]->normal[0] += norm[0];
+		vertices[vid1]->normal[1] += norm[1];
+		vertices[vid1]->normal[2] += norm[2];
+		vertices[vid2]->normal[0] += norm[0];
+		vertices[vid2]->normal[1] += norm[1];
+		vertices[vid2]->normal[2] += norm[2];
 	}
 	myfile.close();
 	
 	/*** Center model around origin  ***/
 	
-	myfile.close();
 	float middlex = (maxx+minx)/2.0;
 	float middley = (maxy+miny)/2.0;
 	float middlez = (maxz+minz)/2.0;
+	vec3 makeMiddle(middlex,middley,middlez);
 	float ratio = 2.0/max(max(maxx-minx, maxy-miny), maxz-minz);
 	
 	for (int i=0; i<numVerts; i+=1) {
-		vertices[i]->position[0] = (vertices[i]->position[0] - middlex) * ratio;
-		vertices[i]->position[1] = (vertices[i]->position[1] - middley) * ratio;
-		vertices[i]->position[2] = (vertices[i]->position[2] - middlez) * ratio;
-		
+		vec3 pos = glm::make_vec3(vertices[i]->position);
+		pos = (pos - makeMiddle) * ratio;
+		memcpy(vertices[i]->position, &pos, sizeof(float)*3);
 	}
 	
     return new Mesh(vertices, faces);
