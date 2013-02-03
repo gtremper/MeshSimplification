@@ -162,11 +162,11 @@ Mesh::update_buffer() {
 	boost::unordered_map<vertex*, GLuint> vertMap = boost::unordered_map<vertex*, GLuint>();
 	
 	GLuint counter = 0;
-	for (int i = 0; i<edges.size(); i+=1) {
-		boost::unordered_map<vertex*, GLuint>::iterator 
-			it = vertMap.find(edges[i]->v);
-		if (it != vertMap.end() ) { 
-			elements.push_back(it->second);
+	for (int i=0; i<edges.size(); i+=1) {
+		boost::unordered_map<vertex*, GLuint>::iterator
+			mapit = vertMap.find(edges[i]->v);
+		if (mapit != vertMap.end() ) { 
+			elements.push_back(mapit->second);
 		} else {
 			vertMap[edges[i]->v] = counter;
 			verts.push_back(edges[i]->v);
