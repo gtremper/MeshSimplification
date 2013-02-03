@@ -135,6 +135,28 @@ Mesh::get_neighboring_vertices(vector<vertex*> &res, half_edge* he) {
     } while (loop != he);
 }
 
+/** Collapses half_edge* [he] and sets the surrounding edges to point to
+ * a new vertex v_m that is the midpoint of [he]'s two defining vertices.
+ * I know I'm probably forgetting to set some edges, but here are my
+ * initial thoughts:
+ */
+
+void
+Mesh::collapse_edge(half_edge* he) {
+	//TODO: write method to find midpoint, adjust normals, etc
+	vertex* midpoint = new vertex();
+	/** set vertices of edge to be the midpoint */
+	he->v = midpoint;
+	he->sym->v = midpoint;
+
+	//TODO: check what edges actually need to be collapsed
+	/** combine collapsed edges */
+	he->next = he->prev->sym;
+	he->next->sym = he->prev;
+	he->sym->next = he->sym->prev->sym;
+	he->sym->next->sym = he->sym->prev;
+}
+
 void
 Mesh::update_buffer() {
 	vector<GLuint> elements;

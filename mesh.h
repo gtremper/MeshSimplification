@@ -54,6 +54,7 @@ class Mesh {
     pair<int, int> get_vertex_key(int v0, int v1);
     void get_neighboring_edges(vector<half_edge*> &res, half_edge* he);
     void get_neighboring_vertices(vector<vertex*> &res, half_edge* he);
+    void collapse_edge(half_edge* he);
 	void update_buffer();
 	void draw();
 };
