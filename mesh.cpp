@@ -66,12 +66,7 @@ vertex::vertex(float x, float y, float z) {
 }
 
 vertex::vertex(vertex* v) {
-	position[0] = v->position[0];
-	position[1] = v->position[1];
-	position[2] = v->position[2];
-	normal[0] = v->normal[0];
-	normal[1] = v->normal[1];
-	normal[2] = v->normal[2];
+	memcpy(&position, v, sizeof(vertex));
 }
 
 vertex::vertex(){};
@@ -162,6 +157,8 @@ Mesh::update_buffer() {
 	vector<GLuint> elements;
 	vector<vertex> verts;
 	
+	int gtime = glutGet(GLUT_ELAPSED_TIME);
+	
 	boost::unordered_map<vertex*, GLuint> vertMap = boost::unordered_map<vertex*, GLuint>();
 	
 	GLuint counter = 0;
@@ -181,6 +178,8 @@ Mesh::update_buffer() {
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex)*verts.size(), &verts[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementArrayBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*elements.size(), &elements[0], GL_STATIC_DRAW);
+	
+	cout <<"Time to draw: " << glutGet(GLUT_ELAPSED_TIME)-gtime << endl;
 }
 
 void
