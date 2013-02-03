@@ -5,10 +5,6 @@ Mesh::Mesh (const vector<vertex>& vertices, const vector<vec3>& faces) {
 
   int numIndices = vertices.size();
   int numFaces = faces.size();
-  verts = new vertex[numIndices];
-
-  /** create local copy of vertices */
-  memcpy( &verts, &vertices, sizeof(vertices) );
 
   for (unsigned int i=0; i < faces.size(); i+=1) {
     half_edge* e0 = new half_edge;
@@ -76,27 +72,24 @@ Mesh::get_vertex_key(int v0, int v1) {
 
 /** given a half_edge pointer he, return a vector of pointers
  * to all the neighboring edges */
-
-vector<half_edge*>
-Mesh::get_neighboring_edges(half_edge* he) {
-  vector<half_edge*> res;
+//TODO: do this for both vertices
+//TODO: change to base vertex, not end vertex
+void
+Mesh::get_neighboring_edges(vector<half_edge*> &res, half_edge* he) {
   half_edge* loop = he;
   do {
     res.push_back(loop);
     loop = loop->next->sym;
   } while (loop != he);
-  return res;
 }
 
-vector<vertex*>
-Mesh::get_neighboring_vertices(half_edge* he) {
-    vector<vertex*> res;
+void
+Mesh::get_neighboring_vertices(vector<vertex*> &res, half_edge* he) {
     half_edge* loop = he;
     do {
       res.push_back((vertex*)loop->v);
       loop = loop->next->sym;
     } while (loop != he);
-    return res;
 }
 
 void

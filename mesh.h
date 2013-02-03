@@ -43,7 +43,6 @@ class Mesh {
   boost::unordered_map< pair<int, int>, half_edge* > existing_edges;
   vector<half_edge*> edges;
   GLuint arrayBuffer;
-  vertex* verts;
   vertex* bufferVerts;
   GLuint elementArrayBuffer;
   GLuint* bufferInds;
@@ -53,8 +52,8 @@ class Mesh {
     Mesh(const vector<vertex>& vertices, const vector<vec3>& faces);
     bool populate_symmetric_edge(half_edge* e, int v0, int v1);
     pair<int, int> get_vertex_key(int v0, int v1);
-    vector<half_edge*> get_neighboring_edges(half_edge* he);
-    vector<vertex*> get_neighboring_vertices(half_edge* he);
+    void get_neighboring_edges(vector<half_edge*> &res, half_edge* he);
+    void get_neighboring_vertices(vector<vertex*> &res, half_edge* he);
 	void draw();
 };
 
