@@ -57,12 +57,8 @@ half_edge::~half_edge(){
 }
 
 vertex::vertex(float x, float y, float z) {
-	position[0] = x;
-	position[1] = y;
-	position[2] = z;
-	normal[0] = 0.0;
-	normal[1] = 0.0;
-	normal[2] = 0.0;
+	position = vec3(x,y,z);
+	normal = vec3(0.0f,0.0f,0.0f);
 }
 
 vertex::vertex(vertex* v) {

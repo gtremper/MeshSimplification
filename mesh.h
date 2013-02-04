@@ -9,6 +9,7 @@
 #include <iostream>
 #include <utility>
 #include <boost/unordered_map.hpp>
+#include <boost/smart_ptr/shared_ptr.hpp>
 
 #define BUFFER_OFFSET(i) (reinterpret_cast<void*>(i))
 
@@ -16,6 +17,7 @@ typedef glm::mat3 mat3 ;
 typedef glm::mat4 mat4 ; 
 typedef glm::vec3 vec3 ; 
 typedef glm::vec4 vec4 ;
+
 
 using namespace std;
 
@@ -29,6 +31,8 @@ struct vertex {
 	vertex(vertex*);
 	vertex();
 };
+
+typedef boost::shared_ptr<vertex> vertexPtr;
 
 struct half_edge {
     vertex *v;
