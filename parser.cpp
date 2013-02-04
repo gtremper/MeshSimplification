@@ -134,19 +134,13 @@ Mesh* parseOFF(char* filename){
 		ln >> junk >> vid0 >> vid1 >> vid2;
 		vec3 f(vid0,vid1,vid2);
 		faces.push_back(f);
-		vec3 v0 = glm::make_vec3(vertices[vid0]->position);
-		vec3 v1 = glm::make_vec3(vertices[vid1]->position);
-		vec3 v2 = glm::make_vec3(vertices[vid2]->position);
+		vec3 v0 = vertices[vid0]->position;
+		vec3 v1 = vertices[vid1]->position;
+		vec3 v2 = vertices[vid2]->position;
 		vec3 norm = glm::cross(v1-v0,v2-v0);
-		vertices[vid0]->normal[0] += norm[0];
-		vertices[vid0]->normal[1] += norm[1];
-		vertices[vid0]->normal[2] += norm[2];
-		vertices[vid1]->normal[0] += norm[0];
-		vertices[vid1]->normal[1] += norm[1];
-		vertices[vid1]->normal[2] += norm[2];
-		vertices[vid2]->normal[0] += norm[0];
-		vertices[vid2]->normal[1] += norm[1];
-		vertices[vid2]->normal[2] += norm[2];
+		vertices[vid0]->normal += norm;
+		vertices[vid1]->normal += norm;
+		vertices[vid2]->normal += norm;
 	}
 	myfile.close();
 	
@@ -159,13 +153,10 @@ Mesh* parseOFF(char* filename){
 	float ratio = 8.0/max(max(maxx-minx, maxy-miny), maxz-minz);
 	
 	for (int i=0; i<numVerts; i+=1) {
-		vec3 pos = glm::make_vec3(vertices[i]->position);
-		pos = (pos - makeMiddle) * ratio;
-		memcpy(vertices[i]->position, &pos, sizeof(float)*3);
+		vertices[i]->position -= makeMiddle;
+		vertices[i]->position *= ratio;
 		
-		vec3 normal = glm::make_vec3(vertices[i]->normal);
-		normal = glm::normalize(normal);
-		memcpy(vertices[i]->normal, &normal, sizeof(float)*3);
+		vertices[i]->normal = glm::normalize(vertices[i]->normal);
 	}
 	
     return new Mesh(vertices, faces);

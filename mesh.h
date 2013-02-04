@@ -22,8 +22,8 @@ using namespace std;
 /********* Data Structures for Winged Edges ***********/
 
 struct vertex {
-	GLfloat position[3]; 
-	GLfloat normal[3];
+	vec3 position; 
+	vec3 normal;
 	GLfloat padding[2];
 	vertex(float,float,float);
 	vertex(vertex*);
