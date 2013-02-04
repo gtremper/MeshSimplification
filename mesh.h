@@ -32,6 +32,8 @@ struct vertex {
 	vertex();
 };
 
+void get_midpoint(vertex* res, vertex* v1, vertex* v2);
+
 typedef boost::shared_ptr<vertex> vertexPtr;
 
 struct half_edge {
@@ -43,7 +45,6 @@ struct half_edge {
 /********* Comprehensive Mesh definition **********/
 
 class Mesh {
-  boost::unordered_map< pair<int, int>, half_edge* > existing_edges;
   vector<half_edge*> edges;
   GLuint arrayBuffer;
   vertex* bufferVerts;
@@ -51,6 +52,7 @@ class Mesh {
   GLuint* bufferInds;
   unsigned int numIndices;
   public:
+    boost::unordered_map< pair<int, int>, half_edge* > existing_edges;
     /** const vector vertices (type vertex), const vector faces (type vec3) **/
     Mesh(vector<vertex*>& vertices, vector<vec3>& faces);
 	~Mesh();

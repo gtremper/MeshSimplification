@@ -1,6 +1,12 @@
 #include "mesh.h"
 using namespace std;
 
+void
+get_midpoint(vertex* res, vertex* v1, vertex* v2) {
+  res->position = (v1->position + v2->position) / 2.0f;
+  res->normal = (v1->normal + v2->normal) / 2.0f;
+}
+
 Mesh::Mesh(vector<vertex*>& vertices, vector<vec3>& faces) {
 
   unsigned int numFaces = faces.size();
@@ -136,6 +142,7 @@ void
 Mesh::collapse_edge(half_edge* he) {
 	//TODO: write method to find midpoint, adjust normals, etc
 	vertex* midpoint = new vertex();
+	get_midpoint(midpoint, he->v, he->sym->v);
 	/** set vertices of edge to be the midpoint */
 	he->v = midpoint;
 	he->sym->v = midpoint;
