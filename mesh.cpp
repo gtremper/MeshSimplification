@@ -111,14 +111,20 @@ Mesh::get_neighboring_edges(vector<half_edge*> &res, half_edge* he) {
   half_edge* loop = he;
   /** add one vertex of the half_edge */
   do {
+	if (loop == NULL)
+	  break;
     res.push_back(loop);
+    res.push_back(loop->sym);
     loop = loop->next->sym;
   } while (loop != he);
   /** now add the other */
   loop = he->sym;
   half_edge* other = loop;
   do {
+	if (loop == NULL)
+	  break;
     res.push_back(loop);
+    res.push_back(loop->sym);
     loop = loop->next->sym;
   } while (loop != he && loop != other);
 }
@@ -140,19 +146,25 @@ Mesh::get_neighboring_vertices(vector<vertex*> &res, half_edge* he) {
 
 void
 Mesh::collapse_edge(half_edge* he) {
-	//TODO: write method to find midpoint, adjust normals, etc
 	vertex* midpoint = new vertex();
 	get_midpoint(midpoint, he->v, he->sym->v);
 	/** set vertices of edge to be the midpoint */
-	he->v = midpoint;
-	he->sym->v = midpoint;
+	vector<half_edge*> neighbors;
+	get_neighboring_edges(neighbors, he);
+	vector<half_edge*>::iterator it;
+	for (unsigned int i = 0; i < neighbors.size(); i++) {
+		if (neighbors[i]->v == he->v || neighbors[i]->v == he->sym->v) {
+			neighbors[i]->v = midpoint;
+		}
+	}
 
-	//TODO: check what edges actually need to be collapsed
-	/** combine collapsed edges */
-	he->next = he->prev->sym;
-	he->next->sym = he->prev;
-	he->sym->next = he->sym->prev->sym;
-	he->sym->next->sym = he->sym->prev;
+	edges.erase(remove(edges.begin(), edges.end(), he->prev), edges.end());
+	edges.erase(remove(edges.begin(), edges.end(), he->next), edges.end());
+	edges.erase(remove(edges.begin(), edges.end(), he), edges.end());
+	edges.erase(remove(edges.begin(), edges.end(), he->sym->prev), edges.end());
+	edges.erase(remove(edges.begin(), edges.end(), he->sym->next), edges.end());
+	edges.erase(remove(edges.begin(), edges.end(), he->sym), edges.end());
+	numIndices = edges.size();
 }
 
 void
@@ -166,7 +178,16 @@ Mesh::update_buffer() {
 	int gtime = glutGet(GLUT_ELAPSED_TIME);
 	
 	boost::unordered_map<vertex*, GLuint> vertMap = boost::unordered_map<vertex*, GLuint>();
-	
+
+	pair<int, int> edge_key = make_pair(9,11);
+	half_edge* he = existing_edges[edge_key];
+	vector<half_edge*> neighbors;
+	get_neighboring_edges(neighbors, he);
+	vector<half_edge*>::iterator it;
+	for (it = neighbors.begin(); it != neighbors.end(); it++) {
+	  cout << (*it)->v << endl;
+	}
+
 	GLuint counter = 0;
 	for (int i=0; i<edges.size(); i+=1) {
 		boost::unordered_map<vertex*, GLuint>::iterator
