@@ -146,6 +146,7 @@ void keyboard(unsigned char key, int x, int y) {
 		printHelp();
 		break;
 	case 27:  // Escape to quit
+		delete mesh;
 		exit(0);
 		break; 
 	case 'p':
