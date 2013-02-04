@@ -33,6 +33,10 @@ bool useFlat;
 bool moveLight;
 bool cameraMode;
 bool animate;
+bool collapse;
+pair<int, int> edge_key;
+half_edge* edge;
+boost::unordered_map< pair<int, int>, half_edge* >::iterator it;
 
 /***  SCENE PARAMETERS  ***/
 GLuint vertexshader, fragmentshader, shaderprogram ; // shaders
@@ -81,6 +85,8 @@ void printHelp() {
 			<< "use 'wasd' to move object.\n"
 			<< "use 'c' to move camera.\n"
 			<< "use 'm' to animate.\n"
+			<< "use 'l' to trigger edge collapse.\n"
+			<< "(currently only works on Models/collapsetest.off)\n"
 			<< "use '1-9' to move lights.\n"
 			<< "press ESC to quit.\n\n";	
 }
@@ -175,6 +181,16 @@ void keyboard(unsigned char key, int x, int y) {
 		animate = !animate;
 		lastTime = glutGet(GLUT_ELAPSED_TIME);
 		cout << "Animate is now set to" << (animate ? " true " : " false ") << "\n";
+		break;
+	case 'l':
+		collapse = true;
+		cout << "Attempting to collapse middle edge" << endl;
+		edge_key = make_pair(9,11);
+		edge = mesh->existing_edges[edge_key];
+		if (edge != NULL)
+			mesh->collapse_edge(edge);
+		mesh->update_buffer();
+		mesh->draw();
 		break;
 	case 48: //0
 	case 49: //1
