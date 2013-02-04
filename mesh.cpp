@@ -68,6 +68,7 @@ vertex::vertex(float x, float y, float z) {
 }
 
 vertex::vertex(vertex* v) {
+	cout << "COPY" << endl;
 	memcpy(&position, v, sizeof(vertex));
 }
 
@@ -132,9 +133,10 @@ Mesh::get_neighboring_edges(vector<half_edge*> &res, half_edge* he) {
 void
 Mesh::get_neighboring_vertices(vector<vertex*> &res, half_edge* he) {
     half_edge* loop = he;
+	cout << "NEIGHBOR TEST" <<endl;
     do {
-      res.push_back((vertex*)loop->v);
-      loop = loop->next->sym;
+    	res.push_back(loop->v);
+    	loop = loop->next->sym;
     } while (loop != he);
 }
 
@@ -149,21 +151,27 @@ Mesh::collapse_edge(half_edge* he) {
 	vertex* midpoint = new vertex();
 	get_midpoint(midpoint, he->v, he->sym->v);
 	/** set vertices of edge to be the midpoint */
-	vector<half_edge*> neighbors;
-	get_neighboring_edges(neighbors, he);
-	vector<half_edge*>::iterator it;
-	for (unsigned int i = 0; i < neighbors.size(); i++) {
-		if (neighbors[i]->v == he->v || neighbors[i]->v == he->sym->v) {
-			neighbors[i]->v = midpoint;
-		}
-	}
-
+	
 	edges.erase(remove(edges.begin(), edges.end(), he->prev), edges.end());
 	edges.erase(remove(edges.begin(), edges.end(), he->next), edges.end());
 	edges.erase(remove(edges.begin(), edges.end(), he), edges.end());
 	edges.erase(remove(edges.begin(), edges.end(), he->sym->prev), edges.end());
 	edges.erase(remove(edges.begin(), edges.end(), he->sym->next), edges.end());
 	edges.erase(remove(edges.begin(), edges.end(), he->sym), edges.end());
+	
+	vector<half_edge*> neighbors;
+	get_neighboring_edges(neighbors, he);
+	vector<half_edge*>::iterator it;
+	for (unsigned int i = 0; i < neighbors.size(); i++) {
+		if (neighbors[i]->v == he->v || neighbors[i]->v == he->sym->v) {
+			//neighbors[i]->v = midpoint;
+			neighbors[i]->v->position = midpoint->position;
+			neighbors[i]->v->normal = midpoint->normal;
+		}
+	}
+	
+	delete midpoint;
+
 	numIndices = edges.size();
 }
 
@@ -187,7 +195,8 @@ Mesh::update_buffer() {
 	for (it = neighbors.begin(); it != neighbors.end(); it++) {
 	  cout << (*it)->v << endl;
 	}
-
+	
+	cout << "creating buffer" << endl;
 	GLuint counter = 0;
 	for (int i=0; i<edges.size(); i+=1) {
 		boost::unordered_map<vertex*, GLuint>::iterator
