@@ -157,6 +157,9 @@ Mesh::collapse_edge(half_edge* he) {
 
 void
 Mesh::update_buffer() {
+	glBindBuffer(GL_ARRAY_BUFFER, NULL);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, NULL);
+	
 	vector<GLuint> elements;
 	vector<vertex> verts;
 	
