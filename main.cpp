@@ -183,15 +183,9 @@ void keyboard(unsigned char key, int x, int y) {
 		cout << "Animate is now set to" << (animate ? " true " : " false ") << "\n";
 		break;
 	case 'l':
-		collapse = true;
-		cout << "Attempting to collapse middle edge" << endl;
-		edge_key = make_pair(9,11);
-		edge = mesh->existing_edges[edge_key];
-		if (edge != NULL) {
-			mesh->collapse_edge(edge);
-		}
+		edge = NULL;
+		mesh->collapse_edge(edge);
 		mesh->update_buffer();
-		mesh->draw();
 		break;
 	case 48: //0
 	case 49: //1
@@ -320,7 +314,15 @@ void display() {
 	
 	mv = glm::rotate(mv,yaw,UP);
 	mv = glm::rotate(mv,pitch,LEFT);
-	glLoadMatrixf(&mv[0][0]); 
+	glLoadMatrixf(&mv[0][0]);
+	
+	edge = NULL;
+	mesh->collapse_edge(edge);
+	mesh->update_buffer();
+	mesh->collapse_edge(edge);
+	mesh->update_buffer();
+	mesh->collapse_edge(edge);
+	mesh->update_buffer();
 	
 	mesh->draw();
 	

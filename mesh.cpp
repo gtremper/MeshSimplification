@@ -151,6 +151,9 @@ Mesh::get_neighboring_vertices(vector<vertex*> &res, half_edge* he) {
 
 void
 Mesh::collapse_edge(half_edge* he) {
+	he = edges[rand() % edges.size()];
+	
+	
 	vertex* midpoint = new vertex();
 	get_midpoint(midpoint, he->v, he->sym->v);
 	
@@ -174,12 +177,12 @@ Mesh::collapse_edge(half_edge* he) {
 	delete he->v;
 	delete he->sym->v;
 	
-	delete he->prev;
-	delete he->next;
-	delete he;
 	delete he->sym->prev;
 	delete he->sym->next;
 	delete he->sym;
+	delete he->prev;
+	delete he->next;
+	delete he;
 	
 	numIndices = edges.size();
 }
