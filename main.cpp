@@ -188,15 +188,6 @@ void keyboard(unsigned char key, int x, int y) {
 		edge_key = make_pair(9,11);
 		edge = mesh->existing_edges[edge_key];
 		if (edge != NULL) {
-			pair<int, int> edge_key = make_pair(9,11);
-			half_edge* he = mesh->existing_edges[edge_key];
-			vector<half_edge*> neighbors;
-			mesh->get_neighboring_edges(neighbors, he);
-			vector<half_edge*>::iterator it;
-			for (it = neighbors.begin(); it != neighbors.end(); it++) {
-			  cout << (*it)->v << endl;
-			}
-			cout << endl;
 			mesh->collapse_edge(edge);
 		}
 		mesh->update_buffer();

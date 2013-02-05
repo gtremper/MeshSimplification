@@ -59,7 +59,6 @@ Mesh::~Mesh(){
 }
 
 half_edge::~half_edge(){
-	delete v;
 }
 
 vertex::vertex(float x, float y, float z) {
@@ -68,7 +67,6 @@ vertex::vertex(float x, float y, float z) {
 }
 
 vertex::vertex(vertex* v) {
-	cout << "COPY" << endl;
 	memcpy(&position, v, sizeof(vertex));
 }
 
@@ -109,25 +107,24 @@ Mesh::get_vertex_key(int v0, int v1) {
  * to all the neighboring edges */
 void
 Mesh::get_neighboring_edges(vector<half_edge*> &res, half_edge* he) {
-  half_edge* loop = he;
+  half_edge* loop = he->prev->sym;
   /** add one vertex of the half_edge */
   do {
 	if (loop == NULL)
 	  break;
     res.push_back(loop);
     res.push_back(loop->sym);
-    loop = loop->next->sym;
+    loop = loop->prev->sym;
   } while (loop != he);
   /** now add the other */
-  loop = he->sym;
-  half_edge* other = loop;
+  loop = he->sym->prev->sym;
   do {
 	if (loop == NULL)
 	  break;
     res.push_back(loop);
     res.push_back(loop->sym);
-    loop = loop->next->sym;
-  } while (loop != he && loop != other);
+    loop = loop->prev->sym;
+  } while (loop != he->sym);
 }
 
 void
@@ -150,8 +147,17 @@ void
 Mesh::collapse_edge(half_edge* he) {
 	vertex* midpoint = new vertex();
 	get_midpoint(midpoint, he->v, he->sym->v);
-	/** set vertices of edge to be the midpoint */
 	
+	vector<half_edge*> neighbors;
+	get_neighboring_edges(neighbors, he);
+	vector<half_edge*>::iterator it;
+	for (unsigned int i = 0; i < neighbors.size(); i++) {
+		if (neighbors[i]->v == he->v || neighbors[i]->v == he->sym->v) {
+			neighbors[i]->v = midpoint;
+		}
+	}
+	
+	/* Remove edges from faces that disapear */
 	edges.erase(remove(edges.begin(), edges.end(), he->prev), edges.end());
 	edges.erase(remove(edges.begin(), edges.end(), he->next), edges.end());
 	edges.erase(remove(edges.begin(), edges.end(), he), edges.end());
@@ -159,19 +165,16 @@ Mesh::collapse_edge(half_edge* he) {
 	edges.erase(remove(edges.begin(), edges.end(), he->sym->next), edges.end());
 	edges.erase(remove(edges.begin(), edges.end(), he->sym), edges.end());
 	
-	vector<half_edge*> neighbors;
-	get_neighboring_edges(neighbors, he);
-	vector<half_edge*>::iterator it;
-	for (unsigned int i = 0; i < neighbors.size(); i++) {
-		if (neighbors[i]->v == he->v || neighbors[i]->v == he->sym->v) {
-			//neighbors[i]->v = midpoint;
-			neighbors[i]->v->position = midpoint->position;
-			neighbors[i]->v->normal = midpoint->normal;
-		}
-	}
+	delete he->v;
+	delete he->sym->v;
 	
-	delete midpoint;
-
+	delete he->prev;
+	delete he->next;
+	delete he;
+	delete he->sym->prev;
+	delete he->sym->next;
+	delete he->sym;
+	
 	numIndices = edges.size();
 }
 
@@ -186,17 +189,9 @@ Mesh::update_buffer() {
 	int gtime = glutGet(GLUT_ELAPSED_TIME);
 	
 	boost::unordered_map<vertex*, GLuint> vertMap = boost::unordered_map<vertex*, GLuint>();
-
-	pair<int, int> edge_key = make_pair(9,11);
-	half_edge* he = existing_edges[edge_key];
-	vector<half_edge*> neighbors;
-	get_neighboring_edges(neighbors, he);
-	vector<half_edge*>::iterator it;
-	for (it = neighbors.begin(); it != neighbors.end(); it++) {
-	  cout << (*it)->v << endl;
-	}
 	
-	cout << "creating buffer" << endl;
+	cout << "size: " << edges.size() << endl;
+	
 	GLuint counter = 0;
 	for (int i=0; i<edges.size(); i+=1) {
 		boost::unordered_map<vertex*, GLuint>::iterator
