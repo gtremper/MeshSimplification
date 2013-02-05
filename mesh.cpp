@@ -15,19 +15,19 @@ Mesh::Mesh(vector<vertex*>& vertices, vector<vec3>& faces) {
   existing_edges = boost::unordered_map< pair<int, int>, half_edge* >();
 
   for (unsigned int i=0; i < numFaces; i+=1) {
-    half_edge* e0 = new half_edge();
-    half_edge* e1 = new half_edge();
-    half_edge* e2 = new half_edge();
+	half_edge* e0 = new half_edge();
+	half_edge* e1 = new half_edge();
+	half_edge* e2 = new half_edge();
 
-    /** populate next/prev edges for each edge in this face */
-    e0->prev = e2;
-    e0->next = e1;
-    e1->prev = e0;
-    e1->next = e2;
-    e2->prev = e1;
-    e2->next = e0;
+	/** populate next/prev edges for each edge in this face */
+	e0->prev = e2;
+	e0->next = e1;
+	e1->prev = e0;
+	e1->next = e2;
+	e2->prev = e1;
+	e2->next = e0;
 
-    /** populate end-vertex for each edge */
+	/** populate end-vertex for each edge */
 	unsigned int v0 = faces[i][0];
 	unsigned int v1 = faces[i][1];
 	unsigned int v2 = faces[i][2];
@@ -36,15 +36,15 @@ Mesh::Mesh(vector<vertex*>& vertices, vector<vec3>& faces) {
 	e1->v = vertices[v1];
 	e2->v = vertices[v2];
 	
-    /** populate the symmetric edge for the given edge */
+	/** populate the symmetric edge for the given edge */
 	populate_symmetric_edge(e0, v0, v1);
 	populate_symmetric_edge(e1, v1, v2);
 	populate_symmetric_edge(e2, v2, v0);
 
-    /** add edges to vector */
-    edges.push_back(e0);
-    edges.push_back(e1);
-    edges.push_back(e2);
+	/** add edges to vector */
+	edges.push_back(e0);
+	edges.push_back(e1);
+	edges.push_back(e2);
   }
 
   glGenBuffers(1, &arrayBuffer);
@@ -83,14 +83,14 @@ bool
 Mesh::populate_symmetric_edge(half_edge* e, int v0, int v1) {
   pair<int, int> key = get_vertex_key(v0, v1);
   boost::unordered_map< pair<int, int>, half_edge* >::iterator it = 
-        existing_edges.find(key);
+		existing_edges.find(key);
   bool res = true;
   if (it != existing_edges.end() ) { // exists
-    e->sym = it->second;
-    e->sym->sym = e;
+	e->sym = it->second;
+	e->sym->sym = e;
   } else {
-    existing_edges[key] = e;
-    res = false;
+	existing_edges[key] = e;
+	res = false;
   }
   return res;
 }
@@ -98,43 +98,49 @@ Mesh::populate_symmetric_edge(half_edge* e, int v0, int v1) {
 pair<int, int>
 Mesh::get_vertex_key(int v0, int v1) {
    if (v0 < v1) 
-     return pair<int, int> (v0, v1);
+	 return pair<int, int> (v0, v1);
    else
-     return pair<int, int> (v1, v0);
+	 return pair<int, int> (v1, v0);
 }
 
 /** given a half_edge pointer he, return a vector of pointers
  * to all the neighboring edges */
 void
 Mesh::get_neighboring_edges(vector<half_edge*> &res, half_edge* he) {
-  half_edge* loop = he->prev->sym;
-  /** add one vertex of the half_edge */
-  do {
-	if (loop == NULL)
-	  break;
-    res.push_back(loop);
-    res.push_back(loop->sym);
-    loop = loop->prev->sym;
-  } while (loop != he);
-  /** now add the other */
-  loop = he->sym->prev->sym;
-  do {
-	if (loop == NULL)
-	  break;
-    res.push_back(loop);
-    res.push_back(loop->sym);
-    loop = loop->prev->sym;
-  } while (loop != he->sym);
+	half_edge* loop = he->prev->sym;
+	/** add one vertex of the half_edge */
+	do {
+		if (loop == NULL)
+			break;
+		res.push_back(loop);
+		res.push_back(loop->sym);
+		loop = loop->prev->sym;
+	} while (loop != he);
+	/** now add the other */
+	loop = he->sym->prev->sym;
+	do {
+		if (loop == NULL)
+			break;
+		res.push_back(loop);
+		res.push_back(loop->sym);
+		loop = loop->prev->sym;
+	} while (loop != he->sym);
+	
+	he->next->sym->sym = he->prev->sym;
+	he->prev->sym->sym = he->next->sym;
+	he = he->sym;
+	he->next->sym->sym = he->prev->sym;
+	he->prev->sym->sym = he->next->sym;
 }
 
 void
 Mesh::get_neighboring_vertices(vector<vertex*> &res, half_edge* he) {
-    half_edge* loop = he;
+	half_edge* loop = he;
 	cout << "NEIGHBOR TEST" <<endl;
-    do {
-    	res.push_back(loop->v);
-    	loop = loop->next->sym;
-    } while (loop != he);
+	do {
+		res.push_back(loop->v);
+		loop = loop->next->sym;
+	} while (loop != he);
 }
 
 /** Collapses half_edge* [he] and sets the surrounding edges to point to
