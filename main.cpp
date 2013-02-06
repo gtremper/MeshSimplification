@@ -316,6 +316,9 @@ void display() {
 	mv = glm::rotate(mv,pitch,LEFT);
 	glLoadMatrixf(&mv[0][0]);
 	
+	//mesh->collapse_edge(edge);
+	//mesh->update_buffer();
+	
 	mesh->draw();
 	
 	glutSwapBuffers();

@@ -159,7 +159,6 @@ Mesh::collapse_edge(half_edge* he) {
 	
 	vector<half_edge*> neighbors;
 	get_neighboring_edges(neighbors, he);
-	vector<half_edge*>::iterator it;
 	for (unsigned int i = 0; i < neighbors.size(); i++) {
 		if (neighbors[i]->v == he->v || neighbors[i]->v == he->sym->v) {
 			neighbors[i]->v = midpoint;
