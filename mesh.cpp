@@ -217,13 +217,24 @@ Mesh::collapse_edge(half_edge* he) {
 	
 	delete he->v;
 	delete he->sym->v;
-	
+
 	delete he->sym->prev;
 	delete he->sym->next;
 	delete he->sym;
 	delete he->prev;
 	delete he->next;
 	delete he;
+
+    for (unsigned int i = 0; i < edges.size(); i++) {
+      half_edge* e = edges[i];
+      assert(e->v != NULL);
+      assert(e->prev != NULL);
+      assert(e->next != NULL);
+      assert(e->sym != NULL);
+      assert(e->sym != e);
+      assert(e->prev != e);
+      assert(e->next != e);
+    }
 	
 	numIndices = edges.size();
 }
