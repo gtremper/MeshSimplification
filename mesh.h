@@ -47,8 +47,11 @@ typedef boost::shared_ptr<vertex> vertexPtr;
 struct half_edge {
     vertex *v;
     half_edge *prev, *next, *sym; //anti-clockwise ordering
+	vec3 merge_point;
+	float merge_cost;
 	half_edge(vertex*);
 	~half_edge();
+	void calculate_quad_error();
 };
 
 struct edge_compare {

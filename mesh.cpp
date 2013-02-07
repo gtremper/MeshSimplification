@@ -1,11 +1,14 @@
 #include "mesh.h"
 using namespace std;
 
+typedef boost::unordered_map<int, vertex*> VertMap;
+
 void
 get_midpoint(vertex* res, vertex* v1, vertex* v2) {
   res->position = (v1->position + v2->position) / 2.0f;
   res->normal = glm::normalize((v1->normal + v2->normal) / 2.0f);
 }
+
 
 Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 
@@ -13,8 +16,7 @@ Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 	numIndices = numFaces*3;
   
 	existing_edges = boost::unordered_map< pair<int, int>, half_edge* >();
-	boost::unordered_map<int, vertex*>
-	existing_vertices = boost::unordered_map<int, vertex* >();
+	VertMap existing_vertices = VertMap();
 
   for (unsigned int i=0; i < numFaces; i+=1) {
 	
@@ -71,9 +73,6 @@ Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 	edges.push_back(e0);
 	edges.push_back(e1);
 	edges.push_back(e2);
-	pq.push(e0);
-	pq.push(e1);
-	pq.push(e2);
   }
   /** use pq.size() to get size, use pq.top() to get the top element,
    * then get rid of it with pq.pop() */
@@ -101,13 +100,21 @@ half_edge::half_edge(vertex* vert){
 
 half_edge::~half_edge(){}
 
-/** a < b means that a is lower on the heap */
+void
+half_edge::calculate_quad_error() {
+	float Q1[10];
+	float Q2[10];
+	memcpy(Q1, v->Q, sizeof(Q1));
+	memcpy(Q2, sym->v->Q, sizeof(Q2));
+	
+	
+}
+
+/** he1 < he2 means that he1 is lower on the heap */
 bool
 edge_compare::operator() (const half_edge* he1, const half_edge* he2) const
 {
-    float a = he1->v->position[0] + he1->v->position[1] + he1->v->position[2];
-	float b = he2->v->position[0] + he2->v->position[1] + he2->v->position[2];
-	return a < b;
+	return he1->merge_cost < he2->merge_cost;
 }
 
 /** Vertex functions **/
@@ -137,7 +144,8 @@ vertex_data vertex::data() {
  * the pair [v0,v1] already exists in the existing_edges map, where v0 < v1.
  * If it doesn't exist, we set the value in the map to be our current edge*,
  * else we set [e]'s symmetric edge to be the value in the map and the map's
- * symmetric edge to be [e]. 
+ * symmetric edge to be [e]. Also puts edge in priority queue and calculates
+ * the removal priority
  * => Returns true if the value was found in the map.
  */
 bool
@@ -149,6 +157,9 @@ Mesh::populate_symmetric_edge(half_edge* e, int v0, int v1) {
   if (it != existing_edges.end() ) { // exists
 	e->sym = it->second;
 	e->sym->sym = e;
+	
+	e->calculate_quad_error();
+	pq.push(e);
   } else {
 	existing_edges[key] = e;
 	res = false;
