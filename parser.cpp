@@ -143,8 +143,19 @@ Mesh* parseOFF(char* filename){
 		vertices[vid2].normal += norm;
 		
 		/** Calculate Quadratic error matrix **/
+		norm = glm::normalize(norm);
+		vec4 p = vec4(norm,-glm::dot(norm,v0));
 		
-		
+		int index = 0;
+		for (int y=0; y<4; y+=1){
+			for (int x=y; x < 4; x+=1){
+				float Qvalue = p[x]*p[y];
+				vertices[vid0].Q[index] += Qvalue;
+				vertices[vid1].Q[index] += Qvalue;
+				vertices[vid2].Q[index] += Qvalue;
+				index += 1;
+			}
+		}
 	}
 	myfile.close();
 	
