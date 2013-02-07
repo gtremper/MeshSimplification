@@ -96,17 +96,16 @@ Mesh::~Mesh(){
 
 half_edge::half_edge(vertex* vert){
 	v = vert;
-	handle = NULL;
 }
 
 half_edge::~half_edge(){}
 
 void
-half_edge::calculate_quad_error() {
+edge_data::calculate_quad_error(half_edge* edge) {
 	float Q1[10];
 	float Q2[10];
-	memcpy(Q1, v->Q, sizeof(Q1));
-	memcpy(Q2, sym->v->Q, sizeof(Q2));
+	memcpy(Q1, edge->v->Q, sizeof(Q1));
+	memcpy(Q2, edge->sym->v->Q, sizeof(Q2));
 	
 	for (int i=0; i<10; i+=1) {
 		Q1[i] += Q2[i];
@@ -137,7 +136,7 @@ half_edge::calculate_quad_error() {
 
 /** he1 < he2 means that he1 is lower on the heap **/
 bool
-edge_compare::operator() (const half_edge* he1, const half_edge* he2) const
+edge_compare::operator() (const edge_data* he1, const edge_data* he2) const
 {
 	return he1->merge_cost < he2->merge_cost;
 }
@@ -183,9 +182,10 @@ Mesh::populate_symmetric_edge(half_edge* e, int v0, int v1) {
 	e->sym = it->second;
 	e->sym->sym = e;
 	
-	e->calculate_quad_error();
-	//e->handle = pq.push(e);
-	pq.push(e);
+	edge_data* d = new edge_data();
+	d->calculate_quad_error(e);
+	pq.push(d);
+	
   } else {
 	existing_edges[key] = e;
 	res = false;
@@ -243,13 +243,16 @@ Mesh::get_neighboring_vertices(vector<vertex*> &res, half_edge* he) {
 
 void
 Mesh::collapse_edge() {
-	cout << "HeapSIZE: "<<pq.size() << endl;
-	half_edge *he = pq.top();
-	pq.pop();
+	//cout << "HeapSIZE: "<<pq.size() << endl;
+	//edge_data *he = pq.top();
+	//pq.pop();
 	
+	half_edge* he = edges[rand() % edges.size() ];
 	
 	vertex* midpoint = new vertex();
 	get_midpoint(midpoint, he->v, he->sym->v);
+	//midpoint->position = he->merge_point;
+	//midpoint->normal=glm::normalize((he->v->normal + he->sym->v->normal)/2.0f);
 	
 	vector<half_edge*> neighbors;
 	get_neighboring_edges(neighbors, he);

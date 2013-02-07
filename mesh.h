@@ -44,24 +44,29 @@ void get_midpoint(vertex* res, vertex* v1, vertex* v2);
 
 typedef boost::shared_ptr<vertex> vertexPtr;
 
+struct half_edge;
+
+struct edge_data {
+	vec3 merge_point;
+	float merge_cost;
+	void calculate_quad_error(half_edge*);
+};
+
 struct half_edge {
     vertex *v;
     half_edge *prev, *next, *sym; //anti-clockwise ordering
-	vec3 merge_point;
-	float merge_cost;
-	half_edge** handle;
+	edge_data* data;
 	half_edge(vertex*);
 	~half_edge();
-	void calculate_quad_error();
 };
 
 struct edge_compare {
-    bool operator() (const half_edge* he1, const half_edge* he2) const;
+    bool operator() (const edge_data* he1, const edge_data* he2) const;
 };
 
 /** use .push(item) to add to the heap, use .top() to get the top of the heap,
  * and use .pop() to get rid of the top item of the heap */
-typedef boost::heap::priority_queue<half_edge*,
+typedef boost::heap::priority_queue<edge_data*,
         boost::heap::compare<edge_compare> > Priority_Queue;
 /********* Comprehensive Mesh definition **********/
 
