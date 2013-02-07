@@ -101,6 +101,15 @@ half_edge::half_edge(vertex* vert){
 
 half_edge::~half_edge(){}
 
+/** a < b means that a is lower on the heap */
+bool
+edge_compare::operator() (const half_edge* he1, const half_edge* he2) const
+{
+    float a = he1->v->position[0] + he1->v->position[1] + he1->v->position[2];
+	float b = he2->v->position[0] + he2->v->position[1] + he2->v->position[2];
+	return a < b;
+}
+
 /** Vertex functions **/
 
 vertex::vertex(){};
