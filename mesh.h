@@ -53,14 +53,8 @@ struct half_edge {
 	~half_edge();
 };
 
-/** replace the contents of operator() with the quadric error function.
- * a < b means that b will be higher on the stack than a */
 struct edge_compare {
-  bool operator() (const half_edge* he1, const half_edge* he2) const {
-    float a = he1->v->position[0] + he1->v->position[1] + he1->v->position[2];
-	float b = he2->v->position[0] + he2->v->position[1] + he2->v->position[2];
-	return a < b;
-  }
+    bool operator() (const half_edge* he1, const half_edge* he2) const;
 };
 
 typedef boost::heap::priority_queue<half_edge*,
