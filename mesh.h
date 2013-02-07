@@ -39,6 +39,7 @@ typedef boost::shared_ptr<vertex> vertexPtr;
 struct half_edge {
     vertex *v;
     half_edge *prev, *next, *sym; //anti-clockwise ordering
+	
 	half_edge(vertex*);
 	~half_edge();
 };

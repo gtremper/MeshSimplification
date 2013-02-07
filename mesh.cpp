@@ -175,7 +175,9 @@ Mesh::get_neighboring_vertices(vector<vertex*> &res, half_edge* he) {
 
 void
 Mesh::collapse_edge(half_edge* he) {
-	he = edges[rand() % edges.size()];
+	do {
+		he = edges[rand() % edges.size()];
+	}while(he->sym==NULL);
 	
 	
 	vertex* midpoint = new vertex();
