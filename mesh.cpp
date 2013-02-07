@@ -96,6 +96,7 @@ Mesh::~Mesh(){
 
 half_edge::half_edge(vertex* vert){
 	v = vert;
+	handle = NULL;
 }
 
 half_edge::~half_edge(){}
@@ -183,6 +184,7 @@ Mesh::populate_symmetric_edge(half_edge* e, int v0, int v1) {
 	e->sym->sym = e;
 	
 	e->calculate_quad_error();
+	//e->handle = pq.push(e);
 	pq.push(e);
   } else {
 	existing_edges[key] = e;
@@ -240,10 +242,10 @@ Mesh::get_neighboring_vertices(vector<vertex*> &res, half_edge* he) {
  */
 
 void
-Mesh::collapse_edge(half_edge* he) {
-	do {
-		he = edges[rand() % edges.size()];
-	}while(he->sym==NULL);
+Mesh::collapse_edge() {
+	cout << "HeapSIZE: "<<pq.size() << endl;
+	half_edge *he = pq.top();
+	pq.pop();
 	
 	
 	vertex* midpoint = new vertex();

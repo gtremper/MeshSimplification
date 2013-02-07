@@ -183,8 +183,7 @@ void keyboard(unsigned char key, int x, int y) {
 		cout << "Animate is now set to" << (animate ? " true " : " false ") << "\n";
 		break;
 	case 'l':
-		edge = NULL;
-		mesh->collapse_edge(edge);
+		mesh->collapse_edge();
 		mesh->update_buffer();
 		break;
 	case 48: //0

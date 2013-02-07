@@ -49,6 +49,7 @@ struct half_edge {
     half_edge *prev, *next, *sym; //anti-clockwise ordering
 	vec3 merge_point;
 	float merge_cost;
+	half_edge** handle;
 	half_edge(vertex*);
 	~half_edge();
 	void calculate_quad_error();
@@ -77,11 +78,11 @@ class Mesh {
     /** const vector vertices (type vertex), const vector faces (type vec3) **/
     Mesh(vector<vertex>& vertices, vector<vec3>& faces);
 	~Mesh();
-    bool populate_symmetric_edge(half_edge* e, int v0, int v1);
-    pair<int, int> get_vertex_key(int v0, int v1);
-    void get_neighboring_edges(vector<half_edge*> &res, half_edge* he);
-    void get_neighboring_vertices(vector<vertex*> &res, half_edge* he);
-    void collapse_edge(half_edge *he);
+    bool populate_symmetric_edge(half_edge*, int, int);
+    pair<int, int> get_vertex_key(int,int);
+    void get_neighboring_edges(vector<half_edge*>&, half_edge*);
+    void get_neighboring_vertices(vector<vertex*>&, half_edge*);
+    void collapse_edge();
 	void update_buffer();
 	void draw();
 };
