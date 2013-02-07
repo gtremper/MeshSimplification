@@ -4,7 +4,7 @@ using namespace std;
 void
 get_midpoint(vertex* res, vertex* v1, vertex* v2) {
   res->position = (v1->position + v2->position) / 2.0f;
-  res->normal = (v1->normal + v2->normal) / 2.0f;
+  res->normal = glm::normalize((v1->normal + v2->normal) / 2.0f);
 }
 
 Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {

@@ -33,7 +33,6 @@ struct vertex_data {
 struct vertex {
 	vec3 position; 
 	vec3 normal;
-	GLfloat padding[2];
 	GLfloat Q[10];
 	vertex(float,float,float);
 	vertex(vertex*);
@@ -48,7 +47,6 @@ typedef boost::shared_ptr<vertex> vertexPtr;
 struct half_edge {
     vertex *v;
     half_edge *prev, *next, *sym; //anti-clockwise ordering
-	
 	half_edge(vertex*);
 	~half_edge();
 };
