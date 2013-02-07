@@ -72,7 +72,16 @@ Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 	edges.push_back(e0);
 	edges.push_back(e1);
 	edges.push_back(e2);
+	pq.push(e0);
+	pq.push(e1);
+	pq.push(e2);
   }
+  /** use pq.size() to get size, use pq.top() to get the top element,
+   * then get rid of it with pq.pop() */
+//  cout << pq.size() << endl;
+//  half_edge* e = pq.top();
+//  cout << e->v->position[0] << " " << e->v->position[1] << " " << e->v->position[2] << endl;
+
 
   glGenBuffers(1, &arrayBuffer);
   glGenBuffers(1, &elementArrayBuffer);
