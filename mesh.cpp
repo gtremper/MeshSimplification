@@ -30,6 +30,7 @@ Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 	vertIt = existing_vertices.find(v0);
 	if (vertIt == existing_vertices.end()) {
 		vert0 = new vertex(&vertices[v0]);
+		existing_vertices[v0] = vert0;
 	} else {
 		vert0 = vertIt->second;
 	}
@@ -37,6 +38,7 @@ Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 	vertIt = existing_vertices.find(v1);
 	if (vertIt == existing_vertices.end()) {
 		vert1 = new vertex(&vertices[v1]);
+		existing_vertices[v1] = vert1;
 	} else {
 		vert1 = vertIt->second;
 	}
@@ -44,6 +46,7 @@ Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 	vertIt = existing_vertices.find(v2);
 	if (vertIt == existing_vertices.end()) {
 		vert2 = new vertex(&vertices[v2]);
+		existing_vertices[v2] = vert2;
 	} else {
 		vert2 = vertIt->second;
 	}
@@ -152,12 +155,6 @@ Mesh::get_neighboring_edges(vector<half_edge*> &res, half_edge* he) {
 		res.push_back(loop->sym);
 		loop = loop->prev->sym;
 	} while (loop != he->sym);
-	
-	he->next->sym->sym = he->prev->sym;
-	he->prev->sym->sym = he->next->sym;
-	he = he->sym;
-	he->next->sym->sym = he->prev->sym;
-	he->prev->sym->sym = he->next->sym;
 }
 
 void
@@ -199,6 +196,11 @@ Mesh::collapse_edge(half_edge* he) {
 	edges.erase(remove(edges.begin(), edges.end(), he->sym->prev), edges.end());
 	edges.erase(remove(edges.begin(), edges.end(), he->sym->next), edges.end());
 	edges.erase(remove(edges.begin(), edges.end(), he->sym), edges.end());
+	
+	he->next->sym->sym = he->prev->sym;
+	he->prev->sym->sym = he->next->sym;
+	he->sym->next->sym->sym = he->sym->prev->sym;
+	he->sym->prev->sym->sym = he->sym->next->sym;
 	
 	delete he->v;
 	delete he->sym->v;
