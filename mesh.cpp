@@ -7,14 +7,13 @@ get_midpoint(vertex* res, vertex* v1, vertex* v2) {
   res->normal = (v1->normal + v2->normal) / 2.0f;
 }
 
-
 Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 
-  unsigned int numFaces = faces.size();
-  numIndices = numFaces*3;
+	unsigned int numFaces = faces.size();
+	numIndices = numFaces*3;
   
-  existing_edges = boost::unordered_map< pair<int, int>, half_edge* >();
-  boost::unordered_map<int, vertex*>
+	existing_edges = boost::unordered_map< pair<int, int>, half_edge* >();
+	boost::unordered_map<int, vertex*>
 	existing_vertices = boost::unordered_map<int, vertex* >();
 
   for (unsigned int i=0; i < numFaces; i+=1) {
@@ -234,16 +233,16 @@ Mesh::collapse_edge(half_edge* he) {
 	delete he->next;
 	delete he;
 
-    for (unsigned int i = 0; i < edges.size(); i++) {
-      half_edge* e = edges[i];
-      assert(e->v != NULL);
-      assert(e->prev != NULL);
-      assert(e->next != NULL);
-      assert(e->sym != NULL);
-      assert(e->sym != e);
-      assert(e->prev != e);
-      assert(e->next != e);
-    }
+	for (unsigned int i = 0; i < edges.size(); i++) {
+	  half_edge* e = edges[i];
+	  assert(e->v != NULL);
+	  assert(e->prev != NULL);
+	  assert(e->next != NULL);
+	  assert(e->sym != NULL);
+	  assert(e->sym != e);
+	  assert(e->prev != e);
+	  assert(e->next != e);
+	}
 	
 	numIndices = edges.size();
 }
