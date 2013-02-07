@@ -57,6 +57,8 @@ struct edge_compare {
     bool operator() (const half_edge* he1, const half_edge* he2) const;
 };
 
+/** use .push(item) to add to the heap, use .top() to get the top of the heap,
+ * and use .pop() to get rid of the top item of the heap */
 typedef boost::heap::priority_queue<half_edge*,
         boost::heap::compare<edge_compare> > Priority_Queue;
 /********* Comprehensive Mesh definition **********/
