@@ -107,10 +107,34 @@ half_edge::calculate_quad_error() {
 	memcpy(Q1, v->Q, sizeof(Q1));
 	memcpy(Q2, sym->v->Q, sizeof(Q2));
 	
+	for (int i=0; i<10; i+=1) {
+		Q1[i] += Q2[i];
+	}
+	/** Hard coded solution to minimum quadric error **/
+	float a = Q1[0];
+	float b = Q1[1];
+	float c = Q1[2];
+	float d = Q1[3];
+	float e = Q1[4];
+	float f = Q1[5];
+	float g = Q1[6];
+	float h = Q1[7];
+	float i = Q1[8];
 	
+	float det = a*e*h - a*f*f - b*b*h + 2*b*c*f - c*c*e;
+	float x = d*f*f - c*g*f - b*i*f - d*e*h + b*g*h + c*e*i;
+	x /= det;
+	float y = g*c*c - d*f*c - b*i*c + b*d*h - a*g*h + a*f*i;
+	y /= det;
+	float z = i*b*b - d*f*b - c*g*b + c*d*e + a*f*g - a*e*i;
+	z /= det;
+	
+	merge_point = vec3(x,y,z);
+	merge_cost = a*x*x + 2*b*x*y + 2*c*x*z + 2*d*x + e*y*y
+	 				+ 2*f*y*z + 2*g*y + h*z*z + 2*i*z + Q1[9];	
 }
 
-/** he1 < he2 means that he1 is lower on the heap */
+/** he1 < he2 means that he1 is lower on the heap **/
 bool
 edge_compare::operator() (const half_edge* he1, const half_edge* he2) const
 {
