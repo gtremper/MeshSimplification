@@ -141,6 +141,10 @@ Mesh* parseOFF(char* filename){
 		vertices[vid0].normal += norm;
 		vertices[vid1].normal += norm;
 		vertices[vid2].normal += norm;
+		
+		/** Calculate Quadratic error matrix **/
+		
+		
 	}
 	myfile.close();
 	

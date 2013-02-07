@@ -117,6 +117,9 @@ vertex::vertex(){};
 vertex::vertex(float x, float y, float z) {
 	position = vec3(x,y,z);
 	normal = vec3(0.0f,0.0f,0.0f);
+	for (int i=0; i<10; i+=1){
+		Q[i] = 0;
+	}
 }
 
 vertex::vertex(vertex* v) {
