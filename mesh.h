@@ -39,6 +39,7 @@ typedef boost::shared_ptr<vertex> vertexPtr;
 struct half_edge {
     vertex *v;
     half_edge *prev, *next, *sym; //anti-clockwise ordering
+	half_edge(vertex*);
 	~half_edge();
 };
 
@@ -54,7 +55,7 @@ class Mesh {
   public:
     boost::unordered_map< pair<int, int>, half_edge* > existing_edges;
     /** const vector vertices (type vertex), const vector faces (type vec3) **/
-    Mesh(vector<vertex*>& vertices, vector<vec3>& faces);
+    Mesh(vector<vertex>& vertices, vector<vec3>& faces);
 	~Mesh();
     bool populate_symmetric_edge(half_edge* e, int v0, int v1);
     pair<int, int> get_vertex_key(int v0, int v1);

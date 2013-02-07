@@ -7,17 +7,50 @@ get_midpoint(vertex* res, vertex* v1, vertex* v2) {
   res->normal = (v1->normal + v2->normal) / 2.0f;
 }
 
-Mesh::Mesh(vector<vertex*>& vertices, vector<vec3>& faces) {
+
+Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 
   unsigned int numFaces = faces.size();
   numIndices = numFaces*3;
   
   existing_edges = boost::unordered_map< pair<int, int>, half_edge* >();
+  boost::unordered_map<int, vertex*>
+	existing_vertices = boost::unordered_map<int, vertex* >();
 
   for (unsigned int i=0; i < numFaces; i+=1) {
-	half_edge* e0 = new half_edge();
-	half_edge* e1 = new half_edge();
-	half_edge* e2 = new half_edge();
+	
+	int v0 = faces[i][0];
+	int v1 = faces[i][1];
+	int v2 = faces[i][2];
+	
+	/** Create new vertex and edge objects if they don't already exist **/
+	vertex *vert0, *vert1, *vert2;
+	boost::unordered_map<int, vertex*>::iterator vertIt; 
+	
+	vertIt = existing_vertices.find(v0);
+	if (vertIt == existing_vertices.end()) {
+		vert0 = new vertex(&vertices[v0]);
+	} else {
+		vert0 = vertIt->second;
+	}
+	
+	vertIt = existing_vertices.find(v1);
+	if (vertIt == existing_vertices.end()) {
+		vert1 = new vertex(&vertices[v1]);
+	} else {
+		vert1 = vertIt->second;
+	}
+	
+	vertIt = existing_vertices.find(v2);
+	if (vertIt == existing_vertices.end()) {
+		vert2 = new vertex(&vertices[v2]);
+	} else {
+		vert2 = vertIt->second;
+	}
+	
+	half_edge* e0 = new half_edge(vert0);
+	half_edge* e1 = new half_edge(vert1);
+	half_edge* e2 = new half_edge(vert2);
 
 	/** populate next/prev edges for each edge in this face */
 	e0->prev = e2;
@@ -26,15 +59,6 @@ Mesh::Mesh(vector<vertex*>& vertices, vector<vec3>& faces) {
 	e1->next = e2;
 	e2->prev = e1;
 	e2->next = e0;
-
-	/** populate end-vertex for each edge */
-	unsigned int v0 = faces[i][0];
-	unsigned int v1 = faces[i][1];
-	unsigned int v2 = faces[i][2];
-	
-	e0->v = vertices[v0];
-	e1->v = vertices[v1];
-	e2->v = vertices[v2];
 	
 	/** populate the symmetric edge for the given edge */
 	populate_symmetric_edge(e0, v0, v1);
@@ -58,8 +82,11 @@ Mesh::~Mesh(){
 	}
 }
 
-half_edge::~half_edge(){
+half_edge::half_edge(vertex* vert){
+	v = vert;
 }
+
+half_edge::~half_edge(){}
 
 vertex::vertex(float x, float y, float z) {
 	position = vec3(x,y,z);

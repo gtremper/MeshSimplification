@@ -92,7 +92,7 @@ Mesh* parseOFF(char* filename){
 		exit(1);
 	}
 	
-	vector<vertex*> vertices; // vectors
+	vector<vertex> vertices; // vectors
 	vector<vec3> faces; // faces
 	int numVerts, numFaces;
 	string line;
@@ -123,7 +123,7 @@ Mesh* parseOFF(char* filename){
 		maxy = max(y,maxy);
 		minz = min(z,minz);
 		maxz = max(z,maxz);
-		vertex* v = new vertex(x,y,z);
+		vertex v = vertex(x,y,z);
 		vertices.push_back(v);
 	}
 	
@@ -134,13 +134,13 @@ Mesh* parseOFF(char* filename){
 		ln >> junk >> vid0 >> vid1 >> vid2;
 		vec3 f(vid0,vid1,vid2);
 		faces.push_back(f);
-		vec3 v0 = vertices[vid0]->position;
-		vec3 v1 = vertices[vid1]->position;
-		vec3 v2 = vertices[vid2]->position;
+		vec3 v0 = vertices[vid0].position;
+		vec3 v1 = vertices[vid1].position;
+		vec3 v2 = vertices[vid2].position;
 		vec3 norm = glm::cross(v1-v0,v2-v0);
-		vertices[vid0]->normal += norm;
-		vertices[vid1]->normal += norm;
-		vertices[vid2]->normal += norm;
+		vertices[vid0].normal += norm;
+		vertices[vid1].normal += norm;
+		vertices[vid2].normal += norm;
 	}
 	myfile.close();
 	
@@ -153,10 +153,10 @@ Mesh* parseOFF(char* filename){
 	float ratio = 8.0/max(max(maxx-minx, maxy-miny), maxz-minz);
 	
 	for (int i=0; i<numVerts; i+=1) {
-		vertices[i]->position -= makeMiddle;
-		vertices[i]->position *= ratio;
+		vertices[i].position -= makeMiddle;
+		vertices[i].position *= ratio;
 		
-		vertices[i]->normal = glm::normalize(vertices[i]->normal);
+		vertices[i].normal = glm::normalize(vertices[i].normal);
 	}
 	
     return new Mesh(vertices, faces);
