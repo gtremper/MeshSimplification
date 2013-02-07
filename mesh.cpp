@@ -85,11 +85,17 @@ Mesh::~Mesh(){
 	}
 }
 
+/** Half Edge functions **/
+
 half_edge::half_edge(vertex* vert){
 	v = vert;
 }
 
 half_edge::~half_edge(){}
+
+/** Vertex functions **/
+
+vertex::vertex(){};
 
 vertex::vertex(float x, float y, float z) {
 	position = vec3(x,y,z);
@@ -100,7 +106,12 @@ vertex::vertex(vertex* v) {
 	memcpy(&position, v, sizeof(vertex));
 }
 
-vertex::vertex(){};
+vertex_data vertex::data() {
+	vertex_data vdata;
+	memcpy(&vdata, &position, sizeof(vertex_data));
+	return vdata;
+}
+
 
 /** Given a half_edge [e] and its two defining vertices [v0,v1], we check if
  * the pair [v0,v1] already exists in the existing_edges map, where v0 < v1.
@@ -223,13 +234,13 @@ Mesh::update_buffer() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, NULL);
 	
 	vector<GLuint> elements;
-	vector<vertex> verts;
+	vector<vertex_data> verts;
 	
 	int gtime = glutGet(GLUT_ELAPSED_TIME);
 	
 	boost::unordered_map<vertex*, GLuint> vertMap = boost::unordered_map<vertex*, GLuint>();
 	
-	cout << "size: " << edges.size() << endl;
+	cout << "Triangles: " << edges.size()/3 << endl;
 	
 	GLuint counter = 0;
 	for (int i=0; i<edges.size(); i+=1) {
@@ -239,13 +250,13 @@ Mesh::update_buffer() {
 			elements.push_back(mapit->second);
 		} else {
 			vertMap[edges[i]->v] = counter;
-			verts.push_back(edges[i]->v);
+			verts.push_back(edges[i]->v->data());
 			elements.push_back(counter);
 			counter += 1;
 		}
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, arrayBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex)*verts.size(), &verts[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data)*verts.size(), &verts[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementArrayBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*elements.size(), &elements[0], GL_STATIC_DRAW);
 	

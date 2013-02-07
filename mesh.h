@@ -23,13 +23,21 @@ using namespace std;
 
 /********* Data Structures for Winged Edges ***********/
 
+struct vertex_data {
+	vec3 position; 
+	vec3 normal;
+	GLfloat padding[2];
+};
+
 struct vertex {
 	vec3 position; 
 	vec3 normal;
 	GLfloat padding[2];
+	GLfloat Q[10];
 	vertex(float,float,float);
 	vertex(vertex*);
 	vertex();
+	vertex_data data();
 };
 
 void get_midpoint(vertex* res, vertex* v1, vertex* v2);
