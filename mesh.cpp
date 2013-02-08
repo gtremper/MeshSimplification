@@ -101,11 +101,11 @@ half_edge::half_edge(vertex* vert){
 half_edge::~half_edge(){}
 
 void
-edge_data::calculate_quad_error(half_edge* edge) {
+edge_data::calculate_quad_error() {
 	float Q1[10];
 	float Q2[10];
-	memcpy(Q1, edge->v->Q, sizeof(Q1));
-	memcpy(Q2, edge->sym->v->Q, sizeof(Q2));
+	memcpy(Q1, e1->v->Q, sizeof(Q1));
+	memcpy(Q2, e2->v->Q, sizeof(Q2));
 	
 	for (int i=0; i<10; i+=1) {
 		Q1[i] += Q2[i];
@@ -183,7 +183,12 @@ Mesh::populate_symmetric_edge(half_edge* e, int v0, int v1) {
 	e->sym->sym = e;
 	
 	edge_data* d = new edge_data();
-	d->calculate_quad_error(e);
+	d->e1 = e;
+	d->e2 = e->sym;
+	d->calculate_quad_error();
+	e->data = d;
+	e->sym->data = d;
+	
 	pq.push(d);
 	
 	

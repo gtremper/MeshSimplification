@@ -49,7 +49,8 @@ struct half_edge;
 struct edge_data {
 	vec3 merge_point;
 	float merge_cost;
-	void calculate_quad_error(half_edge*);
+	half_edge *e1, *e2; //the half edges this data represents
+	void calculate_quad_error();
 };
 
 struct half_edge {
