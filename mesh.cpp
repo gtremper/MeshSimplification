@@ -186,6 +186,7 @@ Mesh::populate_symmetric_edge(half_edge* e, int v0, int v1) {
 	d->calculate_quad_error(e);
 	pq.push(d);
 	
+	
   } else {
 	existing_edges[key] = e;
 	res = false;
