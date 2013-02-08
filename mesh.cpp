@@ -76,9 +76,9 @@ Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
   }
   /** use pq.size() to get size, use pq.top() to get the top element,
    * then get rid of it with pq.pop() */
-//  cout << pq.size() << endl;
-//  half_edge* e = pq.top();
-//  cout << e->v->position[0] << " " << e->v->position[1] << " " << e->v->position[2] << endl;
+//	cout << pq.size() << endl;
+//	half_edge* e = pq.top();
+//	cout << e->v->position[0] << " " << e->v->position[1] << " " << e->v->position[2] << endl;
 
 
   glGenBuffers(1, &arrayBuffer);
@@ -135,7 +135,7 @@ edge_data::calculate_quad_error() {
 	
 	merge_point = vec3(x,y,z);
 	merge_cost = a*x*x + 2*b*x*y + 2*c*x*z + 2*d*x + e*y*y
-	 				+ 2*f*y*z + 2*g*y + h*z*z + 2*i*z + Q1[9];	
+					+ 2*f*y*z + 2*g*y + h*z*z + 2*i*z + Q1[9];
 }
 
 /** he1 < he2 means that he1 is lower on the heap **/
