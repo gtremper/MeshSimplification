@@ -104,6 +104,7 @@ void
 edge_data::calculate_quad_error() {
 	float Q1[10];
 	float Q2[10];
+	
 	memcpy(Q1, edge->v->Q, sizeof(Q1));
 	memcpy(Q2, edge->sym->v->Q, sizeof(Q2));
 	
@@ -253,46 +254,69 @@ Mesh::collapse_edge() {
 	do {
 		edata = pq.top();
 		pq.pop();
+		cout << "pop" << endl;
 	}while(edata->edge == NULL);
 	
 	//half_edge* he = edges[rand() % edges.size() ];
 	
 	half_edge* he = edata->edge;
-	
-	vertex* midpoint = new vertex();
-	//get_midpoint(midpoint, he->v, he->sym->v);
-	midpoint->position = edata->merge_point;
-	midpoint->normal=glm::normalize((he->v->normal + he->sym->v->normal)/2.0f);
+	half_edge* hesym = he->sym;
 	
 	vector<half_edge*> neighbors;
 	get_neighboring_edges(neighbors, he);
-	for (unsigned int i = 0; i < neighbors.size(); i++) {
-		if (neighbors[i]->v == he->v || neighbors[i]->v == he->sym->v) {
-			neighbors[i]->v = midpoint;
-		}
+	
+	/* Calculate new vertex position **/
+	vertex* midpoint = new vertex();
+	midpoint->position = edata->merge_point;
+	midpoint->normal=glm::normalize((he->v->normal + hesym->v->normal)/2.0f);
+	float Q1[10];
+	memcpy(Q1, he->v->Q, sizeof(Q1));
+	for (int j=0; j<10; j+=1) {
+		Q1[j] += hesym->v->Q[j];
 	}
+	memcpy(midpoint->Q, Q1, sizeof(Q1));
 	
 	/* Remove edges from faces that disapear */
 	edges.erase(remove(edges.begin(), edges.end(), he->prev), edges.end());
 	edges.erase(remove(edges.begin(), edges.end(), he->next), edges.end());
 	edges.erase(remove(edges.begin(), edges.end(), he), edges.end());
-	edges.erase(remove(edges.begin(), edges.end(), he->sym->prev), edges.end());
-	edges.erase(remove(edges.begin(), edges.end(), he->sym->next), edges.end());
-	edges.erase(remove(edges.begin(), edges.end(), he->sym), edges.end());
+	edges.erase(remove(edges.begin(), edges.end(), hesym->prev), edges.end());
+	edges.erase(remove(edges.begin(), edges.end(), hesym->next), edges.end());
+	edges.erase(remove(edges.begin(), edges.end(), hesym), edges.end());
 	
+	/** Update edge pointers **/
 	he->next->sym->sym = he->prev->sym;
 	he->prev->sym->sym = he->next->sym;
-	he->sym->next->sym->sym = he->sym->prev->sym;
-	he->sym->prev->sym->sym = he->sym->next->sym;
+	hesym->next->sym->sym = hesym->prev->sym;
+	hesym->prev->sym->sym = hesym->next->sym;
 	
+	/** Update priority queue **/
+	he->next->data->edge = NULL; //discarded when poped from queue
+	he->prev->data->edge = he->prev;
+	he->next->data = he->prev->data;
 	
+	hesym->next->data->edge = NULL; //discarded when poped from queue
+	hesym->prev->data->edge = hesym->prev;
+	hesym->next->data = hesym->prev->data;
 	
+	for (unsigned int i = 0; i < neighbors.size(); i++) {
+		cout << "LOOP " << i << endl;
+		if (neighbors[i]->v == he->v || neighbors[i]->v == hesym->v) {
+			neighbors[i]->v = midpoint;
+			neighbors[i]->data->calculate_quad_error();
+		}
+	}
+	
+	cout << "predelete" <<endl;
+	
+	/** Delete removed items **/
+	delete edata;
 	delete he->v;
 	delete he->sym->v;
 
-	delete he->sym->prev;
-	delete he->sym->next;
-	delete he->sym;
+	delete hesym->prev;
+	delete hesym->next;
+	delete hesym;
 	delete he->prev;
 	delete he->next;
 	delete he;
