@@ -285,6 +285,8 @@ Mesh::collapse_edge() {
 	he->sym->next->sym->sym = he->sym->prev->sym;
 	he->sym->prev->sym->sym = he->sym->next->sym;
 	
+	
+	
 	delete he->v;
 	delete he->sym->v;
 

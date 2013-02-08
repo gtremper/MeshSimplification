@@ -127,6 +127,19 @@ Mesh* parseOFF(char* filename){
 		vertices.push_back(v);
 	}
 	
+	/*** Center model around origin  ***/
+	
+	float middlex = (maxx+minx)/2.0;
+	float middley = (maxy+miny)/2.0;
+	float middlez = (maxz+minz)/2.0;
+	vec3 makeMiddle(middlex,middley,middlez);
+	float ratio = 8.0/max(max(maxx-minx, maxy-miny), maxz-minz);
+	
+	for (int i=0; i<numVerts; i+=1) {
+		vertices[i].position -= makeMiddle;
+		vertices[i].position *= ratio;
+	}
+	
 	for (int i=0; i<numFaces; i+=1){
 		int vid0,vid1,vid2,junk;
 		getline(myfile, line);
@@ -159,18 +172,7 @@ Mesh* parseOFF(char* filename){
 	}
 	myfile.close();
 	
-	/*** Center model around origin  ***/
-	
-	float middlex = (maxx+minx)/2.0;
-	float middley = (maxy+miny)/2.0;
-	float middlez = (maxz+minz)/2.0;
-	vec3 makeMiddle(middlex,middley,middlez);
-	float ratio = 8.0/max(max(maxx-minx, maxy-miny), maxz-minz);
-	
 	for (int i=0; i<numVerts; i+=1) {
-		vertices[i].position -= makeMiddle;
-		vertices[i].position *= ratio;
-		
 		vertices[i].normal = glm::normalize(vertices[i].normal);
 	}
 	
