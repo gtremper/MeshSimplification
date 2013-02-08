@@ -323,19 +323,28 @@ Mesh::collapse_edge() {
 	edges.erase(remove(edges.begin(), edges.end(), hesym), edges.end());
 	
 	/** Update edge pointers **/
-	he->next->sym->sym = he->prev->sym;
-	he->prev->sym->sym = he->next->sym;
-	hesym->next->sym->sym = hesym->prev->sym;
-	hesym->prev->sym->sym = hesym->next->sym;
+	if (he->next->sym != NULL) {
+		he->next->sym->sym = he->prev->sym;
+		he->next->sym->data->edge = he->next->sym;
+	}
+	if (he->prev->sym != NULL) {
+		he->prev->sym->sym = he->next->sym;
+		he->prev->sym->data->edge = NULL; //discarded when poped from queue
+		he->prev->sym->data = he->next->sym->data;
+	}
+	if (hesym->next->sym != NULL) {
+		hesym->next->sym->sym = hesym->prev->sym;
+		hesym->next->sym->data->edge = hesym->next->sym;
+	}
+	if (hesym->prev->sym != NULL) {
+		hesym->prev->sym->sym = hesym->next->sym;
+		hesym->prev->sym->data->edge = NULL; //discarded when poped from queue
+		if (hesym->next->sym != NULL)
+			hesym->prev->sym->data = hesym->next->sym->data;
+	}
 	
 	/** Update priority queue **/
-	he->prev->sym->data->edge = NULL; //discarded when poped from queue
-	he->next->sym->data->edge = he->next->sym;
-	he->prev->sym->data = he->next->sym->data;
 	
-	hesym->prev->sym->data->edge = NULL; //discarded when poped from queue
-	hesym->next->sym->data->edge = hesym->next->sym;
-	hesym->prev->sym->data = hesym->next->sym->data;
 	
 	for (unsigned int i = 0; i < neighbors.size(); i++) {
 		if (neighbors[i]->v == he->v || neighbors[i]->v == hesym->v) {
