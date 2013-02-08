@@ -134,8 +134,11 @@ edge_data::calculate_quad_error() {
 	z /= det;
 	
 	merge_point = vec3(x,y,z);
-	merge_cost = a*x*x + 2*b*x*y + 2*c*x*z + 2*d*x + e*y*y
-					+ 2*f*y*z + 2*g*y + h*z*z + 2*i*z + Q1[9];
+	if (det == 0)
+		merge_cost = 0;
+	else
+		merge_cost = a*x*x + 2*b*x*y + 2*c*x*z + 2*d*x + e*y*y
+						+ 2*f*y*z + 2*g*y + h*z*z + 2*i*z + Q1[9];
 }
 
 /** he1 < he2 means that he1 is lower on the heap **/
@@ -299,6 +302,10 @@ Mesh::collapse_edge() {
 	/* Calculate new vertex position **/
 	vertex* midpoint = new vertex();
 	midpoint->position = edata->merge_point;
+	/** check for Nan, set to midpoint if we have invalid merge_point */
+	if (midpoint->position[0] != midpoint->position[0]) { //Nan not equal to itself
+		midpoint->position = glm::normalize((he->v->position + hesym->v->position)/2.0f);
+	}
 	midpoint->normal=glm::normalize((he->v->normal + hesym->v->normal)/2.0f);
 	float Q1[10];
 	memcpy(Q1, he->v->Q, sizeof(Q1));
