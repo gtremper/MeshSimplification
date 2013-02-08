@@ -135,11 +135,6 @@ Mesh* parseOFF(char* filename){
 	vec3 makeMiddle(middlex,middley,middlez);
 	float ratio = 8.0/max(max(maxx-minx, maxy-miny), maxz-minz);
 	
-	for (int i=0; i<numVerts; i+=1) {
-		vertices[i].position -= makeMiddle;
-		vertices[i].position *= ratio;
-	}
-	
 	for (int i=0; i<numFaces; i+=1){
 		int vid0,vid1,vid2,junk;
 		getline(myfile, line);
@@ -154,8 +149,26 @@ Mesh* parseOFF(char* filename){
 		vertices[vid0].normal += norm;
 		vertices[vid1].normal += norm;
 		vertices[vid2].normal += norm;
+	}
+	myfile.close();
+	
+	for (int i=0; i<numVerts; i+=1) {
+		vertices[i].normal = glm::normalize(vertices[i].normal);
+		vertices[i].position -= makeMiddle;
+		vertices[i].position *= ratio;
+	}
+	
+	/** Calculate Quadratic error matrix **/
+	for (int i=0; i<numFaces; i+=1) {
+		vec3 f = faces[i];
+		int vid0 = f[0];
+		int vid1 = f[1];
+		int vid2 = f[2];
+		vec3 v0 = vertices[vid0].position;
+		vec3 v1 = vertices[vid1].position;
+		vec3 v2 = vertices[vid2].position;
 		
-		/** Calculate Quadratic error matrix **/
+		vec3 norm = glm::cross(v1-v0,v2-v0);
 		norm = glm::normalize(norm);
 		vec4 p = vec4(norm,-glm::dot(norm,v0));
 		
@@ -169,11 +182,6 @@ Mesh* parseOFF(char* filename){
 				index += 1;
 			}
 		}
-	}
-	myfile.close();
-	
-	for (int i=0; i<numVerts; i+=1) {
-		vertices[i].normal = glm::normalize(vertices[i].normal);
 	}
 	
     return new Mesh(vertices, faces);
