@@ -81,7 +81,6 @@ class Mesh {
   public:
     boost::unordered_map< pair<int, int>, half_edge* > existing_edges;
     Priority_Queue pq;
-    /** const vector vertices (type vertex), const vector faces (type vec3) **/
     Mesh(vector<vertex>& vertices, vector<vec3>& faces);
 	~Mesh();
     bool populate_symmetric_edge(half_edge*, int, int);
