@@ -105,6 +105,9 @@ edge_data::calculate_quad_error() {
 	float Q1[10];
 	float Q2[10];
 	
+	//cout << "First edge: " << edge << endl;
+	//cout << "second edge: " << edge->sym << endl;
+	
 	memcpy(Q1, edge->v->Q, sizeof(Q1));
 	memcpy(Q2, edge->sym->v->Q, sizeof(Q2));
 	
@@ -139,7 +142,7 @@ edge_data::calculate_quad_error() {
 bool
 edge_compare::operator() (const edge_data* he1, const edge_data* he2) const
 {
-	return he1->merge_cost > he2->merge_cost;
+	return he1->merge_cost < he2->merge_cost;
 }
 
 /** Vertex functions **/
@@ -253,8 +256,7 @@ Mesh::collapse_edge() {
 	edge_data *edata;
 	do {
 		edata = pq.top();
-		pq.pop();
-		
+		pq.pop();	
 	}while(edata->edge == NULL);
 	
 	cout << "Cost: " << edata->merge_cost << endl;
@@ -263,6 +265,10 @@ Mesh::collapse_edge() {
 	
 	half_edge* he = edata->edge;
 	half_edge* hesym = he->sym;
+	
+	cout << "edge: " << he << endl;
+	cout << "sym: " << hesym << endl;
+	
 	
 	vector<half_edge*> neighbors;
 	get_neighboring_edges(neighbors, he);
@@ -293,13 +299,13 @@ Mesh::collapse_edge() {
 	hesym->prev->sym->sym = hesym->next->sym;
 	
 	/** Update priority queue **/
-	he->next->data->edge = NULL; //discarded when poped from queue
-	he->prev->data->edge = he->prev;
-	he->next->data = he->prev->data;
+	he->prev->sym->data->edge = NULL; //discarded when poped from queue
+	he->next->sym->data->edge = he->next->sym;
+	he->prev->sym->data = he->next->sym->data;
 	
-	hesym->next->data->edge = NULL; //discarded when poped from queue
-	hesym->prev->data->edge = hesym->prev;
-	hesym->next->data = hesym->prev->data;
+	hesym->prev->sym->data->edge = NULL; //discarded when poped from queue
+	hesym->next->sym->data->edge = hesym->next->sym;
+	hesym->prev->sym->data = hesym->next->sym->data;
 	
 	for (unsigned int i = 0; i < neighbors.size(); i++) {
 		if (neighbors[i]->v == he->v || neighbors[i]->v == hesym->v) {
