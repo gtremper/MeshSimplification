@@ -197,6 +197,7 @@ Mesh::populate_symmetric_edge(half_edge* e, int v0, int v1) {
 	
   } else {
 	existing_edges[key] = e;
+	e->sym = NULL; /** we guarantee that the symmetric edge is at least NULL */
 	res = false;
   }
   return res;
