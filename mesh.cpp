@@ -142,7 +142,7 @@ edge_data::calculate_quad_error() {
 bool
 edge_compare::operator() (const edge_data* he1, const edge_data* he2) const
 {
-	return he1->merge_cost < he2->merge_cost;
+	return he1->merge_cost > he2->merge_cost;
 }
 
 /** Vertex functions **/
