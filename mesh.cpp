@@ -139,7 +139,7 @@ edge_data::calculate_quad_error() {
 bool
 edge_compare::operator() (const edge_data* he1, const edge_data* he2) const
 {
-	return he1->merge_cost < he2->merge_cost;
+	return he1->merge_cost > he2->merge_cost;
 }
 
 /** Vertex functions **/
@@ -254,8 +254,10 @@ Mesh::collapse_edge() {
 	do {
 		edata = pq.top();
 		pq.pop();
-		cout << "pop" << endl;
+		
 	}while(edata->edge == NULL);
+	
+	cout << "Cost: " << edata->merge_cost << endl;
 	
 	//half_edge* he = edges[rand() % edges.size() ];
 	
@@ -300,14 +302,11 @@ Mesh::collapse_edge() {
 	hesym->next->data = hesym->prev->data;
 	
 	for (unsigned int i = 0; i < neighbors.size(); i++) {
-		cout << "LOOP " << i << endl;
 		if (neighbors[i]->v == he->v || neighbors[i]->v == hesym->v) {
 			neighbors[i]->v = midpoint;
 			neighbors[i]->data->calculate_quad_error();
 		}
 	}
-	
-	cout << "predelete" <<endl;
 	
 	/** Delete removed items **/
 	delete edata;
