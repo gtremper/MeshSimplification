@@ -196,8 +196,6 @@ Mesh::populate_symmetric_edge(half_edge* e, int v0, int v1) {
 	e->sym->data = d;
 	
 	pq.push(d);
-	
-	
   } else {
 	existing_edges[key] = e;
 	e->sym = NULL; /** we guarantee that the symmetric edge is at least NULL */
@@ -279,23 +277,17 @@ Mesh::get_neighboring_vertices(vector<vertex*> &res, half_edge* he) {
 
 void
 Mesh::collapse_edge() {
-	cout << "HeapSIZE: "<<pq.size() << endl;
+	//cout << "HeapSIZE: "<<pq.size() << endl;
 	edge_data *edata;
 	do {
 		edata = pq.top();
 		pq.pop();	
 	}while(edata->edge == NULL);
 	
-	cout << "Cost: " << edata->merge_cost << endl;
-	
-	//half_edge* he = edges[rand() % edges.size() ];
+	//cout << "Cost: " << edata->merge_cost << endl;
 	
 	half_edge* he = edata->edge;
-	half_edge* hesym = he->sym;
-	
-	cout << "edge: " << he << endl;
-	cout << "sym: " << hesym << endl;
-	
+	half_edge* hesym = he->sym;	
 	
 	vector<half_edge*> neighbors;
 	get_neighboring_edges(neighbors, he);
