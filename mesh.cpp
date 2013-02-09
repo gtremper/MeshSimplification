@@ -126,19 +126,23 @@ edge_data::calculate_quad_error() {
 	float i = Q1[8];
 	
 	float det = a*e*h - a*f*f - b*b*h + 2*b*c*f - c*c*e;
-	float x = d*f*f - c*g*f - b*i*f - d*e*h + b*g*h + c*e*i;
-	x /= det;
-	float y = g*c*c - d*f*c - b*i*c + b*d*h - a*g*h + a*f*i;
-	y /= det;
-	float z = i*b*b - d*f*b - c*g*b + c*d*e + a*f*g - a*e*i;
-	z /= det;
 	
-	merge_point = vec3(x,y,z);
-	if (det == 0)
-		merge_cost = 0;
-	else
+	//cout << "DET: " << det << endl;
+	
+	if (det<0.001) {
+		merge_point = (edge->v->position + edge->sym->v->position)/2.0f;
+		merge_cost = 0.0f;
+	} else {
+		float x = d*f*f - c*g*f - b*i*f - d*e*h + b*g*h + c*e*i;
+		x /= det;
+		float y = g*c*c - d*f*c - b*i*c + b*d*h - a*g*h + a*f*i;
+		y /= det;
+		float z = i*b*b - d*f*b - c*g*b + c*d*e + a*f*g - a*e*i;
+		z /= det;
+		merge_point = vec3(x,y,z);
 		merge_cost = a*x*x + 2*b*x*y + 2*c*x*z + 2*d*x + e*y*y
-						+ 2*f*y*z + 2*g*y + h*z*z + 2*i*z + Q1[9];
+							+ 2*f*y*z + 2*g*y + h*z*z + 2*i*z + Q1[9];
+	}
 }
 
 /** he1 < he2 means that he1 is lower on the heap **/
@@ -191,9 +195,9 @@ Mesh::populate_symmetric_edge(half_edge* e, int v0, int v1) {
 	
 	edge_data* d = new edge_data();
 	d->edge = e;
-	d->calculate_quad_error();
 	e->data = d;
 	e->sym->data = d;
+	d->calculate_quad_error();
 	
 	pq.push(d);
   } else {
@@ -295,11 +299,8 @@ Mesh::collapse_edge() {
 	/* Calculate new vertex position **/
 	vertex* midpoint = new vertex();
 	midpoint->position = edata->merge_point;
-	/** check for Nan, set to midpoint if we have invalid merge_point */
-	if (midpoint->position[0] != midpoint->position[0]) { //Nan not equal to itself
-		midpoint->position = glm::normalize((he->v->position + hesym->v->position)/2.0f);
-	}
 	midpoint->normal=glm::normalize((he->v->normal + hesym->v->normal)/2.0f);
+	
 	float Q1[10];
 	memcpy(Q1, he->v->Q, sizeof(Q1));
 	for (int j=0; j<10; j+=1) {
