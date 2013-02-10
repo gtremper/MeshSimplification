@@ -80,6 +80,7 @@ class Mesh {
   unsigned int numIndices;
   public:
     boost::unordered_map< pair<int, int>, half_edge* > existing_edges;
+	boost::unordered_map<vertex*, GLuint> vertToIndexMap;
     Priority_Queue pq;
     Mesh(vector<vertex>& vertices, vector<vec3>& faces);
 	~Mesh();

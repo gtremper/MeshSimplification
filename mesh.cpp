@@ -17,6 +17,7 @@ Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
   
 	existing_edges = boost::unordered_map< pair<int, int>, half_edge* >();
 	VertMap existing_vertices = VertMap();
+	vertToIndexMap = boost::unordered_map<vertex*, GLuint>();
 
   for (unsigned int i=0; i < numFaces; i+=1) {
 	
@@ -385,18 +386,18 @@ Mesh::update_buffer() {
 	
 	int gtime = glutGet(GLUT_ELAPSED_TIME);
 	
-	boost::unordered_map<vertex*, GLuint> vertMap = boost::unordered_map<vertex*, GLuint>();
-	
 	cout << "Triangles: " << edges.size()/3 << endl;
+	
+	vertToIndexMap = boost::unordered_map<vertex*, GLuint>();
 	
 	GLuint counter = 0;
 	for (int i=0; i<edges.size(); i+=1) {
 		boost::unordered_map<vertex*, GLuint>::iterator
-			mapit = vertMap.find(edges[i]->v);
-		if (mapit != vertMap.end() ) { 
+			mapit = vertToIndexMap.find(edges[i]->v);
+		if (mapit != vertToIndexMap.end() ) { 
 			elements.push_back(mapit->second);
 		} else {
-			vertMap[edges[i]->v] = counter;
+			vertToIndexMap[edges[i]->v] = counter;
 			verts.push_back(edges[i]->v->data());
 			elements.push_back(counter);
 			counter += 1;
@@ -406,8 +407,6 @@ Mesh::update_buffer() {
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data)*verts.size(), &verts[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementArrayBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*elements.size(), &elements[0], GL_STATIC_DRAW);
-	
-	//cout <<"Time to update buffer: " << glutGet(GLUT_ELAPSED_TIME)-gtime << endl;
 }
 
 void
