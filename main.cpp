@@ -123,6 +123,7 @@ void mouse(int x, int y) {
 
 /* Keyboard options */
 void keyboard(unsigned char key, int x, int y) {
+	int coltime;
 	switch(key) {
 	case 'w':
 		if (moveLight) light_position[currentLight] -= vec4(0,0,SENSITIVITY,0);
@@ -183,7 +184,9 @@ void keyboard(unsigned char key, int x, int y) {
 		cout << "Animate is now set to" << (animate ? " true " : " false ") << "\n";
 		break;
 	case 'l':
+		coltime = glutGet(GLUT_ELAPSED_TIME);
 		mesh->collapse_edge();
+		cout << "Time to collapse: "<<glutGet(GLUT_ELAPSED_TIME) - coltime << endl;
 		mesh->update_buffer();
 		break;
 	case 48: //0
@@ -306,7 +309,7 @@ void display() {
 	glUniform4fv(lightPosn, MAXLIGHTS, (GLfloat*)&light[0]);
 	
 	if (animate) {
-		float newTime = glutGet(GLUT_ELAPSED_TIME);
+		int newTime = glutGet(GLUT_ELAPSED_TIME);
 		yaw += (newTime-lastTime)/100.0f;
 		lastTime=newTime;
 	}

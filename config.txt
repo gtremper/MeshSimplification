@@ -1,7 +1,8 @@
 # Default description of the scene
 
 camera 0 0 10 0 0 0 60
-light 0 20 8 1 .2 .7 .1 1
+light 6 10 8 1 .2 .7 .1 1
+light -10 -4 15 1 .4 .4 .7 1
 ambient .2 .2 .2 1
 diffuse .2 .2 .2 1
 specular 1 1 1 1

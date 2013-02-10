@@ -129,20 +129,23 @@ edge_data::calculate_quad_error() {
 	
 	//cout << "DET: " << det << endl;
 	
-	if (det<0.001) {
+	float x,y,z;
+	if (det<0.01) {
 		merge_point = (edge->v->position + edge->sym->v->position)/2.0f;
-		merge_cost = 0.0f;
+		x = merge_point[0];
+		y = merge_point[1];
+		z = merge_point[2];
 	} else {
-		float x = d*f*f - c*g*f - b*i*f - d*e*h + b*g*h + c*e*i;
+		x = d*f*f - c*g*f - b*i*f - d*e*h + b*g*h + c*e*i;
 		x /= det;
-		float y = g*c*c - d*f*c - b*i*c + b*d*h - a*g*h + a*f*i;
+		y = g*c*c - d*f*c - b*i*c + b*d*h - a*g*h + a*f*i;
 		y /= det;
-		float z = i*b*b - d*f*b - c*g*b + c*d*e + a*f*g - a*e*i;
+		z = i*b*b - d*f*b - c*g*b + c*d*e + a*f*g - a*e*i;
 		z /= det;
 		merge_point = vec3(x,y,z);
-		merge_cost = a*x*x + 2*b*x*y + 2*c*x*z + 2*d*x + e*y*y
-							+ 2*f*y*z + 2*g*y + h*z*z + 2*i*z + Q1[9];
 	}
+	merge_cost = a*x*x + 2*b*x*y + 2*c*x*z + 2*d*x + e*y*y
+						+ 2*f*y*z + 2*g*y + h*z*z + 2*i*z + Q1[9];
 }
 
 /** he1 < he2 means that he1 is lower on the heap **/
@@ -281,7 +284,6 @@ Mesh::get_neighboring_vertices(vector<vertex*> &res, half_edge* he) {
 
 void
 Mesh::collapse_edge() {
-	//cout << "HeapSIZE: "<<pq.size() << endl;
 	edge_data *edata;
 	do {
 		edata = pq.top();
@@ -299,7 +301,7 @@ Mesh::collapse_edge() {
 	/* Calculate new vertex position **/
 	vertex* midpoint = new vertex();
 	midpoint->position = edata->merge_point;
-	midpoint->normal=glm::normalize((he->v->normal + hesym->v->normal)/2.0f);
+	midpoint->normal=glm::normalize(he->v->normal + hesym->v->normal);
 	
 	float Q1[10];
 	memcpy(Q1, he->v->Q, sizeof(Q1));
@@ -405,7 +407,7 @@ Mesh::update_buffer() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementArrayBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*elements.size(), &elements[0], GL_STATIC_DRAW);
 	
-	cout <<"Time to update buffer: " << glutGet(GLUT_ELAPSED_TIME)-gtime << endl;
+	//cout <<"Time to update buffer: " << glutGet(GLUT_ELAPSED_TIME)-gtime << endl;
 }
 
 void
