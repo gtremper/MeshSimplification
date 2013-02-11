@@ -268,6 +268,7 @@ Mesh::collapse_edge() {
 	}while(edata->edge == NULL);
 	
 	edge_collapse ec; //store edge collapse information
+	level_of_detail += 1;
 	
 	half_edge* he = edata->edge;
 	half_edge* hesym = he->sym;	
@@ -350,6 +351,7 @@ Mesh::collapse_edge() {
 		}
 	}
 	
+	collapse_list.push_back(ec);
 	
 	/** Delete removed items **/
 	delete edata;
@@ -396,15 +398,15 @@ Mesh::upLevelOfDetail() {
 	
 	for (int i=0; i<ec.fromV2.size(); i+=1) {
 		ec.fromV2[i]->v = ec.V2;
-	}	
+	}
+	numIndices = edges.size();	
 }
 
 void
 Mesh::downLevelOfDetail() {
-	if (level_of_detail == collapse_list.size()-1){
+	if (level_of_detail == collapse_list.size()){
 		return;
 	}
-	level_of_detail += 1;
 	edge_collapse ec = collapse_list[level_of_detail];
 	
 	vector<half_edge*>::iterator rmEdge;
@@ -420,6 +422,8 @@ Mesh::downLevelOfDetail() {
 	for (int i=0; i<ec.fromV2.size(); i+=1) {
 		ec.fromV2[i]->v = ec.collapseVert;
 	}
+	level_of_detail += 1;
+	numIndices = edges.size();
 }
 
 
