@@ -16,8 +16,10 @@ Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 	numIndices = numFaces*3;
   
 	existing_edges = boost::unordered_map< pair<int, int>, half_edge* >();
-	VertMap existing_vertices = VertMap();
-	vertToIndexMap = boost::unordered_map<vertex*, GLuint>();
+	
+	for (int i=0; i<vertices.size(); i+=1){
+		verts.push_back(vertices[i]);
+	}
 
   for (unsigned int i=0; i < numFaces; i+=1) {
 	
@@ -25,37 +27,14 @@ Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 	int v1 = faces[i][1];
 	int v2 = faces[i][2];
 	
-	/** Create new vertex and edge objects if they don't already exist **/
-	vertex *vert0, *vert1, *vert2;
-	boost::unordered_map<int, vertex*>::iterator vertIt; 
 	
-	vertIt = existing_vertices.find(v0);
-	if (vertIt == existing_vertices.end()) {
-		vert0 = new vertex(&vertices[v0]);
-		existing_vertices[v0] = vert0;
-	} else {
-		vert0 = vertIt->second;
-	}
+	half_edge* e0 = new half_edge();
+	half_edge* e1 = new half_edge();
+	half_edge* e2 = new half_edge();
 	
-	vertIt = existing_vertices.find(v1);
-	if (vertIt == existing_vertices.end()) {
-		vert1 = new vertex(&vertices[v1]);
-		existing_vertices[v1] = vert1;
-	} else {
-		vert1 = vertIt->second;
-	}
-	
-	vertIt = existing_vertices.find(v2);
-	if (vertIt == existing_vertices.end()) {
-		vert2 = new vertex(&vertices[v2]);
-		existing_vertices[v2] = vert2;
-	} else {
-		vert2 = vertIt->second;
-	}
-	
-	half_edge* e0 = new half_edge(vert0);
-	half_edge* e1 = new half_edge(vert1);
-	half_edge* e2 = new half_edge(vert2);
+	e0->v = v0;
+	e1->v = v1;
+	e2->v = v2;
 
 	/** populate next/prev edges for each edge in this face */
 	e0->prev = e2;
@@ -75,12 +54,6 @@ Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 	edges.push_back(e1);
 	edges.push_back(e2);
   }
-  /** use pq.size() to get size, use pq.top() to get the top element,
-   * then get rid of it with pq.pop() */
-//	cout << pq.size() << endl;
-//	half_edge* e = pq.top();
-//	cout << e->v->position[0] << " " << e->v->position[1] << " " << e->v->position[2] << endl;
-
 
   glGenBuffers(1, &arrayBuffer);
   glGenBuffers(1, &elementArrayBuffer);
@@ -95,22 +68,24 @@ Mesh::~Mesh(){
 
 /** Half Edge functions **/
 
-half_edge::half_edge(vertex* vert){
-	v = vert;
+half_edge::half_edge(){
 }
 
 half_edge::~half_edge(){}
 
 void
-edge_data::calculate_quad_error() {
+edge_data::calculate_quad_error(vector<vertex>& verts) {
 	float Q1[10];
 	float Q2[10];
 	
 	//cout << "First edge: " << edge << endl;
 	//cout << "second edge: " << edge->sym << endl;
 	
-	memcpy(Q1, edge->v->Q, sizeof(Q1));
-	memcpy(Q2, edge->sym->v->Q, sizeof(Q2));
+	//memcpy(Q1, edge->v->Q, sizeof(Q1));
+	//memcpy(Q2, edge->sym->v->Q, sizeof(Q2));
+	
+	memcpy(Q1, verts[edge->v].Q, sizeof(Q1));
+	memcpy(Q2, verts[edge->sym->v].Q, sizeof(Q2));
 	
 	for (int i=0; i<10; i+=1) {
 		Q1[i] += Q2[i];
@@ -132,7 +107,7 @@ edge_data::calculate_quad_error() {
 	
 	float x,y,z;
 	if (det<0.01) {
-		merge_point = (edge->v->position + edge->sym->v->position)/2.0f;
+		merge_point = (verts[edge->v].position + verts[edge->sym->v].position)/2.0f;
 		x = merge_point[0];
 		y = merge_point[1];
 		z = merge_point[2];
@@ -201,7 +176,7 @@ Mesh::populate_symmetric_edge(half_edge* e, int v0, int v1) {
 	d->edge = e;
 	e->data = d;
 	e->sym->data = d;
-	d->calculate_quad_error();
+	d->calculate_quad_error(verts);
 	
 	pq.push(d);
   } else {
@@ -269,12 +244,12 @@ Mesh::get_neighboring_edges(vector<half_edge*> &res, half_edge* he) {
 
 void
 Mesh::get_neighboring_vertices(vector<vertex*> &res, half_edge* he) {
-	half_edge* loop = he;
-	cout << "NEIGHBOR TEST" <<endl;
-	do {
-		res.push_back(loop->v);
-		loop = loop->next->sym;
-	} while (loop != he);
+	//half_edge* loop = he;
+	//cout << "NEIGHBOR TEST" <<endl;
+	//do {
+	//	res.push_back(loop->v);
+	//	loop = loop->next->sym;
+	//} while (loop != he);
 }
 
 /** Collapses half_edge* [he] and sets the surrounding edges to point to
@@ -291,8 +266,6 @@ Mesh::collapse_edge() {
 		pq.pop();	
 	}while(edata->edge == NULL);
 	
-	//cout << "Cost: " << edata->merge_cost << endl;
-	
 	half_edge* he = edata->edge;
 	half_edge* hesym = he->sym;	
 	
@@ -300,16 +273,16 @@ Mesh::collapse_edge() {
 	get_neighboring_edges(neighbors, he);
 	
 	/* Calculate new vertex position **/
-	vertex* midpoint = new vertex();
-	midpoint->position = edata->merge_point;
-	midpoint->normal=glm::normalize(he->v->normal + hesym->v->normal);
+	vertex midpoint = vertex();
+	midpoint.position = edata->merge_point;
+	midpoint.normal = glm::normalize(verts[he->v].normal + verts[hesym->v].normal);
 	
 	float Q1[10];
-	memcpy(Q1, he->v->Q, sizeof(Q1));
+	memcpy(Q1, verts[he->v].Q, sizeof(Q1));
 	for (int j=0; j<10; j+=1) {
-		Q1[j] += hesym->v->Q[j];
+		Q1[j] += verts[hesym->v].Q[j];
 	}
-	memcpy(midpoint->Q, Q1, sizeof(Q1));
+	memcpy(midpoint.Q, Q1, sizeof(Q1));
 	
 	/* Remove edges from faces that disapear */
 	edges.erase(remove(edges.begin(), edges.end(), he->prev), edges.end());
@@ -342,18 +315,19 @@ Mesh::collapse_edge() {
 	
 	/** Update priority queue **/
 	
+	verts.push_back(midpoint);
 	
 	for (unsigned int i = 0; i < neighbors.size(); i++) {
 		if (neighbors[i]->v == he->v || neighbors[i]->v == hesym->v) {
-			neighbors[i]->v = midpoint;
-			neighbors[i]->data->calculate_quad_error();
+			neighbors[i]->v = verts.size()-1; // set vertex to midpoint
+			neighbors[i]->data->calculate_quad_error(verts);
 		}
 	}
 	
 	/** Delete removed items **/
 	delete edata;
-	delete he->v;
-	delete he->sym->v;
+	//delete he->v;
+	//delete he->sym->v;
 
 	delete hesym->prev;
 	delete hesym->next;
@@ -364,7 +338,7 @@ Mesh::collapse_edge() {
 
 	for (unsigned int i = 0; i < edges.size(); i++) {
 	  half_edge* e = edges[i];
-	  assert(e->v != NULL);
+	  //assert(e->v != NULL);
 	  assert(e->prev != NULL);
 	  assert(e->next != NULL);
 	  assert(e->sym != NULL);
@@ -382,29 +356,20 @@ Mesh::update_buffer() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, NULL);
 	
 	vector<GLuint> elements;
-	vector<vertex_data> verts;
+	vector<vertex_data> vertdata;
+	for (int i=0; i<verts.size(); i+=1){
+		vertdata.push_back(verts[i].data());
+	}
 	
-	int gtime = glutGet(GLUT_ELAPSED_TIME);
-	
+	cout << "verts: " << verts.size() << endl;
 	cout << "Triangles: " << edges.size()/3 << endl;
 	
-	vertToIndexMap = boost::unordered_map<vertex*, GLuint>();
 	
-	GLuint counter = 0;
 	for (int i=0; i<edges.size(); i+=1) {
-		boost::unordered_map<vertex*, GLuint>::iterator
-			mapit = vertToIndexMap.find(edges[i]->v);
-		if (mapit != vertToIndexMap.end() ) { 
-			elements.push_back(mapit->second);
-		} else {
-			vertToIndexMap[edges[i]->v] = counter;
-			verts.push_back(edges[i]->v->data());
-			elements.push_back(counter);
-			counter += 1;
-		}
+		elements.push_back(edges[i]->v);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, arrayBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data)*verts.size(), &verts[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data)*vertdata.size(), &vertdata[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementArrayBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*elements.size(), &elements[0], GL_STATIC_DRAW);
 }
