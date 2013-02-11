@@ -16,6 +16,7 @@ Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 	numIndices = numFaces*3;
   
 	existing_edges = boost::unordered_map< pair<int, int>, half_edge* >();
+	level_of_detail = 0;
 	
 	for (int i=0; i<vertices.size(); i+=1){
 		verts.push_back(vertices[i]);
@@ -378,12 +379,47 @@ Mesh::collapse_edge() {
 
 void
 Mesh::upLevelOfDetail() {
+	if (level_of_detail == 0) {
+		return;
+	}
 	
+	level_of_detail -= 1;
+	edge_collapse ec = collapse_list[level_of_detail];
+	
+	for (int i=0; i<ec.removed.size(); i+=1) {
+		edges.push_back(ec.removed[i]);
+	}
+	
+	for (int i=0; i<ec.fromV1.size(); i+=1) {
+		ec.fromV1[i]->v = ec.V1;
+	}
+	
+	for (int i=0; i<ec.fromV2.size(); i+=1) {
+		ec.fromV2[i]->v = ec.V2;
+	}	
 }
 
 void
 Mesh::downLevelOfDetail() {
+	if (level_of_detail == collapse_list.size()-1){
+		return;
+	}
+	level_of_detail += 1;
+	edge_collapse ec = collapse_list[level_of_detail];
 	
+	vector<half_edge*>::iterator rmEdge;
+	for (int i=0; i<ec.removed.size(); i+=1) {
+		rmEdge = find(edges.begin(), edges.end(), ec.removed[i]);
+		edges.erase(rmEdge);
+	}
+	
+	for (int i=0; i<ec.fromV1.size(); i+=1) {
+		ec.fromV1[i]->v = ec.collapseVert;
+	}
+	
+	for (int i=0; i<ec.fromV2.size(); i+=1) {
+		ec.fromV2[i]->v = ec.collapseVert;
+	}
 }
 
 
