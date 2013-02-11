@@ -33,10 +33,7 @@ bool useFlat;
 bool moveLight;
 bool cameraMode;
 bool animate;
-bool collapse;
-pair<int, int> edge_key;
-half_edge* edge;
-boost::unordered_map< pair<int, int>, half_edge* >::iterator it;
+int collapseSpeed;
 
 /***  SCENE PARAMETERS  ***/
 GLuint vertexshader, fragmentshader, shaderprogram ; // shaders
@@ -212,15 +209,23 @@ void keyboard(unsigned char key, int x, int y) {
 void specialKey(int key,int x,int y) {
 	switch(key) {
 		case 100: //left
+			if (collapseSpeed != 1){
+				collapseSpeed *= 0.1;
+			}
+			cout << "Now collapsing " << collapseSpeed << " triangles" << endl;
 			break;
 		case 101: //up
-			mesh->upLevelOfDetail();
+			mesh->upLevelOfDetail(collapseSpeed);
 			mesh->update_buffer();
 			break;
 		case 102: //right
+			if (collapseSpeed != 10000){
+				collapseSpeed *= 10;
+			}
+			cout << "Now collapsing " << collapseSpeed << " triangles" << endl;
 			break;
 		case 103: //down
-			mesh->downLevelOfDetail();
+			mesh->downLevelOfDetail(collapseSpeed);
 			mesh->update_buffer();
 			break;
 	}
@@ -235,6 +240,7 @@ void init(char* filename) {
 	eye = vec3(0,0,-10);
 	trans = vec3(0,0,0);
 	numLights = 0;
+	collapseSpeed = 1;
 	fovy = 60;
 	useWire = false;
 	useFlat = false;

@@ -102,8 +102,8 @@ class Mesh {
     void collapse_edge();
 	void update_buffer();
 	void draw();
-	void upLevelOfDetail();
-	void downLevelOfDetail();
+	void upLevelOfDetail(const int);
+	void downLevelOfDetail(const int);
 };
 
 #endif //MESH_H

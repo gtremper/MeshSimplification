@@ -363,52 +363,52 @@ Mesh::collapse_edge() {
 }
 
 void
-Mesh::upLevelOfDetail() {
-	if (level_of_detail == 0) {
-		return;
+Mesh::upLevelOfDetail(const int num) {
+	for (int t=0; t<num; ++t) {
+		if (level_of_detail == 0) {
+			return;
+		}
+		
+		level_of_detail -= 1;
+		edge_collapse ec = collapse_list[level_of_detail];
+		
+		for (int i=0; i<ec.removed.size(); i+=1) {
+			edges[ec.removed[i]->index] = ec.removed[i];
+		}
+		
+		for (int i=0; i<ec.fromV1.size(); i+=1) {
+			ec.fromV1[i]->v = ec.V1;
+		}
+		
+		for (int i=0; i<ec.fromV2.size(); i+=1) {
+			ec.fromV2[i]->v = ec.V2;
+		}
 	}
-	
-	level_of_detail -= 1;
-	edge_collapse ec = collapse_list[level_of_detail];
-	
-	for (int i=0; i<ec.removed.size(); i+=1) {
-		edges[ec.removed[i]->index] = ec.removed[i];
-	}
-	
-	for (int i=0; i<ec.fromV1.size(); i+=1) {
-		ec.fromV1[i]->v = ec.V1;
-	}
-	
-	for (int i=0; i<ec.fromV2.size(); i+=1) {
-		ec.fromV2[i]->v = ec.V2;
-	}	
 }
 
+//glutGet(GLUT_ELAPSED_TIME)
 void
-Mesh::downLevelOfDetail() {
-	if (level_of_detail == collapse_list.size()){
-		int x = glutGet(GLUT_ELAPSED_TIME);
-		for(int j=0; j<1; j++){
+Mesh::downLevelOfDetail(const int num) {
+	for(int t=0; t<num; ++t) {
+		if (level_of_detail == collapse_list.size()){
 			collapse_edge();
+			continue;
 		}
-		x = glutGet(GLUT_ELAPSED_TIME) - x;
-		cout << "Time: " <<x <<endl;
-		return;
+		edge_collapse ec = collapse_list[level_of_detail];
+		
+		for (int i=0; i<ec.removed.size(); i+=1) {
+			edges[ec.removed[i]->index] = NULL;
+		}
+		
+		for (int i=0; i<ec.fromV1.size(); i+=1) {
+			ec.fromV1[i]->v = ec.collapseVert;
+		}
+		
+		for (int i=0; i<ec.fromV2.size(); i+=1) {
+			ec.fromV2[i]->v = ec.collapseVert;
+		}
+		level_of_detail += 1;
 	}
-	edge_collapse ec = collapse_list[level_of_detail];
-	
-	for (int i=0; i<ec.removed.size(); i+=1) {
-		edges[ec.removed[i]->index] = NULL;
-	}
-	
-	for (int i=0; i<ec.fromV1.size(); i+=1) {
-		ec.fromV1[i]->v = ec.collapseVert;
-	}
-	
-	for (int i=0; i<ec.fromV2.size(); i+=1) {
-		ec.fromV2[i]->v = ec.collapseVert;
-	}
-	level_of_detail += 1;
 }
 
 
