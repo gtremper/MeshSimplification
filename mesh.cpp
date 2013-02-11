@@ -350,11 +350,6 @@ Mesh::collapse_edge() {
 	}
 	
 	
-	
-	
-	
-	
-	
 	/** Delete removed items **/
 	delete edata;
 	//delete he->v;
@@ -380,6 +375,17 @@ Mesh::collapse_edge() {
 	
 	numIndices = edges.size();
 }
+
+void
+Mesh::upLevelOfDetail() {
+	
+}
+
+void
+Mesh::downLevelOfDetail() {
+	
+}
+
 
 void
 Mesh::update_buffer() {
