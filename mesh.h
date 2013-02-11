@@ -8,7 +8,7 @@
 #include <vector>
 #include <iostream>
 #include <utility>
-#include <map>
+#include <list>
 #include <boost/unordered_map.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/heap/priority_queue.hpp>
@@ -58,6 +58,7 @@ struct half_edge {
 	int v;
     half_edge *prev, *next, *sym; //anti-clockwise ordering
 	edge_data* data;
+	list<half_edge*>::iterator listIt;
 	half_edge();
 	~half_edge();
 };
@@ -82,7 +83,8 @@ typedef boost::heap::priority_queue<edge_data*,
 /********* Comprehensive Mesh definition **********/
 
 class Mesh {
-  vector<half_edge*> edges;
+  //vector<half_edge*> edges;
+  list<half_edge*> edges;
   vector<vertex> verts;
   GLuint arrayBuffer;
   GLuint elementArrayBuffer;
@@ -91,7 +93,6 @@ class Mesh {
   int level_of_detail;
   public:
     boost::unordered_map< pair<int, int>, half_edge* > existing_edges;
-	boost::unordered_map<vertex*, GLuint> vertToIndexMap;
     Priority_Queue pq;
     Mesh(vector<vertex>& vertices, vector<vec3>& faces);
 	~Mesh();

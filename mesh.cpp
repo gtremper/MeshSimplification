@@ -52,8 +52,11 @@ Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 
 	/** add edges to vector */
 	edges.push_back(e0);
+	e0->listIt = --edges.end();
 	edges.push_back(e1);
+	e1->listIt = --edges.end();
 	edges.push_back(e2);
+	e2->listIt = --edges.end();
   }
 
   glGenBuffers(1, &arrayBuffer);
@@ -62,16 +65,14 @@ Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 }
 
 Mesh::~Mesh(){
-	for (int i=0; i<edges.size(); i+=1) {
-		delete edges[i];
+	list<half_edge*>::iterator it;
+	for (it=edges.begin(); it!=edges.end(); ++it) {
+		delete *it;
 	}
 }
 
 /** Half Edge functions **/
-
-half_edge::half_edge(){
-}
-
+half_edge::half_edge(){}
 half_edge::~half_edge(){}
 
 void
@@ -288,7 +289,7 @@ Mesh::collapse_edge() {
 	}
 	memcpy(midpoint.Q, Q1, sizeof(Q1));
 	
-	/* Remove edges from faces that disapear */
+	/* Remove edges from faces that disapear 
 	vector<half_edge*>::iterator rmEdge;
 	rmEdge = find(edges.begin(), edges.end(), he->prev);
 	ec.removed.push_back(*rmEdge);
@@ -308,6 +309,22 @@ Mesh::collapse_edge() {
 	rmEdge = find(edges.begin(), edges.end(), hesym);
 	ec.removed.push_back(*rmEdge);
 	edges.erase(rmEdge);
+	*/
+	
+	ec.removed.push_back(*he->prev->listIt);
+	ec.removed.push_back(*he->next->listIt);
+	ec.removed.push_back(*he->listIt);
+	ec.removed.push_back(*hesym->prev->listIt);
+	ec.removed.push_back(*hesym->next->listIt);
+	ec.removed.push_back(*hesym->listIt);
+	edges.erase(he->prev->listIt);
+	edges.erase(he->next->listIt);
+	edges.erase(he->listIt);
+	edges.erase(hesym->prev->listIt);
+	edges.erase(hesym->next->listIt);
+	edges.erase(hesym->listIt);
+	
+	
 	
 	/** Update edge pointers **/
 	if (he->next->sym != NULL) {
@@ -355,16 +372,8 @@ Mesh::collapse_edge() {
 	
 	/** Delete removed items **/
 	delete edata;
-	//delete he->v;
-	//delete he->sym->v;
-
-	//delete hesym->prev;
-	//delete hesym->next;
-	//delete hesym;
-	//delete he->prev;
-	//delete he->next;
-	//delete he;
-
+ 
+	/*
 	for (unsigned int i = 0; i < edges.size(); i++) {
 	  half_edge* e = edges[i];
 	  //assert(e->v != NULL);
@@ -375,6 +384,7 @@ Mesh::collapse_edge() {
 	  assert(e->prev != e);
 	  assert(e->next != e);
 	}
+	*/
 	
 	numIndices = edges.size();
 }
@@ -390,6 +400,7 @@ Mesh::upLevelOfDetail() {
 	
 	for (int i=0; i<ec.removed.size(); i+=1) {
 		edges.push_back(ec.removed[i]);
+		ec.removed[i]->listIt = --edges.end();
 	}
 	
 	for (int i=0; i<ec.fromV1.size(); i+=1) {
@@ -410,10 +421,8 @@ Mesh::downLevelOfDetail() {
 	}
 	edge_collapse ec = collapse_list[level_of_detail];
 	
-	vector<half_edge*>::iterator rmEdge;
 	for (int i=0; i<ec.removed.size(); i+=1) {
-		rmEdge = find(edges.begin(), edges.end(), ec.removed[i]);
-		edges.erase(rmEdge);
+		edges.erase(ec.removed[i]->listIt);
 	}
 	
 	for (int i=0; i<ec.fromV1.size(); i+=1) {
@@ -441,8 +450,9 @@ Mesh::update_buffer() {
 	
 	cout << "Triangles: " << edges.size()/3 << endl;
 	
-	for (int i=0; i<edges.size(); i+=1) {
-		elements.push_back(edges[i]->v);
+	list<half_edge*>::iterator it;
+	for (it=edges.begin(); it!=edges.end(); ++it) {
+		elements.push_back((*it)->v);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, arrayBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data)*vertdata.size(), &vertdata[0], GL_STATIC_DRAW);
