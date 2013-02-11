@@ -51,12 +51,12 @@ Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 	populate_symmetric_edge(e2, v2, v0);
 
 	/** add edges to vector */
+	e0->index = edges.size();
 	edges.push_back(e0);
-	e0->listIt = --edges.end();
+	e1->index = edges.size();
 	edges.push_back(e1);
-	e1->listIt = --edges.end();
+	e2->index = edges.size();
 	edges.push_back(e2);
-	e2->listIt = --edges.end();
   }
 
   glGenBuffers(1, &arrayBuffer);
@@ -65,7 +65,7 @@ Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 }
 
 Mesh::~Mesh(){
-	list<half_edge*>::iterator it;
+	vector<half_edge*>::iterator it;
 	for (it=edges.begin(); it!=edges.end(); ++it) {
 		delete *it;
 	}
@@ -83,8 +83,7 @@ edge_data::calculate_quad_error(vector<vertex>& verts) {
 	//cout << "First edge: " << edge << endl;
 	//cout << "second edge: " << edge->sym << endl;
 	
-	//memcpy(Q1, edge->v->Q, sizeof(Q1));
-	//memcpy(Q2, edge->sym->v->Q, sizeof(Q2));
+	//cout <<"PRecrach: "<< edge <<endl;
 	
 	memcpy(Q1, verts[edge->v].Q, sizeof(Q1));
 	memcpy(Q2, verts[edge->sym->v].Q, sizeof(Q2));
@@ -289,42 +288,18 @@ Mesh::collapse_edge() {
 	}
 	memcpy(midpoint.Q, Q1, sizeof(Q1));
 	
-	/* Remove edges from faces that disapear 
-	vector<half_edge*>::iterator rmEdge;
-	rmEdge = find(edges.begin(), edges.end(), he->prev);
-	ec.removed.push_back(*rmEdge);
-	edges.erase(rmEdge);
-	rmEdge = find(edges.begin(), edges.end(), he->next);
-	ec.removed.push_back(*rmEdge);
-	edges.erase(rmEdge);
-	rmEdge = find(edges.begin(), edges.end(), he);
-	ec.removed.push_back(*rmEdge);
-	edges.erase(rmEdge);
-	rmEdge = find(edges.begin(), edges.end(), hesym->prev);
-	ec.removed.push_back(*rmEdge);
-	edges.erase(rmEdge);
-	rmEdge = find(edges.begin(), edges.end(), hesym->next);
-	ec.removed.push_back(*rmEdge);
-	edges.erase(rmEdge);
-	rmEdge = find(edges.begin(), edges.end(), hesym);
-	ec.removed.push_back(*rmEdge);
-	edges.erase(rmEdge);
-	*/
-	
-	ec.removed.push_back(*he->prev->listIt);
-	ec.removed.push_back(*he->next->listIt);
-	ec.removed.push_back(*he->listIt);
-	ec.removed.push_back(*hesym->prev->listIt);
-	ec.removed.push_back(*hesym->next->listIt);
-	ec.removed.push_back(*hesym->listIt);
-	edges.erase(he->prev->listIt);
-	edges.erase(he->next->listIt);
-	edges.erase(he->listIt);
-	edges.erase(hesym->prev->listIt);
-	edges.erase(hesym->next->listIt);
-	edges.erase(hesym->listIt);
-	
-	
+	ec.removed.push_back(edges[he->prev->index]);
+	ec.removed.push_back(edges[he->next->index]);
+	ec.removed.push_back(edges[he->index]);
+	ec.removed.push_back(edges[hesym->prev->index]);
+	ec.removed.push_back(edges[hesym->next->index]);
+	ec.removed.push_back(edges[hesym->index]);
+	edges[he->prev->index] = NULL;
+	edges[he->next->index] = NULL;
+	edges[he->index] = NULL;
+	edges[hesym->prev->index] = NULL;
+	edges[hesym->next->index] = NULL;
+	edges[hesym->index] = NULL;
 	
 	/** Update edge pointers **/
 	if (he->next->sym != NULL) {
@@ -385,8 +360,6 @@ Mesh::collapse_edge() {
 	  assert(e->next != e);
 	}
 	*/
-	
-	numIndices = edges.size();
 }
 
 void
@@ -399,8 +372,7 @@ Mesh::upLevelOfDetail() {
 	edge_collapse ec = collapse_list[level_of_detail];
 	
 	for (int i=0; i<ec.removed.size(); i+=1) {
-		edges.push_back(ec.removed[i]);
-		ec.removed[i]->listIt = --edges.end();
+		edges[ec.removed[i]->index] = ec.removed[i];
 	}
 	
 	for (int i=0; i<ec.fromV1.size(); i+=1) {
@@ -409,20 +381,22 @@ Mesh::upLevelOfDetail() {
 	
 	for (int i=0; i<ec.fromV2.size(); i+=1) {
 		ec.fromV2[i]->v = ec.V2;
-	}
-	numIndices = edges.size();	
+	}	
 }
 
 void
 Mesh::downLevelOfDetail() {
 	if (level_of_detail == collapse_list.size()){
+		int x = glutGet(GLUT_ELAPSED_TIME);
 		collapse_edge();
+		x = glutGet(GLUT_ELAPSED_TIME) - x;
+		cout << "Time: " <<x <<endl;
 		return;
 	}
 	edge_collapse ec = collapse_list[level_of_detail];
 	
 	for (int i=0; i<ec.removed.size(); i+=1) {
-		edges.erase(ec.removed[i]->listIt);
+		edges[ec.removed[i]->index] = NULL;
 	}
 	
 	for (int i=0; i<ec.fromV1.size(); i+=1) {
@@ -433,7 +407,6 @@ Mesh::downLevelOfDetail() {
 		ec.fromV2[i]->v = ec.collapseVert;
 	}
 	level_of_detail += 1;
-	numIndices = edges.size();
 }
 
 
@@ -448,12 +421,17 @@ Mesh::update_buffer() {
 		vertdata.push_back(verts[i].data());
 	}
 	
-	cout << "Triangles: " << edges.size()/3 << endl;
-	
-	list<half_edge*>::iterator it;
+	vector<half_edge*>::iterator it;
+	int removed = 0;
 	for (it=edges.begin(); it!=edges.end(); ++it) {
-		elements.push_back((*it)->v);
+		if (*it) {
+			elements.push_back((*it)->v);
+		}
 	}
+	
+	cout << "Triangles: " << elements.size()-removed << endl;
+	numIndices = elements.size();
+	
 	glBindBuffer(GL_ARRAY_BUFFER, arrayBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data)*vertdata.size(), &vertdata[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementArrayBuffer);

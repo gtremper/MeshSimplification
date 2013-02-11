@@ -58,7 +58,7 @@ struct half_edge {
 	int v;
     half_edge *prev, *next, *sym; //anti-clockwise ordering
 	edge_data* data;
-	list<half_edge*>::iterator listIt;
+	int index;
 	half_edge();
 	~half_edge();
 };
@@ -83,15 +83,14 @@ typedef boost::heap::priority_queue<edge_data*,
 /********* Comprehensive Mesh definition **********/
 
 class Mesh {
-  //vector<half_edge*> edges;
-  list<half_edge*> edges;
-  vector<vertex> verts;
   GLuint arrayBuffer;
   GLuint elementArrayBuffer;
   unsigned int numIndices;
   vector<edge_collapse> collapse_list;
   int level_of_detail;
   public:
+	vector<half_edge*> edges;
+	vector<vertex> verts;
     boost::unordered_map< pair<int, int>, half_edge* > existing_edges;
     Priority_Queue pq;
     Mesh(vector<vertex>& vertices, vector<vec3>& faces);
