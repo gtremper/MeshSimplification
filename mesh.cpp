@@ -388,7 +388,9 @@ void
 Mesh::downLevelOfDetail() {
 	if (level_of_detail == collapse_list.size()){
 		int x = glutGet(GLUT_ELAPSED_TIME);
-		collapse_edge();
+		for(int j=0; j<1; j++){
+			collapse_edge();
+		}
 		x = glutGet(GLUT_ELAPSED_TIME) - x;
 		cout << "Time: " <<x <<endl;
 		return;
@@ -422,14 +424,13 @@ Mesh::update_buffer() {
 	}
 	
 	vector<half_edge*>::iterator it;
-	int removed = 0;
 	for (it=edges.begin(); it!=edges.end(); ++it) {
 		if (*it) {
 			elements.push_back((*it)->v);
 		}
 	}
 	
-	cout << "Triangles: " << elements.size()-removed << endl;
+	cout << "Triangles: " << elements.size()/3 << endl;
 	numIndices = elements.size();
 	
 	glBindBuffer(GL_ARRAY_BUFFER, arrayBuffer);
