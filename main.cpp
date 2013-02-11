@@ -188,7 +188,7 @@ void keyboard(unsigned char key, int x, int y) {
 		mesh->collapse_edge();
 		cout << "Time to collapse: "<<glutGet(GLUT_ELAPSED_TIME) - coltime << endl;
 		mesh->update_buffer();
-		break;
+		break;	
 	case 48: //0
 	case 49: //1
 	case 50: //2
@@ -216,6 +216,25 @@ void keyboard(unsigned char key, int x, int y) {
 	}
 	glutPostRedisplay();
 }
+
+void specialKey(int key,int x,int y) {
+	switch(key) {
+		case 100: //left
+			break;
+		case 101: //up
+			mesh->upLevelOfDetail();
+			mesh->update_buffer();
+			break;
+		case 102: //right
+			break;
+		case 103: //down
+			mesh->downLevelOfDetail();
+			mesh->update_buffer();
+			break;
+	}
+	glutPostRedisplay();
+}
+
 
 void init(char* filename) {
 	mesh = parseOFF(filename);
@@ -334,6 +353,7 @@ int main(int argc, char* argv[]) {
 	init(argv[1]);
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);
+	glutSpecialFunc(specialKey);
 	glutReshapeFunc(reshape);
 	glutReshapeWindow(600,400);
 	glutIdleFunc(display);
