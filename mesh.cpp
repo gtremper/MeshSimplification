@@ -438,9 +438,7 @@ Mesh::update_buffer() {
 		vertdata.push_back(verts[i].data());
 	}
 	
-	cout << "verts: " << verts.size() << endl;
 	cout << "Triangles: " << edges.size()/3 << endl;
-	
 	
 	for (int i=0; i<edges.size(); i+=1) {
 		elements.push_back(edges[i]->v);
