@@ -55,12 +55,20 @@ struct edge_data {
 };
 
 struct half_edge {
-    //vertex *v;
 	int v;
     half_edge *prev, *next, *sym; //anti-clockwise ordering
 	edge_data* data;
 	half_edge();
 	~half_edge();
+};
+
+struct edge_collapse {
+	vector<half_edge*> removed;
+	vector<half_edge*> fromV1;
+	vector<half_edge*> fromV2;
+	int V1;
+	int V2;
+	int collapseVert;
 };
 
 struct edge_compare {
@@ -77,10 +85,9 @@ class Mesh {
   vector<half_edge*> edges;
   vector<vertex> verts;
   GLuint arrayBuffer;
-  vertex* bufferVerts;
   GLuint elementArrayBuffer;
-  GLuint* bufferInds;
   unsigned int numIndices;
+  
   public:
     boost::unordered_map< pair<int, int>, half_edge* > existing_edges;
 	boost::unordered_map<vertex*, GLuint> vertToIndexMap;

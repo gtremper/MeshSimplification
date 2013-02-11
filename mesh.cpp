@@ -324,17 +324,23 @@ Mesh::collapse_edge() {
 		}
 	}
 	
+	
+	
+	
+	
+	
+	
 	/** Delete removed items **/
-	delete edata;
+	//delete edata;
 	//delete he->v;
 	//delete he->sym->v;
 
-	delete hesym->prev;
-	delete hesym->next;
-	delete hesym;
-	delete he->prev;
-	delete he->next;
-	delete he;
+	//delete hesym->prev;
+	//delete hesym->next;
+	//delete hesym;
+	//delete he->prev;
+	//delete he->next;
+	//delete he;
 
 	for (unsigned int i = 0; i < edges.size(); i++) {
 	  half_edge* e = edges[i];
