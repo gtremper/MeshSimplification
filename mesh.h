@@ -87,7 +87,8 @@ class Mesh {
   GLuint arrayBuffer;
   GLuint elementArrayBuffer;
   unsigned int numIndices;
-  
+  vector<edge_collapse> collapse_list;
+  int lod; //level of detail
   public:
     boost::unordered_map< pair<int, int>, half_edge* > existing_edges;
 	boost::unordered_map<vertex*, GLuint> vertToIndexMap;

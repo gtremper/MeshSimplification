@@ -266,6 +266,8 @@ Mesh::collapse_edge() {
 		pq.pop();	
 	}while(edata->edge == NULL);
 	
+	edge_collapse ec; //store edge collapse information
+	
 	half_edge* he = edata->edge;
 	half_edge* hesym = he->sym;	
 	
@@ -285,12 +287,25 @@ Mesh::collapse_edge() {
 	memcpy(midpoint.Q, Q1, sizeof(Q1));
 	
 	/* Remove edges from faces that disapear */
-	edges.erase(remove(edges.begin(), edges.end(), he->prev), edges.end());
-	edges.erase(remove(edges.begin(), edges.end(), he->next), edges.end());
-	edges.erase(remove(edges.begin(), edges.end(), he), edges.end());
-	edges.erase(remove(edges.begin(), edges.end(), hesym->prev), edges.end());
-	edges.erase(remove(edges.begin(), edges.end(), hesym->next), edges.end());
-	edges.erase(remove(edges.begin(), edges.end(), hesym), edges.end());
+	vector<half_edge*>::iterator rmEdge;
+	rmEdge = find(edges.begin(), edges.end(), he->prev);
+	ec.removed.push_back(*rmEdge);
+	edges.erase(rmEdge);
+	rmEdge = find(edges.begin(), edges.end(), he->next);
+	ec.removed.push_back(*rmEdge);
+	edges.erase(rmEdge);
+	rmEdge = find(edges.begin(), edges.end(), he);
+	ec.removed.push_back(*rmEdge);
+	edges.erase(rmEdge);
+	rmEdge = find(edges.begin(), edges.end(), hesym->prev);
+	ec.removed.push_back(*rmEdge);
+	edges.erase(rmEdge);
+	rmEdge = find(edges.begin(), edges.end(), hesym->next);
+	ec.removed.push_back(*rmEdge);
+	edges.erase(rmEdge);
+	rmEdge = find(edges.begin(), edges.end(), hesym);
+	ec.removed.push_back(*rmEdge);
+	edges.erase(rmEdge);
 	
 	/** Update edge pointers **/
 	if (he->next->sym != NULL) {
@@ -317,10 +332,20 @@ Mesh::collapse_edge() {
 	
 	verts.push_back(midpoint);
 	
+	ec.collapseVert = verts.size()-1;
+	ec.V1 = he->v;
+	ec.V2 = hesym->v;
+	
 	for (unsigned int i = 0; i < neighbors.size(); i++) {
-		if (neighbors[i]->v == he->v || neighbors[i]->v == hesym->v) {
+		if (neighbors[i]->v == he->v) {
 			neighbors[i]->v = verts.size()-1; // set vertex to midpoint
 			neighbors[i]->data->calculate_quad_error(verts);
+			ec.fromV1.push_back(neighbors[i]);
+		}
+		if (neighbors[i]->v == hesym->v) {
+			neighbors[i]->v = verts.size()-1; // set vertex to midpoint
+			neighbors[i]->data->calculate_quad_error(verts);
+			ec.fromV2.push_back(neighbors[i]);
 		}
 	}
 	
@@ -331,7 +356,7 @@ Mesh::collapse_edge() {
 	
 	
 	/** Delete removed items **/
-	//delete edata;
+	delete edata;
 	//delete he->v;
 	//delete he->sym->v;
 
