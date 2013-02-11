@@ -405,6 +405,7 @@ Mesh::upLevelOfDetail() {
 void
 Mesh::downLevelOfDetail() {
 	if (level_of_detail == collapse_list.size()){
+		collapse_edge();
 		return;
 	}
 	edge_collapse ec = collapse_list[level_of_detail];

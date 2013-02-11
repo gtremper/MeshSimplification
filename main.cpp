@@ -85,8 +85,7 @@ void printHelp() {
 			<< "use 'wasd' to move object.\n"
 			<< "use 'c' to move camera.\n"
 			<< "use 'm' to animate.\n"
-			<< "use 'l' to trigger edge collapse.\n"
-			<< "(currently only works on Models/collapsetest.off)\n"
+			<< "use 'up' or 'down' to change level of detail.\n"
 			<< "use '1-9' to move lights.\n"
 			<< "press ESC to quit.\n\n";	
 }
@@ -123,7 +122,6 @@ void mouse(int x, int y) {
 
 /* Keyboard options */
 void keyboard(unsigned char key, int x, int y) {
-	int coltime;
 	switch(key) {
 	case 'w':
 		if (moveLight) light_position[currentLight] -= vec4(0,0,SENSITIVITY,0);
@@ -183,12 +181,6 @@ void keyboard(unsigned char key, int x, int y) {
 		lastTime = glutGet(GLUT_ELAPSED_TIME);
 		cout << "Animate is now set to" << (animate ? " true " : " false ") << "\n";
 		break;
-	case 'l':
-		coltime = glutGet(GLUT_ELAPSED_TIME);
-		mesh->collapse_edge();
-		cout << "Time to collapse: "<<glutGet(GLUT_ELAPSED_TIME) - coltime << endl;
-		mesh->update_buffer();
-		break;	
 	case 48: //0
 	case 49: //1
 	case 50: //2
