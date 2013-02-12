@@ -261,12 +261,8 @@ Mesh::get_neighboring_vertices(vector<vertex*> &res, half_edge* he) {
 
 void
 Mesh::collapse_edge() {
-	edge_data *edata;
-	do {
-		edata = pq.top();
-		pq.pop();	
-	}while(edata->edge == NULL);
-	cout << edata->merge_cost << endl;
+	edge_data *edata = pq.top();
+	pq.pop();
 	
 	edge_collapse ec; //store edge collapse information
 	level_of_detail += 1;
@@ -349,20 +345,7 @@ Mesh::collapse_edge() {
 	collapse_list.push_back(ec);
 	
 	/** Delete removed items **/
-//	delete edata;
- 
-	/*
-	for (unsigned int i = 0; i < edges.size(); i++) {
-	  half_edge* e = edges[i];
-	  //assert(e->v != NULL);
-	  assert(e->prev != NULL);
-	  assert(e->next != NULL);
-	  assert(e->sym != NULL);
-	  assert(e->sym != e);
-	  assert(e->prev != e);
-	  assert(e->next != e);
-	}
-	*/
+	delete edata;
 }
 
 void
