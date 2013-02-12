@@ -309,7 +309,7 @@ Mesh::collapse_edge() {
 	}
 	if (he->prev->sym != NULL) {
 		he->prev->sym->sym = he->next->sym;
-		he->prev->sym->data->edge = NULL; //discarded when poped from queue
+		pq.erase(he->prev->sym->data->pq_handle);
 		he->prev->sym->data = he->next->sym->data;
 	}
 	if (hesym->next->sym != NULL) {
@@ -318,7 +318,7 @@ Mesh::collapse_edge() {
 	}
 	if (hesym->prev->sym != NULL) {
 		hesym->prev->sym->sym = hesym->next->sym;
-		hesym->prev->sym->data->edge = NULL; //discarded when poped from queue
+		pq.erase(hesym->prev->sym->data->pq_handle);
 		if (hesym->next->sym != NULL)
 			hesym->prev->sym->data = hesym->next->sym->data;
 	}
