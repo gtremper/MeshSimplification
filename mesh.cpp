@@ -179,7 +179,7 @@ Mesh::populate_symmetric_edge(half_edge* e, int v0, int v1) {
 	e->sym->data = d;
 	d->calculate_quad_error(verts);
 	
-	pq.push(d);
+	d->pq_handle = pq.push(d);
   } else {
 	existing_edges[key] = e;
 	e->sym = NULL; /** we guarantee that the symmetric edge is at least NULL */
@@ -266,6 +266,7 @@ Mesh::collapse_edge() {
 		edata = pq.top();
 		pq.pop();	
 	}while(edata->edge == NULL);
+	cout << edata->merge_cost << endl;
 	
 	edge_collapse ec; //store edge collapse information
 	level_of_detail += 1;
@@ -334,11 +335,13 @@ Mesh::collapse_edge() {
 		if (neighbors[i]->v == he->v) {
 			neighbors[i]->v = verts.size()-1; // set vertex to midpoint
 			neighbors[i]->data->calculate_quad_error(verts);
+			pq.update(neighbors[i]->data->pq_handle);
 			ec.fromV1.push_back(neighbors[i]);
 		}
 		if (neighbors[i]->v == hesym->v) {
 			neighbors[i]->v = verts.size()-1; // set vertex to midpoint
 			neighbors[i]->data->calculate_quad_error(verts);
+			pq.update(neighbors[i]->data->pq_handle);
 			ec.fromV2.push_back(neighbors[i]);
 		}
 	}
@@ -346,7 +349,7 @@ Mesh::collapse_edge() {
 	collapse_list.push_back(ec);
 	
 	/** Delete removed items **/
-	delete edata;
+//	delete edata;
  
 	/*
 	for (unsigned int i = 0; i < edges.size(); i++) {
