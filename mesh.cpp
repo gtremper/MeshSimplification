@@ -23,11 +23,9 @@ Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 	}
 
   for (unsigned int i=0; i < numFaces; i+=1) {
-	
 	int v0 = faces[i][0];
 	int v1 = faces[i][1];
 	int v2 = faces[i][2];
-	
 	
 	half_edge* e0 = new half_edge();
 	half_edge* e1 = new half_edge();
@@ -69,7 +67,6 @@ Mesh::~Mesh(){
 	for (it=edges.begin(); it!=edges.end(); ++it) {
 		delete *it;
 	}
-	
 	while(!pq.empty()){
 		delete pq.top();
 		pq.pop();
@@ -84,11 +81,6 @@ void
 edge_data::calculate_quad_error(vector<vertex>& verts) {
 	float Q1[10];
 	float Q2[10];
-	
-	//cout << "First edge: " << edge << endl;
-	//cout << "second edge: " << edge->sym << endl;
-	
-	//cout <<"PRecrach: "<< edge <<endl;
 	
 	memcpy(Q1, verts[edge->v].Q, sizeof(Q1));
 	memcpy(Q2, verts[edge->sym->v].Q, sizeof(Q2));
@@ -109,8 +101,6 @@ edge_data::calculate_quad_error(vector<vertex>& verts) {
 	
 	float det = a*e*h - a*f*f - b*b*h + 2*b*c*f - c*c*e;
 	
-	//cout << "DET: " << det << endl;
-	
 	float x,y,z;
 	if (det<0.01) {
 		merge_point = (verts[edge->v].position + verts[edge->sym->v].position)/2.0f;
@@ -130,7 +120,6 @@ edge_data::calculate_quad_error(vector<vertex>& verts) {
 						+ 2*f*y*z + 2*g*y + h*z*z + 2*i*z + Q1[9];
 }
 
-/** he1 < he2 means that he1 is lower on the heap **/
 bool
 edge_compare::operator() (const edge_data* he1, const edge_data* he2) const
 {
@@ -187,7 +176,7 @@ Mesh::populate_symmetric_edge(half_edge* e, int v0, int v1) {
 	d->pq_handle = pq.push(d);
   } else {
 	existing_edges[key] = e;
-	e->sym = NULL; /** we guarantee that the symmetric edge is at least NULL */
+	e->sym = NULL; 
 	res = false;
   }
   return res;
