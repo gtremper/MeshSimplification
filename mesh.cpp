@@ -243,16 +243,6 @@ Mesh::get_neighboring_edges(vector<half_edge*> &res, half_edge* he) {
 	}
 }
 
-void
-Mesh::get_neighboring_vertices(vector<vertex*> &res, half_edge* he) {
-	//half_edge* loop = he;
-	//cout << "NEIGHBOR TEST" <<endl;
-	//do {
-	//	res.push_back(loop->v);
-	//	loop = loop->next->sym;
-	//} while (loop != he);
-}
-
 /** Collapses half_edge* [he] and sets the surrounding edges to point to
  * a new vertex v_m that is the midpoint of [he]'s two defining vertices.
  * I know I'm probably forgetting to set some edges, but here are my
@@ -261,6 +251,9 @@ Mesh::get_neighboring_vertices(vector<vertex*> &res, half_edge* he) {
 
 void
 Mesh::collapse_edge() {
+	if (pq.size() < 4) {
+		return;
+	}
 	edge_data *edata = pq.top();
 	pq.pop();
 	

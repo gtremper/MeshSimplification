@@ -109,7 +109,6 @@ class Mesh {
     bool populate_symmetric_edge(half_edge*, int, int);
     pair<int, int> get_vertex_key(int,int);
     void get_neighboring_edges(vector<half_edge*>&, half_edge*);
-    void get_neighboring_vertices(vector<vertex*>&, half_edge*);
     void collapse_edge();
 	void update_buffer();
 	void draw();
