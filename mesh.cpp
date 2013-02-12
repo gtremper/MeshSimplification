@@ -69,6 +69,11 @@ Mesh::~Mesh(){
 	for (it=edges.begin(); it!=edges.end(); ++it) {
 		delete *it;
 	}
+	
+	while(!pq.empty()){
+		delete pq.top();
+		pq.pop();
+	}
 }
 
 /** Half Edge functions **/
