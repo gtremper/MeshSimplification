@@ -305,7 +305,7 @@ Mesh::collapse_edge() {
 	}
 	memcpy(midpoint.Q, Q1, sizeof(Q1));
 	
-	ec.removed.push_back(edges[he->prev->index]);
+	ec.removed.push_back(he->prev);
 	ec.removed.push_back(edges[he->next->index]);
 	ec.removed.push_back(edges[he->index]);
 	ec.removed.push_back(edges[hesym->prev->index]);
