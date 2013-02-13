@@ -315,6 +315,13 @@ Mesh::collapse_edge() {
 	ec.V2 = hesym->v;
 	
 	for (unsigned int i = 0; i < neighbors.size(); i++) {
+	    if (neighbors[i] == he->prev ||
+			neighbors[i] == he->next ||
+			neighbors[i] == he ||
+			neighbors[i] == hesym->prev ||
+			neighbors[i] == hesym->next ||
+			neighbors[i] == hesym)
+		  continue;
 		if (neighbors[i]->v == he->v) {
 			neighbors[i]->v = verts.size()-1; // set vertex to midpoint
 			neighbors[i]->data->calculate_quad_error(verts);
