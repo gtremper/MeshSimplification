@@ -61,7 +61,7 @@ struct edge_data {
 	float merge_cost;
 	half_edge *edge; //the half edges this data represents
     edge_handle pq_handle;
-	void calculate_quad_error(vector<vertex>& verts);
+	void calculate_quad_error(vector<vertex>&);
 };
 
 
@@ -106,7 +106,7 @@ class Mesh {
     priorityQueue pq;
     Mesh(vector<vertex>& vertices, vector<vec3>& faces);
 	~Mesh();
-    bool populate_symmetric_edge(half_edge*, int, int);
+    void populate_symmetric_edge(half_edge*, int, int);
     pair<int, int> get_vertex_key(int,int);
     void get_neighboring_edges(vector<half_edge*>&, half_edge*);
     void collapse_edge();

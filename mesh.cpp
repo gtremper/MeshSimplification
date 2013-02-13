@@ -83,7 +83,7 @@ edge_data::calculate_quad_error(vector<vertex>& verts) {
 	float Q2[10];
 	
 	memcpy(Q1, verts[edge->v].Q, sizeof(Q1));
-	memcpy(Q2, verts[edge->sym->v].Q, sizeof(Q2));
+	memcpy(Q2, verts[edge->next->v].Q, sizeof(Q2));
 	
 	for (int i=0; i<10; i+=1) {
 		Q1[i] += Q2[i];
@@ -103,7 +103,7 @@ edge_data::calculate_quad_error(vector<vertex>& verts) {
 	
 	float x,y,z;
 	if (det<0.01) {
-		merge_point = (verts[edge->v].position + verts[edge->sym->v].position)/2.0f;
+		merge_point = (verts[edge->v].position + verts[edge->next->v].position)/2.0f;
 		x = merge_point[0];
 		y = merge_point[1];
 		z = merge_point[2];
@@ -157,29 +157,24 @@ vertex_data vertex::data() {
  * the removal priority
  * => Returns true if the value was found in the map.
  */
-bool
+void
 Mesh::populate_symmetric_edge(half_edge* e, int v0, int v1) {
-  pair<int, int> key = get_vertex_key(v0, v1);
-  boost::unordered_map< pair<int, int>, half_edge* >::iterator it = 
+	pair<int, int> key = get_vertex_key(v0, v1);
+	boost::unordered_map< pair<int, int>, half_edge* >::iterator it = 
 		existing_edges.find(key);
-  bool res = true;
-  if (it != existing_edges.end() ) { // exists
-	e->sym = it->second;
-	e->sym->sym = e;
-	
-	edge_data* d = new edge_data();
-	d->edge = e;
-	e->data = d;
-	e->sym->data = d;
-	d->calculate_quad_error(verts);
-	
-	d->pq_handle = pq.push(d);
-  } else {
-	existing_edges[key] = e;
-	e->sym = NULL; 
-	res = false;
-  }
-  return res;
+	if (it != existing_edges.end() ) { // exists
+		e->sym = it->second;
+		e->sym->sym = e;
+		e->data = e->sym->data;
+	} else {
+		existing_edges[key] = e;
+		e->sym = NULL; 
+		edge_data* d = new edge_data();
+		d->edge = e;
+		e->data = d;
+		d->calculate_quad_error(verts);
+		d->pq_handle = pq.push(d);
+	}
 }
 
 pair<int, int>
@@ -286,25 +281,25 @@ Mesh::collapse_edge() {
 	edges[hesym->index] = NULL;
 	
 	/** Update edge pointers **/
-	if (he->next->sym != NULL) {
+	//if (he->next->sym != NULL) {
 		he->next->sym->sym = he->prev->sym;
 		he->next->sym->data->edge = he->next->sym;
-	}
-	if (he->prev->sym != NULL) {
+	//}
+	//if (he->prev->sym != NULL) {
 		he->prev->sym->sym = he->next->sym;
 		pq.erase(he->prev->sym->data->pq_handle);
 		he->prev->sym->data = he->next->sym->data;
-	}
-	if (hesym->next->sym != NULL) {
+	//}
+	//if (hesym->next->sym != NULL) {
 		hesym->next->sym->sym = hesym->prev->sym;
 		hesym->next->sym->data->edge = hesym->next->sym;
-	}
-	if (hesym->prev->sym != NULL) {
+	//}
+	//if (hesym->prev->sym != NULL) {
 		hesym->prev->sym->sym = hesym->next->sym;
 		pq.erase(hesym->prev->sym->data->pq_handle);
 		if (hesym->next->sym != NULL)
 			hesym->prev->sym->data = hesym->next->sym->data;
-	}
+	//}
 	
 	/** Update priority queue **/
 	
@@ -313,6 +308,8 @@ Mesh::collapse_edge() {
 	ec.collapseVert = verts.size()-1;
 	ec.V1 = he->v;
 	ec.V2 = hesym->v;
+	
+	//cout << "data handle: " << *edata->pq_handle << endl;
 	
 	for (unsigned int i = 0; i < neighbors.size(); i++) {
 	    if (neighbors[i] == he->prev ||
