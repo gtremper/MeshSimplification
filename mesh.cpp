@@ -193,6 +193,7 @@ Mesh::get_neighboring_edges(vector<half_edge*> &res, half_edge* he) {
 	
 	loop = he->prev->sym;
 	while (loop != he->sym->next) {
+		if (!loop) break;
 		res.push_back(loop);
 		res.push_back(loop->prev);
 		loop = loop->prev->sym;
@@ -253,14 +254,15 @@ Mesh::collapse_edge() {
 	if (pq.size() < 4) {
 		return;
 	}
-	//edge_data *edata;
-	//do {
-	//	edata = pq.top();
-	//	pq.pop();
-	//}while(!edata->edge);
 	
 	edge_data *edata = pq.top();
 	pq.pop();
+	while (!edata->edge){
+		delete edata;
+		edata = pq.top();
+		pq.pop();
+	}
+	
 	
 	edge_collapse ec; //store edge collapse information
 	level_of_detail += 1;
@@ -270,87 +272,55 @@ Mesh::collapse_edge() {
 	
 	vector<half_edge*> neighbors;
 	get_neighboring_edges(neighbors, he);
-	vector<half_edge*> neighborsB;
-	get_neighboring_edges(neighborsB, he->sym);
-	//for (int a=0; a<neighbors.size(); ++a) {
-	//	for (int b=0; b<neighborsB.size(); ++b) {
-	//		if (neighbors[a]->next->sym == neighborsB[b]->next) {
-	//			cout << "DEGENERATE EDGE" <<endl;
-	//			ec.removed.push_back(edges[he->prev->index]);
-	//			ec.removed.push_back(edges[he->next->index]);
-	//			ec.removed.push_back(edges[he->index]);
-	//			ec.removed.push_back(edges[hesym->prev->index]);
-	//			ec.removed.push_back(edges[hesym->next->index]);
-	//			ec.removed.push_back(edges[hesym->index]);
-	//			edges[he->prev->index] = NULL;
-	//			edges[he->next->index] = NULL;
-	//			edges[he->index] = NULL;
-	//			edges[hesym->prev->index] = NULL;
-	//			edges[hesym->next->index] = NULL;
-	//			edges[hesym->index] = NULL;
-	//		}
-	//	}
-	//}
-	neighbors.insert(neighbors.end(), neighborsB.begin(), neighborsB.end());
+	get_neighboring_edges(neighbors, he->sym);
+
 	
 	/* Calculate new vertex position **/
 	vertex midpoint = vertex();
 	midpoint.position = edata->merge_point;
-	midpoint.normal = glm::normalize(verts[he->v].normal + verts[hesym->v].normal);
+	midpoint.normal = glm::normalize(verts[he->v].normal + verts[he->next->v].normal);
 	
 	float Q1[10];
 	memcpy(Q1, verts[he->v].Q, sizeof(Q1));
 	for (int j=0; j<10; j+=1) {
-		Q1[j] += verts[hesym->v].Q[j];
+		Q1[j] += verts[he->next->v].Q[j];
 	}
 	memcpy(midpoint.Q, Q1, sizeof(Q1));
 	
 	ec.removed.push_back(he->prev);
-	ec.removed.push_back(edges[he->next->index]);
-	ec.removed.push_back(edges[he->index]);
-	ec.removed.push_back(edges[hesym->prev->index]);
-	ec.removed.push_back(edges[hesym->next->index]);
-	ec.removed.push_back(edges[hesym->index]);
+	ec.removed.push_back(he->next);
+	ec.removed.push_back(he);
 	edges[he->prev->index] = NULL;
 	edges[he->next->index] = NULL;
 	edges[he->index] = NULL;
-	edges[hesym->prev->index] = NULL;
-	edges[hesym->next->index] = NULL;
-	edges[hesym->index] = NULL;
+	if (hesym){
+		edges[hesym->prev->index] = NULL;
+		edges[hesym->next->index] = NULL;
+		edges[hesym->index] = NULL;
+		ec.removed.push_back(hesym->prev);
+		ec.removed.push_back(hesym->next);
+		ec.removed.push_back(hesym);
+	}
 	
 	/** Update edge pointers **/
 
 	he->next->sym->sym = he->prev->sym;
 	he->prev->sym->sym = he->next->sym;
 	he->next->data->edge = he->next->sym;
-	pq.erase(he->prev->data->pq_handle);
+	he->prev->data->edge = NULL; 
 	he->prev->sym->data = he->next->data;
 	
 	hesym->next->sym->sym = hesym->prev->sym;
 	hesym->next->data->edge = hesym->next->sym;
 	hesym->prev->sym->sym = hesym->next->sym;
-	pq.erase(hesym->prev->data->pq_handle);
+	hesym->prev->data->edge = NULL;
 	hesym->prev->sym->data = hesym->next->data;
-	
-	
-    
-	//hesym->next->sym->sym = hesym->prev->sym;
-	//hesym->next->sym->data->edge = hesym->next->sym;
-    
-	//hesym->prev->sym->sym = hesym->next->sym;
-	//pq.erase(hesym->prev->sym->data->pq_handle);
-	//hesym->prev->sym->data = hesym->next->sym->data;
-
-	
-	/** Update priority queue **/
 	
 	verts.push_back(midpoint);
 	
 	ec.collapseVert = verts.size()-1;
 	ec.V1 = he->v;
 	ec.V2 = hesym->v;
-	
-	//cout << "data handle: " << *edata->pq_handle << endl;
 	
 	for (unsigned int i = 0; i < neighbors.size(); i++) {
 	    if (neighbors[i] == he->prev ||
@@ -373,6 +343,8 @@ Mesh::collapse_edge() {
 			ec.fromV2.push_back(neighbors[i]);
 		}
 	}
+	
+	
 	
 	collapse_list.push_back(ec);
 	
