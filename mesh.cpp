@@ -270,7 +270,28 @@ Mesh::collapse_edge() {
 	
 	vector<half_edge*> neighbors;
 	get_neighboring_edges(neighbors, he);
-	get_neighboring_edges(neighbors, he->sym);
+	vector<half_edge*> neighborsB;
+	get_neighboring_edges(neighborsB, he->sym);
+	//for (int a=0; a<neighbors.size(); ++a) {
+	//	for (int b=0; b<neighborsB.size(); ++b) {
+	//		if (neighbors[a]->next->sym == neighborsB[b]->next) {
+	//			cout << "DEGENERATE EDGE" <<endl;
+	//			ec.removed.push_back(edges[he->prev->index]);
+	//			ec.removed.push_back(edges[he->next->index]);
+	//			ec.removed.push_back(edges[he->index]);
+	//			ec.removed.push_back(edges[hesym->prev->index]);
+	//			ec.removed.push_back(edges[hesym->next->index]);
+	//			ec.removed.push_back(edges[hesym->index]);
+	//			edges[he->prev->index] = NULL;
+	//			edges[he->next->index] = NULL;
+	//			edges[he->index] = NULL;
+	//			edges[hesym->prev->index] = NULL;
+	//			edges[hesym->next->index] = NULL;
+	//			edges[hesym->index] = NULL;
+	//		}
+	//	}
+	//}
+	neighbors.insert(neighbors.end(), neighborsB.begin(), neighborsB.end());
 	
 	/* Calculate new vertex position **/
 	vertex midpoint = vertex();
