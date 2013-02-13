@@ -74,8 +74,6 @@ Mesh::~Mesh(){
 }
 
 /** Half Edge functions **/
-half_edge::half_edge(){}
-half_edge::~half_edge(){}
 
 void
 edge_data::calculate_quad_error(vector<vertex>& verts) {
@@ -190,8 +188,20 @@ Mesh::get_vertex_key(int v0, int v1) {
 //TODO: deal with null edge->data
 void
 Mesh::get_neighboring_edges(vector<half_edge*> &res, half_edge* he) {
-	half_edge* loop = he->prev->sym;
-	/** add one vertex of the half_edge */
+	bool done = false;
+	half_edge* loop;
+	
+	loop = he->prev->sym;
+	while (loop != he->sym->next) {
+		res.push_back(loop);
+		res.push_back(loop->prev);
+		loop = loop->prev->sym;
+	}
+	
+	
+	
+	//half_edge* loop = he->prev->sym;
+	/** add one vertex of the half_edge 
 	if (loop == NULL) {
 		loop = he->sym->next;
 		do {
@@ -210,7 +220,7 @@ Mesh::get_neighboring_edges(vector<half_edge*> &res, half_edge* he) {
 			loop = loop->prev->sym;
 		} while (loop != he);
 	}
-	/** now add the other */
+	/** now add the other 
 	loop = he->sym->prev->sym;
 	if (loop == NULL) {
 		loop = he->next;
@@ -229,7 +239,7 @@ Mesh::get_neighboring_edges(vector<half_edge*> &res, half_edge* he) {
 				res.push_back(loop->sym);
 			loop = loop->prev->sym;
 		} while (loop != he->sym);
-	}
+	}*/
 }
 
 /** Collapses half_edge* [he] and sets the surrounding edges to point to
@@ -243,6 +253,12 @@ Mesh::collapse_edge() {
 	if (pq.size() < 4) {
 		return;
 	}
+	//edge_data *edata;
+	//do {
+	//	edata = pq.top();
+	//	pq.pop();
+	//}while(!edata->edge);
+	
 	edge_data *edata = pq.top();
 	pq.pop();
 	
@@ -254,6 +270,7 @@ Mesh::collapse_edge() {
 	
 	vector<half_edge*> neighbors;
 	get_neighboring_edges(neighbors, he);
+	get_neighboring_edges(neighbors, he->sym);
 	
 	/* Calculate new vertex position **/
 	vertex midpoint = vertex();
@@ -281,25 +298,28 @@ Mesh::collapse_edge() {
 	edges[hesym->index] = NULL;
 	
 	/** Update edge pointers **/
-	//if (he->next->sym != NULL) {
-		he->next->sym->sym = he->prev->sym;
-		he->next->sym->data->edge = he->next->sym;
-	//}
-	//if (he->prev->sym != NULL) {
-		he->prev->sym->sym = he->next->sym;
-		pq.erase(he->prev->sym->data->pq_handle);
-		he->prev->sym->data = he->next->sym->data;
-	//}
-	//if (hesym->next->sym != NULL) {
-		hesym->next->sym->sym = hesym->prev->sym;
-		hesym->next->sym->data->edge = hesym->next->sym;
-	//}
-	//if (hesym->prev->sym != NULL) {
-		hesym->prev->sym->sym = hesym->next->sym;
-		pq.erase(hesym->prev->sym->data->pq_handle);
-		if (hesym->next->sym != NULL)
-			hesym->prev->sym->data = hesym->next->sym->data;
-	//}
+
+	he->next->sym->sym = he->prev->sym;
+	he->prev->sym->sym = he->next->sym;
+	he->next->data->edge = he->next->sym;
+	pq.erase(he->prev->data->pq_handle);
+	he->prev->sym->data = he->next->data;
+	
+	hesym->next->sym->sym = hesym->prev->sym;
+	hesym->next->data->edge = hesym->next->sym;
+	hesym->prev->sym->sym = hesym->next->sym;
+	pq.erase(hesym->prev->data->pq_handle);
+	hesym->prev->sym->data = hesym->next->data;
+	
+	
+    
+	//hesym->next->sym->sym = hesym->prev->sym;
+	//hesym->next->sym->data->edge = hesym->next->sym;
+    
+	//hesym->prev->sym->sym = hesym->next->sym;
+	//pq.erase(hesym->prev->sym->data->pq_handle);
+	//hesym->prev->sym->data = hesym->next->sym->data;
+
 	
 	/** Update priority queue **/
 	

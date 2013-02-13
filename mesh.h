@@ -71,8 +71,6 @@ struct half_edge {
     half_edge *prev, *next, *sym; //anti-clockwise ordering
 	edge_data* data;
 	int index;
-	half_edge();
-	~half_edge();
 };
 
 struct edge_collapse {
