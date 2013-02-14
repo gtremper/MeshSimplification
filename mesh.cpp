@@ -257,12 +257,6 @@ Mesh::collapse_edge() {
 	
 	edge_data *edata = pq.top();
 	pq.pop();
-	while (!edata->edge){
-		delete edata;
-		edata = pq.top();
-		pq.pop();
-	}
-	
 	
 	edge_collapse ec; //store edge collapse information
 	level_of_detail += 1;
@@ -307,13 +301,15 @@ Mesh::collapse_edge() {
 	he->next->sym->sym = he->prev->sym;
 	he->prev->sym->sym = he->next->sym;
 	he->next->data->edge = he->next->sym;
-	he->prev->data->edge = NULL; 
+	pq.erase(he->prev->data->pq_handle);
+	delete he->prev->data;
 	he->prev->sym->data = he->next->data;
 	
 	hesym->next->sym->sym = hesym->prev->sym;
 	hesym->next->data->edge = hesym->next->sym;
 	hesym->prev->sym->sym = hesym->next->sym;
-	hesym->prev->data->edge = NULL;
+	pq.erase(hesym->prev->data->pq_handle);
+	delete hesym->prev->data;
 	hesym->prev->sym->data = hesym->next->data;
 	
 	verts.push_back(midpoint);
