@@ -198,49 +198,6 @@ Mesh::get_neighboring_edges(vector<half_edge*> &res, half_edge* he) {
 		res.push_back(loop->prev);
 		loop = loop->prev->sym;
 	}
-	
-	
-	
-	//half_edge* loop = he->prev->sym;
-	/** add one vertex of the half_edge 
-	if (loop == NULL) {
-		loop = he->sym->next;
-		do {
-			res.push_back(loop);
-			if (loop->sym == NULL)
-				break;
-			loop = loop->sym->next;
-		} while (loop != he && loop != NULL);
-	} else {
-		do {
-			if (loop == NULL)
-				break;
-			res.push_back(loop);
-			if (loop->sym != NULL)
-				res.push_back(loop->sym);
-			loop = loop->prev->sym;
-		} while (loop != he);
-	}
-	/** now add the other 
-	loop = he->sym->prev->sym;
-	if (loop == NULL) {
-		loop = he->next;
-		do {
-			res.push_back(loop);
-			if (loop->sym == NULL)
-				break;
-			loop = loop->sym->next;
-		} while (loop != he && loop != NULL);
-	} else {
-		do {
-			if (loop == NULL)
-				break;
-			res.push_back(loop);
-			if (loop->sym != NULL)
-				res.push_back(loop->sym);
-			loop = loop->prev->sym;
-		} while (loop != he->sym);
-	}*/
 }
 
 /** Collapses half_edge* [he] and sets the surrounding edges to point to
