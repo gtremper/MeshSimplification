@@ -307,49 +307,76 @@ Mesh::collapse_edge() {
 	}
 	
 	/** Update edge pointers **/
-	he->next->sym->sym = he->prev->sym;
-	he->prev->sym->sym = he->next->sym;
+	if (he->next->sym)
+		he->next->sym->sym = he->prev->sym;
+	if (he->prev->sym)
+		he->prev->sym->sym = he->next->sym;
 	he->next->data->edge = he->next->sym;
 	pq.erase(he->prev->data->pq_handle);
 	delete he->prev->data;
-	he->prev->sym->data = he->next->data;
+	if (he->prev->sym)
+		he->prev->sym->data = he->next->data;
 	
-	hesym->next->sym->sym = hesym->prev->sym;
-	hesym->next->data->edge = hesym->next->sym;
-	hesym->prev->sym->sym = hesym->next->sym;
-	pq.erase(hesym->prev->data->pq_handle);
-	delete hesym->prev->data;
-	hesym->prev->sym->data = hesym->next->data;
-	
+	if (hesym) {
+		if (hesym->next->sym)
+			hesym->next->sym->sym = hesym->prev->sym;
+		hesym->next->data->edge = hesym->next->sym;
+		if (hesym->prev->sym)
+			hesym->prev->sym->sym = hesym->next->sym;
+		pq.erase(hesym->prev->data->pq_handle);
+		delete hesym->prev->data;
+		if (hesym->prev->sym)
+			hesym->prev->sym->data = hesym->next->data;
+	}
 	verts.push_back(midpoint);
 	
 	ec.collapseVert = verts.size()-1;
 	ec.V1 = he->v;
-	ec.V2 = hesym->v;
+	if (hesym)
+		ec.V2 = hesym->v;
 	
-	for (unsigned int i = 0; i < neighbors.size(); i++) {
-	    if (neighbors[i] == he->prev ||
-			neighbors[i] == he->next ||
-			neighbors[i] == he ||
-			neighbors[i] == hesym->prev ||
-			neighbors[i] == hesym->next ||
-			neighbors[i] == hesym)
-		  continue;
-		if (neighbors[i]->v == he->v) {
-			neighbors[i]->v = verts.size()-1; // set vertex to midpoint
-			neighbors[i]->data->calculate_quad_error(verts);
-			pq.update(neighbors[i]->data->pq_handle);
-			ec.fromV1.push_back(neighbors[i]);
+	if (hesym) {
+		for (unsigned int i = 0; i < neighbors.size(); i++) {
+			if (neighbors[i] == hesym->prev ||
+				neighbors[i] == hesym->next ||
+				neighbors[i] == hesym ||
+				neighbors[i] == he->prev ||
+				neighbors[i] == he->next ||
+				neighbors[i] == he)
+			  continue;
+			if (neighbors[i]->v == he->v) {
+				neighbors[i]->v = verts.size()-1; // set vertex to midpoint
+				neighbors[i]->data->calculate_quad_error(verts);
+				pq.update(neighbors[i]->data->pq_handle);
+				ec.fromV1.push_back(neighbors[i]);
+			}
+			if (neighbors[i]->v == hesym->v) {
+				neighbors[i]->v = verts.size()-1; // set vertex to midpoint
+				neighbors[i]->data->calculate_quad_error(verts);
+				pq.update(neighbors[i]->data->pq_handle);
+				ec.fromV2.push_back(neighbors[i]);
+			}
 		}
-		if (neighbors[i]->v == hesym->v) {
-			neighbors[i]->v = verts.size()-1; // set vertex to midpoint
-			neighbors[i]->data->calculate_quad_error(verts);
-			pq.update(neighbors[i]->data->pq_handle);
-			ec.fromV2.push_back(neighbors[i]);
+	} else {
+		for (unsigned int i = 0; i < neighbors.size(); i++) {
+			if (neighbors[i] == he->prev ||
+				neighbors[i] == he->next ||
+				neighbors[i] == he)
+			  continue;
+			if (neighbors[i]->v == he->v) {
+				neighbors[i]->v = verts.size()-1; // set vertex to midpoint
+				neighbors[i]->data->calculate_quad_error(verts);
+				pq.update(neighbors[i]->data->pq_handle);
+				ec.fromV1.push_back(neighbors[i]);
+			}
+			if (neighbors[i]->v == he->next->v) {
+				neighbors[i]->v = verts.size()-1; // set vertex to midpoint
+				neighbors[i]->data->calculate_quad_error(verts);
+				pq.update(neighbors[i]->data->pq_handle);
+				ec.fromV2.push_back(neighbors[i]);
+			}
 		}
 	}
-	
-	
 	
 	collapse_list.push_back(ec);
 	
