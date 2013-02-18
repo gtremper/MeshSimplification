@@ -251,14 +251,6 @@ Mesh::get_neighboring_edges(vector<half_edge*> &res, half_edge* he) {
 
 	get_src_edges(res, he);
 	get_dst_edges(res, he);
-	
-//	loop = he->prev->sym;
-//	while (loop != he->sym->next) {
-//		if (!loop) break;
-//		res.push_back(loop);
-//		res.push_back(loop->prev);
-//		loop = loop->prev->sym;
-//	}
 }
 
 /** Collapses half_edge* [he] and sets the surrounding edges to point to
@@ -315,7 +307,6 @@ Mesh::collapse_edge() {
 	}
 	
 	/** Update edge pointers **/
-
 	he->next->sym->sym = he->prev->sym;
 	he->prev->sym->sym = he->next->sym;
 	he->next->data->edge = he->next->sym;
