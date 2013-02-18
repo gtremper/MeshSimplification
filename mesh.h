@@ -49,7 +49,7 @@ typedef boost::shared_ptr<vertex> vertexPtr;
 struct half_edge;
 struct edge_data;
 struct edge_compare {
-    bool operator() (const edge_data* he1, const edge_data* he2) const;
+	bool operator() (const edge_data* he1, const edge_data* he2) const;
 };
 struct edge_compare;
 
@@ -60,7 +60,7 @@ struct edge_data {
 	vec3 merge_point;
 	float merge_cost;
 	half_edge *edge; //the half edges this data represents
-    edge_handle pq_handle;
+	edge_handle pq_handle;
 	void calculate_quad_error(vector<vertex>&);
 };
 
@@ -68,7 +68,7 @@ struct edge_data {
 
 struct half_edge {
 	int v;
-    half_edge *prev, *next, *sym; //anti-clockwise ordering
+	half_edge *prev, *next, *sym; //anti-clockwise ordering
 	edge_data* data;
 	int index;
 };
@@ -86,7 +86,7 @@ struct edge_collapse {
 /** use .push(item) to add to the heap, use .top() to get the top of the heap,
  * and use .pop() to get rid of the top item of the heap */
 typedef boost::heap::priority_queue<edge_data*,
-        boost::heap::compare<edge_compare> > Priority_Queue;
+		boost::heap::compare<edge_compare> > Priority_Queue;
 
 
 /********* Comprehensive Mesh definition **********/
@@ -100,16 +100,16 @@ class Mesh {
   public:
 	vector<half_edge*> edges;
 	vector<vertex> verts;
-    boost::unordered_map< pair<int, int>, half_edge* > existing_edges;
-    priorityQueue pq;
-    Mesh(vector<vertex>& vertices, vector<vec3>& faces);
+	boost::unordered_map< pair<int, int>, half_edge* > existing_edges;
+	priorityQueue pq;
+	Mesh(vector<vertex>& vertices, vector<vec3>& faces);
 	~Mesh();
-    void populate_symmetric_edge(half_edge*, int, int);
-    pair<int, int> get_vertex_key(int,int);
+	void populate_symmetric_edge(half_edge*, int, int);
+	pair<int, int> get_vertex_key(int,int);
 	void get_src_edges(vector<half_edge*>&, half_edge*);
 	void get_dst_edges(vector<half_edge*>&, half_edge*);
-    void get_neighboring_edges(vector<half_edge*>&, half_edge*);
-    void collapse_edge();
+	void get_neighboring_edges(vector<half_edge*>&, half_edge*);
+	void collapse_edge();
 	void update_buffer();
 	void draw();
 	void upLevelOfDetail(const int);
