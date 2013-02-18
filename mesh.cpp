@@ -195,11 +195,11 @@ Mesh::get_src_edges(vector<half_edge*> &res, half_edge* he) {
 			loop = loop->prev->sym;
 		}
 	} else if (he->prev->sym == NULL) {
-		loop = he->sym->next;
-		while (loop->sym->next) {
+		loop = he->sym;
+		while (loop->next->sym) {
 			res.push_back(loop);
-			res.push_back(loop->prev);
-			loop = loop->sym->next;
+			res.push_back(loop->next);
+			loop = loop->next->sym;
 		}
 	} else {
 		loop = he->prev->sym;
