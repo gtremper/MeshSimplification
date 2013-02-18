@@ -183,6 +183,64 @@ Mesh::get_vertex_key(int v0, int v1) {
 	 return pair<int, int> (v1, v0);
 }
 
+void
+Mesh::get_src_edges(vector<half_edge*> &res, half_edge* he) {
+	if (he->sym == NULL && he->prev->sym == NULL) return;
+	half_edge* loop;
+	if (he->sym == NULL) {
+		loop = he->prev->sym;
+		while (loop->prev->sym) {
+			res.push_back(loop);
+			res.push_back(loop->prev);
+			loop = loop->prev->sym;
+		}
+	} else if (he->prev->sym == NULL) {
+		loop = he->sym->next;
+		while (loop->sym->next) {
+			res.push_back(loop);
+			res.push_back(loop->prev);
+			loop = loop->sym->next;
+		}
+	} else {
+		loop = he->prev->sym;
+		while (loop != he->sym->next) {
+			if (!loop) break;
+			res.push_back(loop);
+			res.push_back(loop->prev);
+			loop = loop->prev->sym;
+		}
+	}
+}
+
+void
+Mesh::get_dst_edges(vector<half_edge*> &res, half_edge* he) {
+	if (he->sym == NULL && he->next->sym == NULL) return;
+	half_edge* loop;
+	if (he->sym == NULL) {
+		loop = he->next->sym;
+		while (loop->next->sym) {
+			res.push_back(loop);
+			res.push_back(loop->sym);
+			loop = loop->next->sym;
+		}
+	} else if (he->next->sym == NULL) {
+		loop = he->sym;
+		while (loop->prev->sym) {
+			res.push_back(loop);
+			res.push_back(loop->prev);
+			loop = loop->prev->sym;
+		}
+	} else {
+		loop = he->sym->prev->sym;
+		while (loop != he->next) {
+			if (!loop) break;
+			res.push_back(loop);
+			res.push_back(loop->prev);
+			loop = loop->prev->sym;
+		}
+	}
+}
+
 /** given a half_edge pointer he, return a vector of pointers
  * to all the neighboring edges */
 //TODO: deal with null edge->data
@@ -190,14 +248,17 @@ void
 Mesh::get_neighboring_edges(vector<half_edge*> &res, half_edge* he) {
 	bool done = false;
 	half_edge* loop;
+
+	get_src_edges(res, he);
+	get_dst_edges(res, he);
 	
-	loop = he->prev->sym;
-	while (loop != he->sym->next) {
-		if (!loop) break;
-		res.push_back(loop);
-		res.push_back(loop->prev);
-		loop = loop->prev->sym;
-	}
+//	loop = he->prev->sym;
+//	while (loop != he->sym->next) {
+//		if (!loop) break;
+//		res.push_back(loop);
+//		res.push_back(loop->prev);
+//		loop = loop->prev->sym;
+//	}
 }
 
 /** Collapses half_edge* [he] and sets the surrounding edges to point to
@@ -223,7 +284,7 @@ Mesh::collapse_edge() {
 	
 	vector<half_edge*> neighbors;
 	get_neighboring_edges(neighbors, he);
-	get_neighboring_edges(neighbors, he->sym);
+	//get_neighboring_edges(neighbors, he->sym);
 
 	
 	/* Calculate new vertex position **/

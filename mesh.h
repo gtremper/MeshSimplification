@@ -106,6 +106,8 @@ class Mesh {
 	~Mesh();
     void populate_symmetric_edge(half_edge*, int, int);
     pair<int, int> get_vertex_key(int,int);
+	void get_src_edges(vector<half_edge*>&, half_edge*);
+	void get_dst_edges(vector<half_edge*>&, half_edge*);
     void get_neighboring_edges(vector<half_edge*>&, half_edge*);
     void collapse_edge();
 	void update_buffer();
