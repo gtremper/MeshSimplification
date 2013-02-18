@@ -276,8 +276,6 @@ Mesh::collapse_edge() {
 	
 	vector<half_edge*> neighbors;
 	get_neighboring_edges(neighbors, he);
-	//get_neighboring_edges(neighbors, he->sym);
-
 	
 	/* Calculate new vertex position **/
 	vertex midpoint = vertex();
