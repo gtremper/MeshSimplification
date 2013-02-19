@@ -83,12 +83,6 @@ struct edge_collapse {
 };
 
 
-/** use .push(item) to add to the heap, use .top() to get the top of the heap,
- * and use .pop() to get rid of the top item of the heap */
-typedef boost::heap::priority_queue<edge_data*,
-		boost::heap::compare<edge_compare> > Priority_Queue;
-
-
 /********* Comprehensive Mesh definition **********/
 
 class Mesh {
