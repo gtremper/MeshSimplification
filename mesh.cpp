@@ -305,20 +305,22 @@ Mesh::collapse_edge() {
 	}
 	
 	/** Update edge pointers **/
-	if (he->next->sym)
+	if (he->next->sym) {
 		he->next->sym->sym = he->prev->sym;
+        he->next->data->edge = he->next->sym;
+    }
 	if (he->prev->sym)
 		he->prev->sym->sym = he->next->sym;
-	he->next->data->edge = he->next->sym;
 	pq.erase(he->prev->data->pq_handle);
 	delete he->prev->data;
 	if (he->prev->sym)
 		he->prev->sym->data = he->next->data;
 	
 	if (hesym) {
-		if (hesym->next->sym)
+		if (hesym->next->sym) {
 			hesym->next->sym->sym = hesym->prev->sym;
-		hesym->next->data->edge = hesym->next->sym;
+            hesym->next->data->edge = hesym->next->sym;
+        }
 		if (hesym->prev->sym)
 			hesym->prev->sym->sym = hesym->next->sym;
 		pq.erase(hesym->prev->data->pq_handle);
@@ -332,6 +334,8 @@ Mesh::collapse_edge() {
 	ec.V1 = he->v;
 	if (hesym)
 		ec.V2 = hesym->v;
+    else
+        ec.V2 = he->next->v;
 	
 	if (hesym) {
 		for (unsigned int i = 0; i < neighbors.size(); i++) {
