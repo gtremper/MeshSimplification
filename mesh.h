@@ -90,6 +90,7 @@ class Mesh {
 	vector<half_edge*> edges;
 	vector<vertex> verts;
 	boost::unordered_map< pair<int, int>, half_edge* > existing_edges;
+    boost::unordered_map< edge_data*, bool > pq_contains;
 	priorityQueue pq;
 	Mesh(vector<vertex>& vertices, vector<vec3>& faces);
 	~Mesh();

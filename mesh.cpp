@@ -7,6 +7,7 @@ Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 	numIndices = numFaces*3;
   
 	existing_edges = boost::unordered_map< pair<int, int>, half_edge* >();
+    pq_contains = boost::unordered_map< edge_data*, bool >();
 	level_of_detail = 0;
 	
 	for (int i=0; i<vertices.size(); i+=1){
@@ -54,6 +55,7 @@ Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 		edge_data* d = edatas[i];
 		d->calculate_quad_error(verts);
 		d->pq_handle = pq.push(d);
+        pq_contains[d] = true;
 	}
 
   glGenBuffers(1, &arrayBuffer);
@@ -315,6 +317,7 @@ Mesh::collapse_edge() {
 	
 	edge_data *edata = pq.top();
 	pq.pop();
+    pq_contains[edata] = false;
 	
 	level_of_detail += 1;
 	
@@ -377,8 +380,11 @@ Mesh::collapse_edge() {
     }
 	if (he->prev->sym)
 		he->prev->sym->sym = he->next->sym;
-	pq.erase(he->prev->data->pq_handle);
-	delete he->prev->data;
+    if (pq_contains[he->prev->data]) {
+        pq.erase(he->prev->data->pq_handle);
+        pq_contains[he->prev->data] = false;
+    }
+//	delete he->prev->data;
 	if (he->prev->sym)
 		he->prev->sym->data = he->next->data;
 	
@@ -389,8 +395,11 @@ Mesh::collapse_edge() {
         }
 		if (hesym->prev->sym)
 			hesym->prev->sym->sym = hesym->next->sym;
-		pq.erase(hesym->prev->data->pq_handle);
-		delete hesym->prev->data;
+        if (pq_contains[hesym->prev->data]) {
+            pq.erase(hesym->prev->data->pq_handle);
+            pq_contains[hesym->prev->data] = false;
+        }
+		//delete hesym->prev->data;
 		if (hesym->prev->sym)
 			hesym->prev->sym->data = hesym->next->data;
 	}
@@ -407,13 +416,15 @@ Mesh::collapse_edge() {
 			if (neighbors[i]->v == he->v) {
 				neighbors[i]->v = ec.collapseVert; // set vertex to midpoint
 				neighbors[i]->data->calculate_quad_error(verts);
-				pq.update(neighbors[i]->data->pq_handle);
+                if (pq_contains[neighbors[i]->data])
+                    pq.update(neighbors[i]->data->pq_handle);
 				ec.fromV1.push_back(neighbors[i]);
 			}
 			if (neighbors[i]->v == hesym->v) {
 				neighbors[i]->v = ec.collapseVert; // set vertex to midpoint
 				neighbors[i]->data->calculate_quad_error(verts);
-				pq.update(neighbors[i]->data->pq_handle);
+                if (pq_contains[neighbors[i]->data])
+                    pq.update(neighbors[i]->data->pq_handle);
 				ec.fromV2.push_back(neighbors[i]);
 			}
 		}
@@ -431,14 +442,16 @@ Mesh::collapse_edge() {
                 //cout << "if case 1" << endl;
 				neighbors[i]->v = ec.collapseVert; // set vertex to midpoint
 				neighbors[i]->data->calculate_quad_error(verts);
-				pq.update(neighbors[i]->data->pq_handle);
+                if (pq_contains[neighbors[i]->data])
+                    pq.update(neighbors[i]->data->pq_handle);
 				ec.fromV1.push_back(neighbors[i]);
 			}
 			if (neighbors[i]->v == ec.V2) {
                 //cout << "if case 2" << endl;
 				neighbors[i]->v = ec.collapseVert; // set vertex to midpoint
 				neighbors[i]->data->calculate_quad_error(verts);
-				pq.update(neighbors[i]->data->pq_handle);
+                if (pq_contains[neighbors[i]->data])
+                    pq.update(neighbors[i]->data->pq_handle);
 				ec.fromV2.push_back(neighbors[i]);
 			} else {
                 //cout << "neighborvertex: " << neighbors[i]->v << endl;
