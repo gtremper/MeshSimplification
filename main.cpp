@@ -34,6 +34,8 @@ bool moveLight;
 bool cameraMode;
 bool animate;
 int collapseSpeed;
+int width;
+int height;
 
 /***  SCENE PARAMETERS  ***/
 GLuint vertexshader, fragmentshader, shaderprogram ; // shaders
@@ -67,10 +69,12 @@ GLuint lightColor;
 
 void reshape(int w, int h){
 	glMatrixMode(GL_PROJECTION);
-	float width = w;
-	float height = h;
+	width = w;
+	height = h;
+	float widthf = w;
+	float heightf = h;
 	// zNear=0.1, zFar=99
-	mat4 mv = glm::perspectiveFov(fovy, width, height, 0.1f, 99.0f);
+	mat4 mv = glm::perspectiveFov(fovy, widthf, heightf, 0.1f, 99.0f);
 	glLoadMatrixf(&mv[0][0]); 
 	glViewport(0, 0, w, h);
 }
@@ -150,7 +154,7 @@ void keyboard(unsigned char key, int x, int y) {
 	case 27:  // Escape to quit
 		delete mesh;
 		exit(0);
-		break; 
+		break;
 	case 'p':
 		useFlat = !useFlat;
 		glUniform1i(isFlat, useFlat);
@@ -235,7 +239,6 @@ void specialKey(int key,int x,int y) {
 
 void init(char* filename) {
 	mesh = parseOFF(filename);
-	
 	/* Default Values */
 	eye = vec3(0,0,-10);
 	trans = vec3(0,0,0);
@@ -247,6 +250,8 @@ void init(char* filename) {
 	moveLight = false;
 	cameraMode = false;
 	animate = false;
+	width = 600;
+	height = 400;
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -353,7 +358,7 @@ int main(int argc, char* argv[]) {
 	glutKeyboardFunc(keyboard);
 	glutSpecialFunc(specialKey);
 	glutReshapeFunc(reshape);
-	glutReshapeWindow(600,400);
+	glutReshapeWindow(width,height);
 	glutIdleFunc(display);
 	glutMotionFunc(mouse);
 	glutMouseFunc(mouseClick) ;
