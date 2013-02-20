@@ -227,13 +227,13 @@ Mesh::get_src_edges(vector<half_edge*> &res, half_edge* he) {
 		loop = he->prev->sym;
 		while (loop && loop != he->prev) {
 			res.push_back(loop);
-			res.push_back(loop->prev);
+			//res.push_back(loop->prev);
 			loop = loop->prev->sym;
 		}
 	} else if (he->prev->sym == NULL) {
 		loop = he->sym;
 		while (loop) {
-			res.push_back(loop);
+			//res.push_back(loop);
 			res.push_back(loop->next);
 			loop = loop->next->sym;
 		}
@@ -241,7 +241,7 @@ Mesh::get_src_edges(vector<half_edge*> &res, half_edge* he) {
 		loop = he->prev->sym;
 		while (loop != he && loop) {
 			res.push_back(loop);
-			res.push_back(loop->prev);
+			//res.push_back(loop->prev);
 			loop = loop->prev->sym;
 		}
 	}
@@ -254,7 +254,7 @@ Mesh::get_dst_edges(vector<half_edge*> &res, half_edge* he) {
 	if (he->sym == NULL) {
 		loop = he->next->sym;
 		while (loop && loop != he) {
-			res.push_back(loop);
+			//res.push_back(loop);
 			res.push_back(loop->next);
 			loop = loop->next->sym;
 		}
@@ -262,14 +262,14 @@ Mesh::get_dst_edges(vector<half_edge*> &res, half_edge* he) {
 		loop = he->sym;
 		while (loop && loop != he->next) {
 			res.push_back(loop);
-			res.push_back(loop->prev);
+			//res.push_back(loop->prev);
 			loop = loop->prev->sym;
 		}
 	} else {
 		loop = he->sym;
 		while (loop != he->next && loop) {
 			res.push_back(loop);
-			res.push_back(loop->prev);
+			//res.push_back(loop->prev);
 			loop = loop->prev->sym;
 		}
 	}
@@ -366,10 +366,7 @@ Mesh::collapse_edge() {
 	
 	ec.collapseVert = verts.size()-1;
 	ec.V1 = he->v;
-	if (hesym)
-		ec.V2 = hesym->v;
-    else
-        ec.V2 = he->next->v;
+    ec.V2 = he->next->v;
 	
 	if (hesym) {
 		for (unsigned int i = 0; i < neighbors.size(); i++) {
