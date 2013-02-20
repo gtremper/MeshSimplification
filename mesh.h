@@ -10,9 +10,7 @@
 #include <utility>
 #include <list>
 #include <boost/unordered_map.hpp>
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/heap/priority_queue.hpp>
-#include <boost/heap/fibonacci_heap.hpp>
+#include <boost/heap/binomial_heap.hpp>
 
 #define BUFFER_OFFSET(i) (reinterpret_cast<void*>(i))
 
@@ -20,7 +18,6 @@ typedef glm::mat3 mat3 ;
 typedef glm::mat4 mat4 ; 
 typedef glm::vec3 vec3 ; 
 typedef glm::vec4 vec4 ;
-
 
 using namespace std;
 
@@ -42,8 +39,6 @@ struct vertex {
 	vertex_data data();
 };
 
-void get_midpoint(vertex* res, vertex* v1, vertex* v2);
-
 typedef boost::shared_ptr<vertex> vertexPtr;
 
 struct half_edge;
@@ -53,7 +48,7 @@ struct edge_compare {
 };
 struct edge_compare;
 
-typedef boost::heap::fibonacci_heap<edge_data*, boost::heap::compare<edge_compare> > priorityQueue;
+typedef boost::heap::binomial_heap<edge_data*, boost::heap::compare<edge_compare> > priorityQueue;
 typedef priorityQueue::handle_type edge_handle;
 
 struct edge_data {

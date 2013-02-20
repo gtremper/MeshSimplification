@@ -1,15 +1,6 @@
 #include "mesh.h"
 using namespace std;
 
-typedef boost::unordered_map<int, vertex*> VertMap;
-
-void
-get_midpoint(vertex* res, vertex* v1, vertex* v2) {
-  res->position = (v1->position + v2->position) / 2.0f;
-  res->normal = glm::normalize((v1->normal + v2->normal) / 2.0f);
-}
-
-
 Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 
 	unsigned int numFaces = faces.size();
@@ -100,7 +91,7 @@ edge_data::calculate_quad_error(vector<vertex>& verts) {
 	float det = a*e*h - a*f*f - b*b*h + 2*b*c*f - c*c*e;
 	
 	float x,y,z;
-	if (det<0.01) {
+	if (det<0.01 || !edge->sym) {
 		merge_point = (verts[edge->v].position + verts[edge->next->v].position)/2.0f;
 		x = merge_point[0];
 		y = merge_point[1];
@@ -164,6 +155,8 @@ Mesh::populate_symmetric_edge(half_edge* e, int v0, int v1) {
 		e->sym = it->second;
 		e->sym->sym = e;
 		e->data = e->sym->data;
+		e->data->calculate_quad_error(verts);
+		pq.update(e->data->pq_handle);
 	} else {
 		existing_edges[key] = e;
 		e->sym = NULL; 
