@@ -12,6 +12,8 @@ Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 	for (int i=0; i<vertices.size(); i+=1){
 		verts.push_back(vertices[i]);
 	}
+	
+	vector<edge_data*> edatas;
 
   for (unsigned int i=0; i < numFaces; i+=1) {
 	int v0 = faces[i][0];
@@ -35,9 +37,9 @@ Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 	e2->next = e0;
 	
 	/** populate the symmetric edge for the given edge */
-	populate_symmetric_edge(e0, v0, v1);
-	populate_symmetric_edge(e1, v1, v2);
-	populate_symmetric_edge(e2, v2, v0);
+	populate_symmetric_edge(e0, v0, v1, edatas);
+	populate_symmetric_edge(e1, v1, v2, edatas);
+	populate_symmetric_edge(e2, v2, v0, edatas);
 
 	/** add edges to vector */
 	e0->index = edges.size();
@@ -47,6 +49,12 @@ Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 	e2->index = edges.size();
 	edges.push_back(e2);
   }
+	
+	for(int i=0; i<edatas.size(); i+=1){
+		edge_data* d = edatas[i];
+		d->calculate_quad_error(verts);
+		d->pq_handle = pq.push(d);
+	}
 
   glGenBuffers(1, &arrayBuffer);
   glGenBuffers(1, &elementArrayBuffer);
@@ -90,8 +98,46 @@ edge_data::calculate_quad_error(vector<vertex>& verts) {
 	
 	float det = a*e*h - a*f*f - b*b*h + 2*b*c*f - c*c*e;
 	
+	/* Check if one of the ends of the edge is on the edge of the mesh */
+	half_edge* curEdge = edge;
+	bool firstEdge = false;
+	do {
+		if (!curEdge->prev->sym){
+			firstEdge = true;
+			break;
+		}
+		curEdge = curEdge->prev->sym;
+	} while(curEdge != edge);
+	
+	bool secondEdge = false;
+	if(edge->sym){
+		curEdge = edge->sym;
+		do {
+			if (!curEdge->prev->sym){
+				secondEdge = true;
+				break;
+			}
+			curEdge = curEdge->prev->sym;
+		} while(curEdge != edge->sym);
+	}
+	
 	float x,y,z;
-	if (det<0.01 || !edge->sym) {
+	if (!edge->sym) {
+		merge_point = (verts[edge->v].position + verts[edge->next->v].position)/2.0f;
+		x = merge_point[0];
+		y = merge_point[1];
+		z = merge_point[2];
+	} else if (firstEdge) {
+		merge_point = verts[edge->v].position;
+		x = merge_point[0];
+		y = merge_point[1];
+		z = merge_point[2];
+	} else if (secondEdge) {
+		merge_point = verts[edge->next->v].position;
+		x = merge_point[0];
+		y = merge_point[1];
+		z = merge_point[2];
+	} else if (det<0.01) {
 		merge_point = (verts[edge->v].position + verts[edge->next->v].position)/2.0f;
 		x = merge_point[0];
 		y = merge_point[1];
@@ -147,7 +193,7 @@ vertex_data vertex::data() {
  * => Returns true if the value was found in the map.
  */
 void
-Mesh::populate_symmetric_edge(half_edge* e, int v0, int v1) {
+Mesh::populate_symmetric_edge(half_edge* e, int v0, int v1, vector<edge_data*>& edatas) {
 	pair<int, int> key = get_vertex_key(v0, v1);
 	boost::unordered_map< pair<int, int>, half_edge* >::iterator it = 
 		existing_edges.find(key);
@@ -155,16 +201,13 @@ Mesh::populate_symmetric_edge(half_edge* e, int v0, int v1) {
 		e->sym = it->second;
 		e->sym->sym = e;
 		e->data = e->sym->data;
-		e->data->calculate_quad_error(verts);
-		pq.update(e->data->pq_handle);
 	} else {
 		existing_edges[key] = e;
 		e->sym = NULL; 
 		edge_data* d = new edge_data();
 		d->edge = e;
 		e->data = d;
-		d->calculate_quad_error(verts);
-		d->pq_handle = pq.push(d);
+		edatas.push_back(d);
 	}
 }
 
@@ -401,7 +444,6 @@ Mesh::upLevelOfDetail(const int num) {
 	}
 }
 
-//glutGet(GLUT_ELAPSED_TIME)
 void
 Mesh::downLevelOfDetail(const int num) {
 	for(int t=0; t<num; ++t) {

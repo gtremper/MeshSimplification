@@ -93,7 +93,7 @@ class Mesh {
 	priorityQueue pq;
 	Mesh(vector<vertex>& vertices, vector<vec3>& faces);
 	~Mesh();
-	void populate_symmetric_edge(half_edge*, int, int);
+	void populate_symmetric_edge(half_edge*, int, int,vector<edge_data*>&);
 	pair<int, int> get_vertex_key(int,int);
 	void get_src_edges(vector<half_edge*>&, half_edge*);
 	void get_dst_edges(vector<half_edge*>&, half_edge*);
