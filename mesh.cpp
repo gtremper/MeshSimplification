@@ -217,7 +217,6 @@ Mesh::get_dst_edges(vector<half_edge*> &res, half_edge* he) {
 		}
 	} else if (he->next->sym == NULL) {
 		loop = he->sym;
-        cout << "case" << endl;
 		while (loop && loop != he->next) {
 			res.push_back(loop);
 			res.push_back(loop->prev);
