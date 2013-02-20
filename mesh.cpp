@@ -392,22 +392,29 @@ Mesh::collapse_edge() {
 		}
 	} else {
 		for (unsigned int i = 0; i < neighbors.size(); i++) {
+            //cout << "i: " << i << endl;
 			if (neighbors[i] == he->prev ||
 				neighbors[i] == he->next ||
 				neighbors[i] == he)
 			  continue;
 			if (neighbors[i]->v == he->v) {
+             //   cout << "if case 1" << endl;
 				neighbors[i]->v = verts.size()-1; // set vertex to midpoint
 				neighbors[i]->data->calculate_quad_error(verts);
 				pq.update(neighbors[i]->data->pq_handle);
 				ec.fromV1.push_back(neighbors[i]);
 			}
 			if (neighbors[i]->v == he->next->v) {
+              //  cout << "if case 2" << endl;
 				neighbors[i]->v = verts.size()-1; // set vertex to midpoint
 				neighbors[i]->data->calculate_quad_error(verts);
 				pq.update(neighbors[i]->data->pq_handle);
 				ec.fromV2.push_back(neighbors[i]);
-			}
+			} else {
+               // cout << "neighborvertex: " << neighbors[i]->v << endl;
+                //cout << " myvertex: " << he->v << endl;
+                //cout << " mysym vertex: " << he->next->v << endl;
+            }
 		}
 	}
 	
