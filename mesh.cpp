@@ -302,19 +302,34 @@ Mesh::collapse_edge() {
 	edge_data *edata = pq.top();
 	pq.pop();
 	
-	edge_collapse ec; //store edge collapse information
 	level_of_detail += 1;
 	
 	half_edge* he = edata->edge;
 	half_edge* hesym = he->sym;	
 	
+	edge_collapse ec; //store edge collapse information
+	ec.V1 = he->v;
+    ec.V2 = he->next->v;
+	
 	vector<half_edge*> neighbors;
 	get_neighboring_edges(neighbors, he);
 	
-	/* Calculate new vertex position **/
+	int vertex_index;
 	vertex midpoint = vertex();
-	midpoint.position = edata->merge_point;
-	midpoint.normal = glm::normalize(verts[he->v].normal + verts[he->next->v].normal);
+	/* Calculate new vertex position **/
+	if (edata->merge_point == verts[he->v].position){
+		midpoint = verts[he->v];
+		vertex_index = he->v;
+	} else if (edata->merge_point == verts[he->next->v].position){
+		midpoint = verts[he->next->v];
+		vertex_index = he->next->v;
+	} else {
+		midpoint.position = edata->merge_point;
+		midpoint.normal = glm::normalize(verts[he->v].normal + verts[he->next->v].normal);
+		verts.push_back(midpoint);
+		vertex_index = verts.size()-1;
+	}
+	ec.collapseVert = vertex_index;
 	
 	float Q1[10];
 	memcpy(Q1, verts[he->v].Q, sizeof(Q1));
@@ -362,11 +377,6 @@ Mesh::collapse_edge() {
 		if (hesym->prev->sym)
 			hesym->prev->sym->data = hesym->next->data;
 	}
-	verts.push_back(midpoint);
-	
-	ec.collapseVert = verts.size()-1;
-	ec.V1 = he->v;
-    ec.V2 = he->next->v;
 	
 	if (hesym) {
 		for (unsigned int i = 0; i < neighbors.size(); i++) {
@@ -378,13 +388,13 @@ Mesh::collapse_edge() {
 				neighbors[i] == he)
 			  continue;
 			if (neighbors[i]->v == he->v) {
-				neighbors[i]->v = verts.size()-1; // set vertex to midpoint
+				neighbors[i]->v = vertex_index; // set vertex to midpoint
 				neighbors[i]->data->calculate_quad_error(verts);
 				pq.update(neighbors[i]->data->pq_handle);
 				ec.fromV1.push_back(neighbors[i]);
 			}
 			if (neighbors[i]->v == hesym->v) {
-				neighbors[i]->v = verts.size()-1; // set vertex to midpoint
+				neighbors[i]->v = vertex_index; // set vertex to midpoint
 				neighbors[i]->data->calculate_quad_error(verts);
 				pq.update(neighbors[i]->data->pq_handle);
 				ec.fromV2.push_back(neighbors[i]);
@@ -393,27 +403,30 @@ Mesh::collapse_edge() {
 	} else {
 		for (unsigned int i = 0; i < neighbors.size(); i++) {
             //cout << "i: " << i << endl;
+			//cout << "neighborvertex: " << neighbors[i]->v << endl;
+            //cout << " myvertex: " << ec.V1 << endl;
+            //cout << " mysym vertex: " << ec.V2 << endl;
 			if (neighbors[i] == he->prev ||
 				neighbors[i] == he->next ||
 				neighbors[i] == he)
 			  continue;
-			if (neighbors[i]->v == he->v) {
-             //   cout << "if case 1" << endl;
-				neighbors[i]->v = verts.size()-1; // set vertex to midpoint
+			if (neighbors[i]->v == ec.V1) {
+                //cout << "if case 1" << endl;
+				neighbors[i]->v = vertex_index; // set vertex to midpoint
 				neighbors[i]->data->calculate_quad_error(verts);
 				pq.update(neighbors[i]->data->pq_handle);
 				ec.fromV1.push_back(neighbors[i]);
 			}
-			if (neighbors[i]->v == he->next->v) {
-              //  cout << "if case 2" << endl;
-				neighbors[i]->v = verts.size()-1; // set vertex to midpoint
+			if (neighbors[i]->v == ec.V2) {
+                //cout << "if case 2" << endl;
+				neighbors[i]->v = vertex_index; // set vertex to midpoint
 				neighbors[i]->data->calculate_quad_error(verts);
 				pq.update(neighbors[i]->data->pq_handle);
 				ec.fromV2.push_back(neighbors[i]);
 			} else {
-               // cout << "neighborvertex: " << neighbors[i]->v << endl;
-                //cout << " myvertex: " << he->v << endl;
-                //cout << " mysym vertex: " << he->next->v << endl;
+                //cout << "neighborvertex: " << neighbors[i]->v << endl;
+                //cout << " myvertex: " << ec.V1 << endl;
+                //cout << " mysym vertex: " << ec.V2 << endl;
             }
 		}
 	}
