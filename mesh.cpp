@@ -196,8 +196,7 @@ Mesh::get_src_edges(vector<half_edge*> &res, half_edge* he) {
 		}
 	} else {
 		loop = he->prev->sym;
-		while (loop != he) {
-			if (!loop) break;
+		while (loop != he && loop) {
 			res.push_back(loop);
 			res.push_back(loop->prev);
 			loop = loop->prev->sym;
@@ -226,8 +225,7 @@ Mesh::get_dst_edges(vector<half_edge*> &res, half_edge* he) {
 		}
 	} else {
 		loop = he->sym;
-		while (loop != he->next) {
-			if (!loop) break;
+		while (loop != he->next && loop) {
 			res.push_back(loop);
 			res.push_back(loop->prev);
 			loop = loop->prev->sym;
