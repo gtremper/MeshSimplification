@@ -161,6 +161,14 @@ edge_compare::operator() (const edge_data* he1, const edge_data* he2) const
 	return he1->merge_cost > he2->merge_cost;
 }
 
+bool
+operator==(const glm::vec3 &vecA, const glm::vec3 &vecB){ 
+	const double epsilion = 0.001;
+	return fabs(vecA[0] -vecB[0]) < epsilion   
+			&& fabs(vecA[1] -vecB[1]) < epsilion   
+			&& fabs(vecA[2] -vecB[2]) < epsilion;
+}
+
 /** Vertex functions **/
 
 vertex::vertex(){};
@@ -329,9 +337,11 @@ Mesh::collapse_edge() {
 	if (edata->merge_point == verts[he->v].position){
 		midpoint = verts[he->v];
 		ec.collapseVert = he->v;
+		memcpy(verts[he->v].Q, Q1, sizeof(Q1));
 	} else if (edata->merge_point == verts[he->next->v].position){
 		midpoint = verts[he->next->v];
 		ec.collapseVert= he->next->v;
+		memcpy(verts[he->next->v].Q, Q1, sizeof(Q1));
 	} else {
 		midpoint.position = edata->merge_point;
 		midpoint.normal = glm::normalize(verts[he->v].normal + verts[he->next->v].normal);
