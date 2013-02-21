@@ -330,7 +330,6 @@ Mesh::calculate_new_vertex(vertex& midpoint, edge_collapse& ec, edge_data* edata
 	for (int j=0; j<10; j+=1) {
 		Q1[j] += verts[he->next->v].Q[j];
 	}
-	memcpy(midpoint.Q, Q1, sizeof(Q1));
 	
     if (edata->merge_point == verts[he->v].position){
     	midpoint = verts[he->v];
@@ -341,6 +340,7 @@ Mesh::calculate_new_vertex(vertex& midpoint, edge_collapse& ec, edge_data* edata
     	ec.collapseVert= he->next->v;
     	memcpy(verts[he->next->v].Q, Q1, sizeof(Q1));
     } else {
+		memcpy(midpoint.Q, Q1, sizeof(Q1));
 		midpoint.position = edata->merge_point;
 		midpoint.normal = glm::normalize(verts[he->v].normal + verts[he->next->v].normal);
 		verts.push_back(midpoint);
@@ -365,36 +365,44 @@ Mesh::calculate_new_vertex(vertex& midpoint, edge_collapse& ec, edge_data* edata
 
 void
 Mesh::update_edge_pointers(half_edge* he, half_edge* hesym) {
-
-	/** Update edge pointers **/
-	if (he->next->sym) {
-		he->next->sym->sym = he->prev->sym;
-        he->next->data->edge = he->next->sym;
-    }
-	if (he->prev->sym)
-		he->prev->sym->sym = he->next->sym;
-    if (pq_contains[he->prev->data]) {
-        pq.erase(he->prev->data->pq_handle);
-        pq_contains[he->prev->data] = false;
-    }
-//	delete he->prev->data;
-	if (he->prev->sym)
-		he->prev->sym->data = he->next->data;
 	
-	if (hesym) {
-		if (hesym->next->sym) {
-			hesym->next->sym->sym = hesym->prev->sym;
-            hesym->next->data->edge = hesym->next->sym;
-        }
-		if (hesym->prev->sym)
-			hesym->prev->sym->sym = hesym->next->sym;
-        if (pq_contains[hesym->prev->data]) {
-            pq.erase(hesym->prev->data->pq_handle);
-            pq_contains[hesym->prev->data] = false;
-        }
-		//delete hesym->prev->data;
-		if (hesym->prev->sym)
-			hesym->prev->sym->data = hesym->next->data;
+	half_edge *first, *second;
+	edge_data *newdata;
+	
+	pq.erase(he->prev->data->pq_handle);
+	delete he->prev->data;
+	newdata = he->next->data;
+	
+	first = he->next->sym;
+	second = he->prev->sym;
+	if (first) {
+		first->sym = second;
+		first->data = newdata;
+		newdata->edge = first;
+	}
+	if (second) {
+		second->sym = first;
+		second->data = newdata;
+		newdata->edge = second;
+	}
+	
+	if (hesym){
+		pq.erase(hesym->prev->data->pq_handle);
+		delete hesym->prev->data;
+		newdata = hesym->next->data;
+
+		first = hesym->next->sym;
+		second = hesym->prev->sym;
+		if (first) {
+			first->sym = second;
+			first->data = newdata;
+			newdata->edge = first;
+		}
+		if (second) {
+			second->sym = first;
+			second->data = newdata;
+			newdata->edge = second;
+		}
 	}
 }
 

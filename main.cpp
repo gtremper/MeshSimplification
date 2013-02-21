@@ -250,8 +250,8 @@ void init(char* filename) {
 	moveLight = false;
 	cameraMode = false;
 	animate = false;
-	width = 1280;
-	height = 720;
+	width = 640;
+	height = 480;
 
 	glEnable(GL_DEPTH_TEST);
 
