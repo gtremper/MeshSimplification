@@ -155,6 +155,7 @@ edge_data::calculate_quad_error(vector<vertex>& verts) {
 	}
 	merge_cost = a*x*x + 2*b*x*y + 2*c*x*z + 2*d*x + e*y*y
 						+ 2*f*y*z + 2*g*y + h*z*z + 2*i*z + Q1[9];
+	merge_cost = abs(merge_cost);
 }
 
 bool
@@ -165,7 +166,7 @@ edge_compare::operator() (const edge_data* he1, const edge_data* he2) const
 
 bool
 operator==(const glm::vec3 &vecA, const glm::vec3 &vecB){ 
-	const double epsilion = 0.001;
+	const double epsilion = 0.0001;
 	return fabs(vecA[0] -vecB[0]) < epsilion   
 			&& fabs(vecA[1] -vecB[1]) < epsilion   
 			&& fabs(vecA[2] -vecB[2]) < epsilion;
@@ -319,6 +320,8 @@ Mesh::collapse_edge() {
 	pq.pop();
     pq_contains[edata] = false;
 	
+	//cout << edata->merge_cost<<endl;
+	
 	level_of_detail += 1;
 	
 	half_edge* he = edata->edge;
@@ -343,15 +346,15 @@ Mesh::collapse_edge() {
 	}
 	memcpy(midpoint.Q, Q1, sizeof(Q1));
 	
-	if (edata->merge_point == verts[he->v].position){
-		midpoint = verts[he->v];
-		ec.collapseVert = he->v;
-		memcpy(verts[he->v].Q, Q1, sizeof(Q1));
-	} else if (edata->merge_point == verts[he->next->v].position){
-		midpoint = verts[he->next->v];
-		ec.collapseVert= he->next->v;
-		memcpy(verts[he->next->v].Q, Q1, sizeof(Q1));
-	} else {
+    if (edata->merge_point == verts[he->v].position){
+    	midpoint = verts[he->v];
+    	ec.collapseVert = he->v;
+    	memcpy(verts[he->v].Q, Q1, sizeof(Q1));
+    } else if (edata->merge_point == verts[he->next->v].position){
+    	midpoint = verts[he->next->v];
+    	ec.collapseVert= he->next->v;
+    	memcpy(verts[he->next->v].Q, Q1, sizeof(Q1));
+    } else {
 		midpoint.position = edata->merge_point;
 		midpoint.normal = glm::normalize(verts[he->v].normal + verts[he->next->v].normal);
 		verts.push_back(midpoint);
