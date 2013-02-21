@@ -4,6 +4,9 @@ Mesh Data Structure,
 		-every three edges defines a face.
 	- 
 
+Edge decimation:
+- pointers for collapsed edges are modifies.
+
 Quadric simplification
 
 Every vertex has 10 floats that represent the quadric Q matrix. For every edge in the mesh, an "edge_data" object is created (one for every pair of symmetric edges) which stores the optimum merge point for the two vertices and the associated the quadric error. These objects are then stored in a priority queue sorted by their quadric error. A handle to each of the objects in the in the priority queue is stored with the associated edge, so that modified edges can update their "edge_data" object when the error is changed. To go down a level of detail, the edge at the top of the priority queue is collapsed, and and degenerate edges are removed from the queue.
