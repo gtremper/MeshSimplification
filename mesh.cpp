@@ -74,6 +74,24 @@ Mesh::~Mesh(){
 	}
 }
 
+void
+Mesh::print_half_edge(half_edge* he) {
+  cout << "******************" << endl;
+  cout << "Data for half_edge" << endl;
+  cout << "Position: \nsrc vertex: " << he->v << endl;
+  cout << verts[he->v].position[0];
+  cout << ", " << verts[he->v].position[1];
+  cout << ", " << verts[he->v].position[2] << endl;
+  cout << "Next edge: " << he->next->v << endl;
+  cout << verts[he->next->v].position[0];
+  cout << ", " << verts[he->next->v].position[1];
+  cout << ", " << verts[he->next->v].position[2] << endl;
+  cout << "Prev edge: " << he->prev->v << endl;
+  cout << verts[he->prev->v].position[0];
+  cout << ", " << verts[he->prev->v].position[1];
+  cout << ", " << verts[he->prev->v].position[2] << endl;
+}
+
 /** Half Edge functions **/
 
 void

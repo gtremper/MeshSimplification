@@ -104,6 +104,7 @@ class Mesh {
 	void draw();
 	void upLevelOfDetail(const int);
 	void downLevelOfDetail(const int);
+    void print_half_edge(half_edge*);
 };
 
 #endif //MESH_H
