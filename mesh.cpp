@@ -363,39 +363,9 @@ Mesh::calculate_new_vertex(vertex& midpoint, edge_collapse& ec, edge_data* edata
 	}
 }
 
-/** Collapses half_edge* [he] and sets the surrounding edges to point to
- * a new vertex v_m that is the midpoint of [he]'s two defining vertices.
- * I know I'm probably forgetting to set some edges, but here are my
- * initial thoughts:
- */
-
 void
-Mesh::collapse_edge() {
-	if (pq.size() < 4) {
-		return;
-	}
-	
-	edge_data *edata = pq.top();
-	pq.pop();
-    pq_contains[edata] = false;
+Mesh::update_edge_pointers(half_edge* he, half_edge* hesym) {
 
-	level_of_detail += 1;
-	
-	half_edge* he = edata->edge;
-	half_edge* hesym = he->sym;	
-	
-	edge_collapse ec; //store edge collapse information
-	ec.V1 = he->v;
-    ec.V2 = he->next->v;
-	
-	vector<half_edge*> neighbors;
-	get_neighboring_edges(neighbors, he);
-
-	/* Calculate new vertex position **/
-	int vertex_index;
-	vertex midpoint = vertex();
-	
-	calculate_new_vertex(midpoint, ec, edata, he, hesym);
 	/** Update edge pointers **/
 	if (he->next->sym) {
 		he->next->sym->sym = he->prev->sym;
@@ -426,6 +396,36 @@ Mesh::collapse_edge() {
 		if (hesym->prev->sym)
 			hesym->prev->sym->data = hesym->next->data;
 	}
+}
+
+/** Collapses half_edge* [he] and sets the surrounding edges to point to
+ * a new vertex v_m that is the midpoint of [he]'s two defining vertices.
+ * I know I'm probably forgetting to set some edges, but here are my
+ * initial thoughts:
+ */
+
+void
+Mesh::collapse_edge() {
+	if (pq.size() < 4) {
+		return;
+	}
+	edge_data *edata = pq.top();
+	pq.pop();
+    pq_contains[edata] = false;
+	level_of_detail += 1;
+	half_edge* he = edata->edge;
+	half_edge* hesym = he->sym;	
+	edge_collapse ec; //store edge collapse information
+	ec.V1 = he->v;
+    ec.V2 = he->next->v;
+	vector<half_edge*> neighbors;
+	get_neighboring_edges(neighbors, he);
+
+	/* Calculate new vertex position **/
+	int vertex_index;
+	vertex midpoint = vertex();
+	calculate_new_vertex(midpoint, ec, edata, he, hesym);
+    update_edge_pointers(he, hesym);
 	
 	if (hesym) {
 		for (unsigned int i = 0; i < neighbors.size(); i++) {
