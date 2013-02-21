@@ -98,6 +98,7 @@ class Mesh {
 	void get_dst_edges(vector<half_edge*>&, half_edge*);
 	void get_neighboring_edges(vector<half_edge*>&, half_edge*);
 	void collapse_edge();
+    void calculate_new_vertex(vertex& v, edge_collapse& ec, edge_data* edata, half_edge* he, half_edge* hesym);
 	void update_buffer();
 	void draw();
 	void upLevelOfDetail(const int);
