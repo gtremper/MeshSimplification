@@ -1,0 +1,10 @@
+Mesh Data Structure,
+	- used half edge
+	- faces implicitly stored in half_edge* list
+		-every three edges defines a face.
+	- 
+
+
+Progressive meshes.
+
+Objects are drawn using Vertex Buffer Objects (VBOs). After parsing all of the vertices from the OFF file, new vertices are appended to the end of the vertex when created during an edge collapse. This way, once all of the edges are collapsed, we have calculated and stored all of vertices that are possible at any level of detail. This makes switching between levels of detail very easy by simply changing the indices in the element array buffer. This allows us to simply store the changes in the indices for each level of detail. This is implemented using a vector of "collapse_data" objects 
