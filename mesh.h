@@ -59,8 +59,6 @@ struct edge_data {
 	void calculate_quad_error(vector<vertex>&);
 };
 
-
-
 struct half_edge {
 	int v;
 	half_edge *prev, *next, *sym; //anti-clockwise ordering
