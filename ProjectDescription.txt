@@ -4,7 +4,11 @@ Mesh Data Structure,
 		-every three edges defines a face.
 	- 
 
+Quadric simplification
+
+Every vertex has 10 floats that represent the quadric Q matrix. For every edge in the mesh, an "edge_data" object is created (one for every pair of symmetric edges) which stores the optimum merge point for the two vertices and the associated the quadric error. These objects are then stored in a priority queue sorted by their quadric error. A handle to each of the objects in the in the priority queue is stored with the associated edge, so that modified edges can update their "edge_data" object when the error is changed. To go down a level of detail, the edge at the top of the priority queue is collapsed, and and degenerate edges are removed from the queue.
+
 
 Progressive meshes.
 
-Objects are drawn using Vertex Buffer Objects (VBOs). After parsing all of the vertices from the OFF file, new vertices are appended to the end of the vertex when created during an edge collapse. This way, once all of the edges are collapsed, we have calculated and stored all of vertices that are possible at any level of detail. This makes switching between levels of detail very easy by simply changing the indices in the element array buffer. This allows us to simply store the changes in the indices for each level of detail. This is implemented using a vector of "collapse_data" objects 
+Objects are drawn using Vertex Buffer Objects (VBOs). After parsing all of the vertices from the OFF file, new vertices are appended to the end of the vertex when created during an edge collapse. This way, once all of the edges are collapsed, we have calculated and stored all of vertices that are possible at any level of detail. This makes switching between levels of detail very easy by simply changing the indices in the element array buffer. This allows us to simply store the changes in the indices for each level of detail. This is implemented using a vector of "collapse_data" objects which store the changes need to move both up and down a level of detail.
