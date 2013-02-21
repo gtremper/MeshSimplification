@@ -174,6 +174,7 @@ edge_data::calculate_quad_error(vector<vertex>& verts) {
 	merge_cost = a*x*x + 2*b*x*y + 2*c*x*z + 2*d*x + e*y*y
 						+ 2*f*y*z + 2*g*y + h*z*z + 2*i*z + Q1[9];
 	merge_cost = abs(merge_cost);
+	merge_cost += (rand()%100)/10000.;
 }
 
 bool
