@@ -398,6 +398,48 @@ Mesh::update_edge_pointers(half_edge* he, half_edge* hesym) {
 	}
 }
 
+void
+Mesh::update_src_neighbors(half_edge* he, vector<half_edge*>& src_neighbors, edge_collapse& ec) {
+    for (unsigned int i = 0; i < src_neighbors.size(); i++) {
+          if (he->sym) {
+              if (src_neighbors[i] == he->sym ||
+                  src_neighbors[i] == he->sym->prev ||
+                  src_neighbors[i] == he->sym->next)
+                continue;
+          }
+          if (src_neighbors[i] == he ||
+              src_neighbors[i] == he->next ||
+              src_neighbors[i] == he->prev)
+            continue;
+          src_neighbors[i]->v = ec.collapseVert; // set vertex to midpoint
+          src_neighbors[i]->data->calculate_quad_error(verts);
+          if (pq_contains[src_neighbors[i]->data])
+              pq.update(src_neighbors[i]->data->pq_handle);
+          ec.fromV1.push_back(src_neighbors[i]);
+    }
+}
+
+void
+Mesh::update_dst_neighbors(half_edge* he, vector<half_edge*>& dst_neighbors, edge_collapse& ec) {
+    for (unsigned int i = 0; i < dst_neighbors.size(); i++) {
+          if (he->sym) {
+              if (dst_neighbors[i] == he->sym ||
+                  dst_neighbors[i] == he->sym->prev ||
+                  dst_neighbors[i] == he->sym->next)
+                continue;
+          }
+          if (dst_neighbors[i] == he ||
+              dst_neighbors[i] == he->next ||
+              dst_neighbors[i] == he->prev)
+            continue;
+          dst_neighbors[i]->v = ec.collapseVert; // set vertex to midpoint
+          dst_neighbors[i]->data->calculate_quad_error(verts);
+          if (pq_contains[dst_neighbors[i]->data])
+              pq.update(dst_neighbors[i]->data->pq_handle);
+          ec.fromV2.push_back(dst_neighbors[i]);
+    }
+}
+
 /** Collapses half_edge* [he] and sets the surrounding edges to point to
  * a new vertex v_m that is the midpoint of [he]'s two defining vertices.
  * I know I'm probably forgetting to set some edges, but here are my
@@ -418,71 +460,19 @@ Mesh::collapse_edge() {
 	edge_collapse ec; //store edge collapse information
 	ec.V1 = he->v;
     ec.V2 = he->next->v;
-	vector<half_edge*> neighbors;
-	get_neighboring_edges(neighbors, he);
+
+    vector<half_edge*> src_neighbors;
+    get_src_edges(src_neighbors, he);
+    vector<half_edge*> dst_neighbors;
+    get_dst_edges(dst_neighbors, he);
 
 	/* Calculate new vertex position **/
 	int vertex_index;
 	vertex midpoint = vertex();
 	calculate_new_vertex(midpoint, ec, edata, he, hesym);
     update_edge_pointers(he, hesym);
-	
-	if (hesym) {
-		for (unsigned int i = 0; i < neighbors.size(); i++) {
-			if (neighbors[i] == hesym->prev ||
-				neighbors[i] == hesym->next ||
-				neighbors[i] == hesym ||
-				neighbors[i] == he->prev ||
-				neighbors[i] == he->next ||
-				neighbors[i] == he)
-			  continue;
-			if (neighbors[i]->v == he->v) {
-				neighbors[i]->v = ec.collapseVert; // set vertex to midpoint
-				neighbors[i]->data->calculate_quad_error(verts);
-                if (pq_contains[neighbors[i]->data])
-                    pq.update(neighbors[i]->data->pq_handle);
-				ec.fromV1.push_back(neighbors[i]);
-			}
-			if (neighbors[i]->v == hesym->v) {
-				neighbors[i]->v = ec.collapseVert; // set vertex to midpoint
-				neighbors[i]->data->calculate_quad_error(verts);
-                if (pq_contains[neighbors[i]->data])
-                    pq.update(neighbors[i]->data->pq_handle);
-				ec.fromV2.push_back(neighbors[i]);
-			}
-		}
-	} else {
-		for (unsigned int i = 0; i < neighbors.size(); i++) {
-            //cout << "i: " << i << endl;
-			//cout << "neighborvertex: " << neighbors[i]->v << endl;
-            //cout << " myvertex: " << ec.V1 << endl;
-            //cout << " mysym vertex: " << ec.V2 << endl;
-			if (neighbors[i] == he->prev ||
-				neighbors[i] == he->next ||
-				neighbors[i] == he)
-			  continue;
-			if (neighbors[i]->v == ec.V1) {
-                //cout << "if case 1" << endl;
-				neighbors[i]->v = ec.collapseVert; // set vertex to midpoint
-				neighbors[i]->data->calculate_quad_error(verts);
-                if (pq_contains[neighbors[i]->data])
-                    pq.update(neighbors[i]->data->pq_handle);
-				ec.fromV1.push_back(neighbors[i]);
-			}
-			if (neighbors[i]->v == ec.V2) {
-                //cout << "if case 2" << endl;
-				neighbors[i]->v = ec.collapseVert; // set vertex to midpoint
-				neighbors[i]->data->calculate_quad_error(verts);
-                if (pq_contains[neighbors[i]->data])
-                    pq.update(neighbors[i]->data->pq_handle);
-				ec.fromV2.push_back(neighbors[i]);
-			} else {
-                //cout << "neighborvertex: " << neighbors[i]->v << endl;
-                //cout << " myvertex: " << ec.V1 << endl;
-                //cout << " mysym vertex: " << ec.V2 << endl;
-            }
-		}
-	}
+    update_src_neighbors(he, src_neighbors, ec);
+    update_dst_neighbors(he, dst_neighbors, ec);
 	
 	collapse_list.push_back(ec);
 	
