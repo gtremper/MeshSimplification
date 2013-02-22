@@ -106,16 +106,15 @@ The base method for obtaining the edges that share a source vertex is:
 \end{verbatim}
 
 Obviously, this will break in cases where an edge has a NULL \verb`sym`,
-indicating that it is on the edge of a non-manifold mesh. We implement different
-traversal functions for each of the cases where a relevant symmetric edge
-might be null:
+indicating that it is on the edge of a non-manifold mesh. To account for these
+problems, we implement different traversal functions for each of the cases where a
+relevant symmetric edge might be null:
 
 \begin{itemize}
     \item \verb`he->sym == NULL`
     \item \verb`he->prev->sym == NULL`
     \item \verb`he->next->sym == NULL`
 \end{itemize}
-
 
 \subsection{Updating Edge Pointers}
 % go ahead and work here
