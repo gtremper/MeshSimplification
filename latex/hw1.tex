@@ -129,14 +129,17 @@ relevant symmetric edge might be null:
 \section{Quadric Simplification}
 
 Every vertex has 10 floats that represent the quadric Q matrix. For every edge
-in the mesh, an \verb`edge_data` object is created (one for every pair of symmetric
-edges) which stores the optimum merge point for the two vertices and the
-associated the quadric error. These objects are then stored in a priority queue
-sorted by their quadric error. A handle to each of the objects in the in the
-priority queue is stored with the associated edge, so that modified edges can
-update their \verb`edge_data` object when the error is changed. To go down a level
-of detail, the edge at the top of the priority queue is collapsed, and and
-degenerate edges are removed from the queue.
+in the mesh, an \verb`edge_data` object is created (one for every pair of
+symmetric edges) which stores the optimum merge point for the two vertices and
+the associated the quadric error. These objects are then stored in a priority
+queue sorted by their quadric error. A handle to each of the objects in the in
+the priority queue is stored with the associated edge, so that modified edges
+can update their \verb`edge_data` object when the error is changed. To go down
+a level of detail, the edge at the top of the priority queue is collapsed, and
+and degenerate edges are removed from the queue. The Boost library
+implementation of a binomial heap was chosen for its constant time access of
+the next edge to be collapsed, and amortized logarithmic time for updating
+edges.
 
 \section{Progressive Meshes}
 
