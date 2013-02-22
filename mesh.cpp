@@ -7,6 +7,7 @@ Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 
 	unsigned int numFaces = faces.size();
 	numIndices = numFaces*3;
+	max_lod = -1;
   
 	existing_edges = boost::unordered_map< pair<int, int>, half_edge* >();
     pq_contains = boost::unordered_map< edge_data*, bool >();
@@ -423,8 +424,7 @@ Mesh::update_src_neighbors(half_edge* he, vector<half_edge*>& src_neighbors, edg
             continue;
           src_neighbors[i]->v = ec.collapseVert; // set vertex to midpoint
           src_neighbors[i]->data->calculate_quad_error(verts);
-          //if (pq_contains[src_neighbors[i]->data])
-              pq.update(src_neighbors[i]->data->pq_handle);
+          pq.update(src_neighbors[i]->data->pq_handle);
           ec.fromV1.push_back(src_neighbors[i]);
     }
 }
@@ -444,8 +444,7 @@ Mesh::update_dst_neighbors(half_edge* he, vector<half_edge*>& dst_neighbors, edg
             continue;
           dst_neighbors[i]->v = ec.collapseVert; // set vertex to midpoint
           dst_neighbors[i]->data->calculate_quad_error(verts);
-          //if (pq_contains[dst_neighbors[i]->data])
-              pq.update(dst_neighbors[i]->data->pq_handle);
+          pq.update(dst_neighbors[i]->data->pq_handle);
           ec.fromV2.push_back(dst_neighbors[i]);
     }
 }
@@ -458,7 +457,8 @@ Mesh::remove_fins(half_edge* he, edge_collapse& ec) {
 			return;
 		}
 		
-		if (!he->prev->sym) {
+		if (he->next->sym == he->prev) {
+			cout << "DERP" << endl;
 			return;
 		}
 		
@@ -626,15 +626,9 @@ Mesh::downLevelOfDetail(const int num) {
 
 void
 Mesh::update_buffer() {
-	glBindBuffer(GL_ARRAY_BUFFER, NULL);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, NULL);
 	
 	vector<GLuint> elements;
-	vector<vertex_data> vertdata;
-	for (int i=0; i<verts.size(); i+=1){
-		vertdata.push_back(verts[i].data());
-	}
-	
 	vector<half_edge*>::iterator it;
 	for (it=edges.begin(); it!=edges.end(); ++it) {
 		if (*it) {
@@ -645,10 +639,19 @@ Mesh::update_buffer() {
 	cout << "Triangles: " << elements.size()/3 << endl;
 	numIndices = elements.size();
 	
-	glBindBuffer(GL_ARRAY_BUFFER, arrayBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data)*vertdata.size(), &vertdata[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementArrayBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*elements.size(), &elements[0], GL_STATIC_DRAW);
+	if (max_lod < level_of_detail){
+		cout << "UPLOAD VERTS" << endl;
+		max_lod = level_of_detail;
+		vector<vertex_data> vertdata;
+		for (int i=0; i<verts.size(); i+=1){
+			vertdata.push_back(verts[i].data());
+		}
+		glBindBuffer(GL_ARRAY_BUFFER, NULL);
+		glBindBuffer(GL_ARRAY_BUFFER, arrayBuffer);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data)*vertdata.size(), &vertdata[0], GL_STATIC_DRAW);
+	}
 }
 
 void

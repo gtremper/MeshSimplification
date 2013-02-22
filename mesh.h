@@ -86,6 +86,7 @@ class Mesh {
   unsigned int numIndices;
   vector<edge_collapse> collapse_list;
   int level_of_detail;
+  int max_lod;
   public:
 	vector<half_edge*> edges;
 	vector<vertex> verts;
