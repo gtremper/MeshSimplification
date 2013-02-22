@@ -66,6 +66,13 @@ an example of collapsing a bordering edge.}
 
 \subsection{Finding Neighboring Edges}
 
+The basic paradigm for obtaining the neighboring edges for each of the two
+vertices consisting an edge begins with finding an edge that contains one of
+the indicated vertices as its source vertex, and then following a chain of
+pointers to loop around the vertex. This is appropriate for manifold surfaces,
+in which every single edge has a corresponding symmetric edge, but fails for
+more complex surfaces, in which edges may not have a symmetric edge and in
+which neighbors may not be traversed contiguously.
 
 
 \subsection{Updating Edge Pointers}
