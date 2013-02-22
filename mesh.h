@@ -70,6 +70,8 @@ struct edge_collapse {
 	vector<half_edge*> removed;
 	vector<half_edge*> fromV1;
 	vector<half_edge*> fromV2;
+	vector<half_edge*> changedVerts;
+	vector<int> newVerts;
 	int V1;
 	int V2;
 	int collapseVert;

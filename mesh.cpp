@@ -371,6 +371,7 @@ Mesh::update_edge_pointers(half_edge* he, half_edge* hesym) {
 	
 	pq.erase(he->prev->data->pq_handle);
 	delete he->prev->data;
+	he->prev->data->edge = NULL;
 	newdata = he->next->data;
 	
 	first = he->next->sym;
@@ -450,55 +451,66 @@ Mesh::update_dst_neighbors(half_edge* he, vector<half_edge*>& dst_neighbors, edg
 
 void
 Mesh::remove_fins(half_edge* he, edge_collapse& ec) {
-	if (!he->next->sym || !he->next->sym->prev->sym){
-		return;
-	}
-	
-	if (he->next->sym->prev->sym->prev != he->prev->sym) {
-		return; //no fin
-	}
-	
-	cout << "REMOVING FINS" <<endl;
-	
-	/* Removed fins */
-	ec.removed.push_back(he->next->sym);
-	ec.removed.push_back(he->next->sym->next);
-	ec.removed.push_back(he->next->sym->next->next);
-	ec.removed.push_back(he->prev->sym);
-	ec.removed.push_back(he->prev->sym->next);
-	ec.removed.push_back(he->prev->sym->next->next);
-	edges[he->next->sym->index] = NULL;
-	edges[he->next->sym->next->index] = NULL;
-	edges[he->next->sym->next->next->index] = NULL;
-	edges[he->prev->sym->index] = NULL;
-	edges[he->prev->sym->next->index] = NULL;
-	edges[he->prev->sym->next->next->index] = NULL;
-	
-	/* remove associated edge_datas */
-	pq.erase(he->next->sym->next->data->pq_handle);
-	pq.erase(he->prev->sym->prev->data->pq_handle);
-	pq.erase(he->next->sym->prev->data->pq_handle);
-	
-	he->next->data->edge = he->next;
-	he->prev->data->edge = he->prev;
-	
-	//need to update this for progressive meshes
-	he->prev->v = he->prev->sym->prev->v;
-	
-	/* updata new edge data */
-	half_edge* first = he->next->sym->next;
-	half_edge* second = he->prev->sym->prev;
-	
-	he->next->sym = first->sym;
-	if (first->sym){
-		first->sym->sym = he->next;
-		first->sym->data = he->next->data;
-	}
-	
-	he->prev->sym = second->sym;
-	if (second->sym){
-		second->sym->sym = he->prev;
-		second->sym->data = he->prev->data;
+	int counter = 0;
+	while(true) {
+		if (!he->next->sym || !he->next->sym->prev->sym){
+			return;
+		}
+		
+		if (he->next->sym->prev->sym->prev != he->prev->sym) {
+			return; //no fin
+		}
+		
+		if (counter > 0)
+		cout << "REMOVING FINS " << counter <<endl;
+		counter += 1;
+		
+		/* Removed fins */
+		ec.removed.push_back(he->next->sym);
+		ec.removed.push_back(he->next->sym->next);
+		ec.removed.push_back(he->next->sym->prev);
+		ec.removed.push_back(he->prev->sym);
+		ec.removed.push_back(he->prev->sym->next);
+		ec.removed.push_back(he->prev->sym->prev);
+		edges[he->next->sym->index] = NULL;
+		edges[he->next->sym->next->index] = NULL;
+		edges[he->next->sym->prev->index] = NULL;
+		edges[he->prev->sym->index] = NULL;
+		edges[he->prev->sym->next->index] = NULL;
+		edges[he->prev->sym->prev->index] = NULL;
+		
+		/* remove associated edge_datas */
+		pq.erase(he->next->sym->next->data->pq_handle);
+		delete he->next->sym->next->data;
+		pq.erase(he->prev->sym->prev->data->pq_handle);
+		delete he->prev->sym->prev->data;
+		pq.erase(he->next->sym->prev->data->pq_handle);
+		delete he->next->sym->prev->data;
+		
+		he->next->data->edge = he->next;
+		he->prev->data->edge = he->prev;
+		
+		//need to update this for progressive meshes
+		ec.newVerts.push_back(he->prev->v);
+		he->prev->v = he->prev->sym->prev->v;
+		ec.changedVerts.push_back(he->prev);
+		
+		
+		/* updata new edge data */
+		half_edge* first = he->next->sym->next;
+		half_edge* second = he->prev->sym->prev;
+		
+		he->next->sym = first->sym;
+		if (first->sym){
+			first->sym->sym = he->next;
+			first->sym->data = he->next->data;
+		}
+		
+		he->prev->sym = second->sym;
+		if (second->sym){
+			second->sym->sym = he->prev;
+			second->sym->data = he->prev->data;
+		}
 	}
 }
 
@@ -566,6 +578,12 @@ Mesh::upLevelOfDetail(const int num) {
 		for (int i=0; i<ec.fromV2.size(); i+=1) {
 			ec.fromV2[i]->v = ec.V2;
 		}
+		
+		for (int i=0; i<ec.newVerts.size(); i+=1) {
+			int vert = ec.changedVerts[i]->v;
+			ec.changedVerts[i]->v = ec.newVerts[i];
+			ec.newVerts[i] = vert;
+		}
 	}
 }
 
@@ -589,6 +607,13 @@ Mesh::downLevelOfDetail(const int num) {
 		for (int i=0; i<ec.fromV2.size(); i+=1) {
 			ec.fromV2[i]->v = ec.collapseVert;
 		}
+		
+		for (int i=0; i<ec.newVerts.size(); i+=1) {
+			int vert = ec.changedVerts[i]->v;
+			ec.changedVerts[i]->v = ec.newVerts[i];
+			ec.newVerts[i] = vert;
+		}
+		
 		level_of_detail += 1;
 	}
 }
