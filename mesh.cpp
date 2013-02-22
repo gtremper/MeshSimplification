@@ -1,6 +1,8 @@
 #include "mesh.h"
 using namespace std;
 
+const float THRESHOLD = 100;
+
 Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 
 	unsigned int numFaces = faces.size();
@@ -55,7 +57,7 @@ Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 		edge_data* d = edatas[i];
 		d->calculate_quad_error(verts);
 		d->pq_handle = pq.push(d);
-        pq_contains[d] = true;
+        //pq_contains[d] = true;
 	}
 
   glGenBuffers(1, &arrayBuffer);
@@ -174,7 +176,7 @@ edge_data::calculate_quad_error(vector<vertex>& verts) {
 	merge_cost = a*x*x + 2*b*x*y + 2*c*x*z + 2*d*x + e*y*y
 						+ 2*f*y*z + 2*g*y + h*z*z + 2*i*z + Q1[9];
 	merge_cost = abs(merge_cost);
-	merge_cost += (rand()%100)/10000.;
+	merge_cost += (rand()%1000)/100000000.0f;
 }
 
 bool
@@ -371,7 +373,6 @@ Mesh::update_edge_pointers(half_edge* he, half_edge* hesym) {
 	
 	pq.erase(he->prev->data->pq_handle);
 	delete he->prev->data;
-	he->prev->data->edge = NULL;
 	newdata = he->next->data;
 	
 	first = he->next->sym;
@@ -422,7 +423,7 @@ Mesh::update_src_neighbors(half_edge* he, vector<half_edge*>& src_neighbors, edg
             continue;
           src_neighbors[i]->v = ec.collapseVert; // set vertex to midpoint
           src_neighbors[i]->data->calculate_quad_error(verts);
-          if (pq_contains[src_neighbors[i]->data])
+          //if (pq_contains[src_neighbors[i]->data])
               pq.update(src_neighbors[i]->data->pq_handle);
           ec.fromV1.push_back(src_neighbors[i]);
     }
@@ -443,7 +444,7 @@ Mesh::update_dst_neighbors(half_edge* he, vector<half_edge*>& dst_neighbors, edg
             continue;
           dst_neighbors[i]->v = ec.collapseVert; // set vertex to midpoint
           dst_neighbors[i]->data->calculate_quad_error(verts);
-          if (pq_contains[dst_neighbors[i]->data])
+          //if (pq_contains[dst_neighbors[i]->data])
               pq.update(dst_neighbors[i]->data->pq_handle);
           ec.fromV2.push_back(dst_neighbors[i]);
     }
@@ -454,6 +455,10 @@ Mesh::remove_fins(half_edge* he, edge_collapse& ec) {
 	int counter = 0;
 	while(true) {
 		if (!he->next->sym || !he->next->sym->prev->sym){
+			return;
+		}
+		
+		if (!he->prev->sym) {
 			return;
 		}
 		
@@ -522,12 +527,13 @@ Mesh::remove_fins(half_edge* he, edge_collapse& ec) {
 
 void
 Mesh::collapse_edge() {
-	if (pq.size() < 4) {
+	edge_data *edata = pq.top();
+	if (edata->merge_cost > THRESHOLD || pq.size()<5){
 		return;
 	}
-	edge_data *edata = pq.top();
 	pq.pop();
-    pq_contains[edata] = false;
+	
+    //pq_contains[edata] = false;
 	level_of_detail += 1;
 	half_edge* he = edata->edge;
 	half_edge* hesym = he->sym;	
@@ -544,7 +550,6 @@ Mesh::collapse_edge() {
     get_dst_edges(dst_neighbors, he);
 
 	/* Calculate new vertex position **/
-	int vertex_index;
 	vertex midpoint = vertex();
 	calculate_new_vertex(midpoint, ec, edata, he, hesym);
     update_edge_pointers(he, hesym);
