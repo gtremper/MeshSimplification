@@ -12,8 +12,13 @@
 *.la
 *.a
 
+# latex
+hw1.pdf
+*.aux
+*.log
+*.synctex.gz
+
 # Other
 *.DS_Store
 viewer
 tags
-hw1.pdf
