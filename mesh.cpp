@@ -365,8 +365,7 @@ Mesh::calculate_new_vertex(vertex& midpoint, edge_collapse& ec, edge_data* edata
 }
 
 void
-Mesh::update_edge_pointers(half_edge* he, half_edge* hesym) {
-	
+Mesh::update_edge_pointers(half_edge* he, half_edge* hesym) {	
 	half_edge *first, *second;
 	edge_data *newdata;
 	
@@ -449,6 +448,60 @@ Mesh::update_dst_neighbors(half_edge* he, vector<half_edge*>& dst_neighbors, edg
     }
 }
 
+void
+Mesh::remove_fins(half_edge* he, edge_collapse& ec) {
+	if (!he->next->sym || !he->next->sym->prev->sym){
+		return;
+	}
+	
+	if (he->next->sym->prev->sym->prev != he->prev->sym) {
+		return; //no fin
+	}
+	
+	cout << "REMOVING FINS" <<endl;
+	
+	/* Removed fins */
+	ec.removed.push_back(he->next->sym);
+	ec.removed.push_back(he->next->sym->next);
+	ec.removed.push_back(he->next->sym->next->next);
+	ec.removed.push_back(he->prev->sym);
+	ec.removed.push_back(he->prev->sym->next);
+	ec.removed.push_back(he->prev->sym->next->next);
+	edges[he->next->sym->index] = NULL;
+	edges[he->next->sym->next->index] = NULL;
+	edges[he->next->sym->next->next->index] = NULL;
+	edges[he->prev->sym->index] = NULL;
+	edges[he->prev->sym->next->index] = NULL;
+	edges[he->prev->sym->next->next->index] = NULL;
+	
+	/* remove associated edge_datas */
+	pq.erase(he->next->sym->next->data->pq_handle);
+	pq.erase(he->prev->sym->prev->data->pq_handle);
+	pq.erase(he->next->sym->prev->data->pq_handle);
+	
+	he->next->data->edge = he->next;
+	he->prev->data->edge = he->prev;
+	
+	//need to update this for progressive meshes
+	he->prev->v = he->prev->sym->prev->v;
+	
+	/* updata new edge data */
+	half_edge* first = he->next->sym->next;
+	half_edge* second = he->prev->sym->prev;
+	
+	he->next->sym = first->sym;
+	if (first->sym){
+		first->sym->sym = he->next;
+		first->sym->data = he->next->data;
+	}
+	
+	he->prev->sym = second->sym;
+	if (second->sym){
+		second->sym->sym = he->prev;
+		second->sym->data = he->prev->data;
+	}
+}
+
 /** Collapses half_edge* [he] and sets the surrounding edges to point to
  * a new vertex v_m that is the midpoint of [he]'s two defining vertices.
  * I know I'm probably forgetting to set some edges, but here are my
@@ -469,6 +522,9 @@ Mesh::collapse_edge() {
 	edge_collapse ec; //store edge collapse information
 	ec.V1 = he->v;
     ec.V2 = he->next->v;
+	
+	remove_fins(he,ec);
+	if (hesym) remove_fins(hesym,ec);
 
     vector<half_edge*> src_neighbors;
     get_src_edges(src_neighbors, he);

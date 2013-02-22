@@ -98,6 +98,7 @@ class Mesh {
 	void get_dst_edges(vector<half_edge*>&, half_edge*);
 	void get_neighboring_edges(vector<half_edge*>&, half_edge*);
 	void collapse_edge();
+	void remove_fins(half_edge* he, edge_collapse& ec);
     void calculate_new_vertex(vertex& v, edge_collapse& ec, edge_data* edata, half_edge* he, half_edge* hesym);
     void update_edge_pointers(half_edge* he, half_edge* hesym);
     void update_src_neighbors(half_edge* he, vector<half_edge*>& neighbors, edge_collapse& ec);
