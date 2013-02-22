@@ -93,6 +93,28 @@ in which every single edge has a corresponding symmetric edge, but fails for
 more complex surfaces, in which edges may not have a symmetric edge and in
 which neighbors may not be traversed contiguously.
 
+The base method for obtaining the edges that share a source vertex is:
+
+\begin{verbatim}
+    /* start with half_edge* he */
+    half_edge* loop = he->prev->sym;
+    while (loop != he) {
+        neighbors.push_back(loop);
+        loop = loop->prev->sym;
+    }
+\end{verbatim}
+
+Obviously, this will break in cases where an edge has a NULL \verb`sym`,
+indicating that it is on the edge of a non-manifold mesh. We implement different
+traversal functions for each of the cases where a relevant symmetric edge
+might be null:
+
+\begin{itemize}
+    \item \verb`he->sym == NULL`
+    \item \verb`he->prev->sym == NULL`
+    \item \verb`he->next->sym == NULL`
+\end{itemize}
+
 
 \subsection{Updating Edge Pointers}
 % go ahead and work here
