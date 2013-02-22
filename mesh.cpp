@@ -461,7 +461,6 @@ Mesh::remove_fins(half_edge* he, edge_collapse& ec) {
 			return; //no fin
 		}
 		
-		if (counter > 0)
 		cout << "REMOVING FINS " << counter <<endl;
 		counter += 1;
 		
@@ -490,11 +489,12 @@ Mesh::remove_fins(half_edge* he, edge_collapse& ec) {
 		he->next->data->edge = he->next;
 		he->prev->data->edge = he->prev;
 		
-		//need to update this for progressive meshes
-		ec.newVerts.push_back(he->prev->v);
+		/* Only first loop */
+		if (counter == 1) {
+			ec.newVerts.push_back(he->prev->v);
+			ec.changedVerts.push_back(he->prev);
+		}
 		he->prev->v = he->prev->sym->prev->v;
-		ec.changedVerts.push_back(he->prev);
-		
 		
 		/* updata new edge data */
 		half_edge* first = he->next->sym->next;
