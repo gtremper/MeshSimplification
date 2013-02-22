@@ -45,6 +45,25 @@ Our version of the half edge data structure is as follows:
     };
 \end{verbatim}
 
+The half edge data structure allows for efficient and localized methods of
+obtaining the relations between vertices and edges. Obtaining the two endpoints
+for a collapsing edge is a constant time operation.  Obtaining the neighbors
+for a vertex is linear in the number of edges that touch the vertex, meaning
+that an edge collapse is almost entirely localized so that the entire mesh does
+not need to be updated after each operation. Most of this is made possible by
+the use of the \verb`*prev`, \verb`*next` and \verb`*sym` pointers; by chaining
+together half edges, we can access arbitrary information without the need to
+traverse a vector or other slow data structure.
+
+The vertices themselves are allocated during the construction of the mesh and
+are stored in a vector, allowing for amortized constant time append operations
+for the vertices generated during edge collapses. Each half edge keeps track of
+its source vertex by means of an integer index into this vector, eliminating
+any pointer work that must be done to update each edge's new vertex after an
+edge collapse. Each of the neighboring edges simply has its vertex index set to
+the last item in the vector -- the edge collapse vertex.
+
+
 \section{Edge Collapses}
 
 The task of collapsing an edge can be separated into several discrete sub-tasks. After finding the 
