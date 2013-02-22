@@ -594,6 +594,7 @@ Mesh::upLevelOfDetail(const int num) {
 
 void
 Mesh::downLevelOfDetail(const int num) {
+	
 	for(int t=0; t<num; ++t) {
 		if (level_of_detail == collapse_list.size()){
 			collapse_edge();
@@ -642,7 +643,6 @@ Mesh::update_buffer() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementArrayBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*elements.size(), &elements[0], GL_STATIC_DRAW);
 	if (max_lod < level_of_detail){
-		cout << "UPLOAD VERTS" << endl;
 		max_lod = level_of_detail;
 		vector<vertex_data> vertdata;
 		for (int i=0; i<verts.size(); i+=1){
