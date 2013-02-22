@@ -133,6 +133,20 @@ degenerate edges are removed from the queue.
 
 \section{Progressive Meshes}
 
+\begin{figure}[htb]
+  \begin{center}
+    \includegraphics[width=.24\linewidth]{figs/moomoo7776}
+    \includegraphics[width=.24\linewidth]{figs/moomoo3776}
+    \includegraphics[width=.24\linewidth]{figs/moomoo460}
+    \includegraphics[width=.24\linewidth]{figs/moomoo58}
+  \end{center}
+
+  \caption{Here we can see several stages of progressive mesh simplification on
+  the moomoo model. From left to right, 7776 faces (full model), 3776 faces, 460
+  faces, 58 faces.}
+
+\end{figure}
+
 Objects are drawn using Vertex Buffer Objects (VBOs). After parsing all of the
 vertices from the OFF file, new vertices are appended to the end of the vertex
 when created during an edge collapse. This way, once all of the edges are
@@ -142,5 +156,6 @@ simply changing the indices in the element array buffer. This allows us to
 simply store the changes in the indices for each level of detail. This is
 implemented using a vector of \verb`collapse_data` objects which store the changes
 need to move both up and down a level of detail.
+
 
 \end{document}
