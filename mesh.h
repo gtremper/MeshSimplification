@@ -102,7 +102,7 @@ class Mesh {
 	void get_neighboring_edges(vector<half_edge*>&, half_edge*);
 	void collapse_edge();
 	void remove_fins(half_edge* he, edge_collapse& ec);
-    void calculate_new_vertex(vertex& v, edge_collapse& ec, edge_data* edata, half_edge* he, half_edge* hesym);
+    void calculate_new_vertex(edge_collapse&, edge_data*, half_edge*, half_edge*);
     void update_edge_pointers(half_edge* he, half_edge* hesym);
     void update_src_neighbors(half_edge* he, vector<half_edge*>& neighbors, edge_collapse& ec);
     void update_dst_neighbors(half_edge* he, vector<half_edge*>& neighbors, edge_collapse& ec);
@@ -110,7 +110,7 @@ class Mesh {
 	void draw();
 	void upLevelOfDetail(const int);
 	void downLevelOfDetail(const int);
-    void print_half_edge(half_edge*);
+    void debug();
 };
 
 #endif //MESH_H

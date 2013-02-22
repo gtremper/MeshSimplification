@@ -149,7 +149,8 @@ void keyboard(unsigned char key, int x, int y) {
 		else trans -= vec3(0,WALKSPEED,0);
 		break;
 	case 'h':
-		printHelp();
+		//printHelp();
+		mesh->debug();
 		break;
 	case 27:  // Escape to quit
 		delete mesh;

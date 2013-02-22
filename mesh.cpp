@@ -58,7 +58,6 @@ Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 		edge_data* d = edatas[i];
 		d->calculate_quad_error(verts);
 		d->pq_handle = pq.push(d);
-        //pq_contains[d] = true;
 	}
 
   glGenBuffers(1, &arrayBuffer);
@@ -78,7 +77,8 @@ Mesh::~Mesh(){
 }
 
 void
-Mesh::print_half_edge(half_edge* he) {
+Mesh::debug() {
+	/*
   cout << "******************" << endl;
   cout << "Data for half_edge" << endl;
   cout << "Position: \nsrc vertex: " << he->v << endl;
@@ -93,6 +93,18 @@ Mesh::print_half_edge(half_edge* he) {
   cout << verts[he->prev->v].position[0];
   cout << ", " << verts[he->prev->v].position[1];
   cout << ", " << verts[he->prev->v].position[2] << endl;
+*/
+	cout << "******************" << endl;
+	for (int i=0; i<edges.size(); i+=3){
+		if (!edges[i]) continue;
+		cout << "Face " << i/3 <<":  ";
+		cout << edges[i]->v << "  ";
+		cout << edges[i+1]->v << "  ";
+		cout << edges[i+2]->v << "  ";
+		cout << endl;
+	}
+	cout << endl;
+	
 }
 
 /** Half Edge functions **/
@@ -123,6 +135,7 @@ edge_data::calculate_quad_error(vector<vertex>& verts) {
 	
 	/* Check if one of the ends of the edge is on the edge of the mesh */
 	half_edge* curEdge = edge;
+	
 	bool firstEdge = false;
 	do {
 		if (!curEdge->prev->sym){
@@ -145,21 +158,25 @@ edge_data::calculate_quad_error(vector<vertex>& verts) {
 	}
 	
 	float x,y,z;
+	float multiplier = 1;
 	if (!edge->sym) {
 		merge_point = (verts[edge->v].position + verts[edge->next->v].position)/2.0f;
 		x = merge_point[0];
 		y = merge_point[1];
 		z = merge_point[2];
+		multiplier = 3.0;
 	} else if (firstEdge) {
 		merge_point = verts[edge->v].position;
 		x = merge_point[0];
 		y = merge_point[1];
 		z = merge_point[2];
+		multiplier = 2.0;
 	} else if (secondEdge) {
 		merge_point = verts[edge->next->v].position;
 		x = merge_point[0];
 		y = merge_point[1];
 		z = merge_point[2];
+		multiplier = 2.0;
 	} else if (det<0.01) {
 		merge_point = (verts[edge->v].position + verts[edge->next->v].position)/2.0f;
 		x = merge_point[0];
@@ -176,8 +193,13 @@ edge_data::calculate_quad_error(vector<vertex>& verts) {
 	}
 	merge_cost = a*x*x + 2*b*x*y + 2*c*x*z + 2*d*x + e*y*y
 						+ 2*f*y*z + 2*g*y + h*z*z + 2*i*z + Q1[9];
-	merge_cost = abs(merge_cost);
-	merge_cost += (rand()%1000)/100000000.0f;
+						
+	merge_cost = abs(merge_cost) * multiplier;
+	merge_cost += (rand()%1000)/100000000.0f; // jitter
+	
+	if (firstEdge && secondEdge) {
+		merge_cost += 10;
+	}
 }
 
 bool
@@ -314,9 +336,6 @@ Mesh::get_dst_edges(vector<half_edge*> &res, half_edge* he) {
 	}
 }
 
-/** given a half_edge pointer he, return a vector of pointers
- * to all the neighboring edges */
-//TODO: deal with null edge->data
 void
 Mesh::get_neighboring_edges(vector<half_edge*> &res, half_edge* he) {
 	bool done = false;
@@ -327,7 +346,7 @@ Mesh::get_neighboring_edges(vector<half_edge*> &res, half_edge* he) {
 }
 
 void
-Mesh::calculate_new_vertex(vertex& midpoint, edge_collapse& ec, edge_data* edata, half_edge* he, half_edge* hesym) {
+Mesh::calculate_new_vertex(edge_collapse& ec, edge_data* edata, half_edge* he, half_edge* hesym) {
 
 	float Q1[10];
 	memcpy(Q1, verts[he->v].Q, sizeof(Q1));
@@ -336,14 +355,13 @@ Mesh::calculate_new_vertex(vertex& midpoint, edge_collapse& ec, edge_data* edata
 	}
 	
     if (edata->merge_point == verts[he->v].position){
-    	midpoint = verts[he->v];
     	ec.collapseVert = he->v;
     	memcpy(verts[he->v].Q, Q1, sizeof(Q1));
     } else if (edata->merge_point == verts[he->next->v].position){
-    	midpoint = verts[he->next->v];
     	ec.collapseVert= he->next->v;
     	memcpy(verts[he->next->v].Q, Q1, sizeof(Q1));
     } else {
+		vertex midpoint = vertex();
 		memcpy(midpoint.Q, Q1, sizeof(Q1));
 		midpoint.position = edata->merge_point;
 		midpoint.normal = glm::normalize(verts[he->v].normal + verts[he->next->v].normal);
@@ -457,11 +475,6 @@ Mesh::remove_fins(half_edge* he, edge_collapse& ec) {
 			return;
 		}
 		
-		if (he->next->sym == he->prev) {
-			cout << "DERP" << endl;
-			return;
-		}
-		
 		if (he->next->sym->prev->sym->prev != he->prev->sym) {
 			return; //no fin
 		}
@@ -550,8 +563,7 @@ Mesh::collapse_edge() {
     get_dst_edges(dst_neighbors, he);
 
 	/* Calculate new vertex position **/
-	vertex midpoint = vertex();
-	calculate_new_vertex(midpoint, ec, edata, he, hesym);
+	calculate_new_vertex(ec, edata, he, hesym);
     update_edge_pointers(he, hesym);
     update_src_neighbors(he, src_neighbors, ec);
     update_dst_neighbors(he, dst_neighbors, ec);
