@@ -30,6 +30,7 @@ better utilized to store the previous edge.
 \begin{center}
   \includegraphics{figs/half_edge-data-structure}
 \end{center}
+\caption{Half Edge Data Structure}
 \end{figure}
 
 
@@ -46,8 +47,26 @@ Our version of the half edge data structure is as follows:
 
 \section{Edge Collapses}
 
+The task of collapsing an edge can be separated into several discrete sub-tasks. After finding the 
+least-cost edge (see the section on Quadric Simplification, below, for details), we find the neighboring
+edges that share a vertex with either end of the edge to be collapsed. We compute the new vertex for
+the two ends of the collapsed edge, then update the \verb`half_edge`s surrounding the new vertex
+to ensure the consistency of mesh.
+
+\begin{figure}[htb]
+  \begin{center}
+    \includegraphics[width=.32\linewidth]{figs/ec1.pdf}
+    \includegraphics[width=.32\linewidth]{figs/ec2.pdf}
+    \includegraphics[width=.32\linewidth]{figs/ec3.pdf}
+  \end{center}
+\caption{Two successive edge collapses. The edge collapse is circled in red, and the resulting vertex
+is circuled in blue. Here, we can see an example of collapsing a fully surrounded edge followed by
+an example of collapsing a bordering edge.}
+\end{figure}
+
 \subsection{Finding Neighboring Edges}
-% Graham, I'll work on this section
+
+
 
 \subsection{Updating Edge Pointers}
 % go ahead and work here
