@@ -540,7 +540,8 @@ Mesh::remove_fins(half_edge* he, edge_collapse& ec) {
 
 void
 Mesh::collapse_edge() {
-	edge_data *edata = pq.top();
+	edge_data *edata;
+	edata = pq.top();
 	if (edata->merge_cost > THRESHOLD || pq.size()<5){
 		return;
 	}
@@ -554,8 +555,12 @@ Mesh::collapse_edge() {
 	ec.V1 = he->v;
     ec.V2 = he->next->v;
 	
-	remove_fins(he,ec);
-	if (hesym) remove_fins(hesym,ec);
+	if (ec.V1 != ec.V2){
+		remove_fins(he,ec);
+		if (hesym) remove_fins(hesym,ec);
+	} else {
+		cout << "SAME VERT" << endl;
+	}
 
     vector<half_edge*> src_neighbors;
     get_src_edges(src_neighbors, he);
