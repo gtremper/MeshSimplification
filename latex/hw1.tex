@@ -20,9 +20,7 @@ The code for our solution is publicly available on Github:
 \href{https://github.com/gtremper/MeshSimplification}{https://github.com/gtremper/MeshSimplification}.
 \end{center}
 The code was compiled using Boost 1.53.0 and GLM 0.9.4.1 on Mac OS X 10.7.4 and
-10.8.2.
-
-To compile, run \verb`make` from the \verb`MeshSimplification` directory. The OFF models
+10.8.2. To compile, run \verb`make` from the \verb`MeshSimplification` directory. The OFF models
 are included in the \verb`Models` directory. The compiled binary, \verb`viewer`,
 accepts the path to a model as the only argument, and can be run as follows:
 
@@ -148,22 +146,11 @@ relevant symmetric edge might be null:
 \end{itemize}
 
 \subsection{Updating Edge Pointers}
-% go ahead and work here
+One of the trickier parts of using the half edge data structure is updating the \verb`half_edge` pointers during an edge collapse. Basically, the \verb`half_edges` corresponding to the degenerate faces are removed, and the ``sym'' pointers of neighboring edges are updated. In addition to the two implicit degenerate faces from an edge collapse, we also remove ``fins'' which can become problematic later on. Unfortunately, there is at least one ``edge'' case that we have not been able to detect and correct for. This causes the mesh data structure to rarely become corrupted on some of the larger models. For example, the ``brain'' model will crash if collapsed more than half way. This is a rare occurrence, though, and most of the models are unaffected.
 
 \section{Quadric Simplification}
 
-Every vertex has 10 floats that represent the quadric Q matrix. For every edge
-in the mesh, an \verb`edge_data` object is created (one for every pair of
-symmetric edges) which stores the optimum merge point for the two vertices and
-the associated the quadric error. These objects are then stored in a priority
-queue sorted by their quadric error. A handle to each of the objects in the in
-the priority queue is stored with the associated edge, so that modified edges
-can update their \verb`edge_data` object when the error is changed. To go down
-a level of detail, the edge at the top of the priority queue is collapsed, and
-and degenerate edges are removed from the queue. The Boost library
-implementation of a binomial heap was chosen for its constant time access of
-the next edge to be collapsed, and amortized logarithmic time for updating
-edges.
+Every vertex has 10 floats that represent the quadric Q matrix. For every edge in the mesh, an \verb`edge_data` object is created (one for every pair of symmetric edges) which stores the optimum merge point for the two vertices and the associated quadric error. We also decided to add a small random $\epsilon$ to each quadric error. This ``jitter'' helps evenly distribute the edge collapses when model is very dense. This prevents all of the zero error collapses from clustering in an undesirable pattern. As the quadric error for a collapse increases, this term becomes irrelevant. The \verb`edge_data` objects are then stored in a priority queue sorted by their quadric error. A handle to each of the objects in the in the priority queue is stored with the associated edge, so that modified edges can update their \verb`edge_data` object when the error is changed. To go down a level of detail, the edge at the top of the priority queue is collapsed, and and degenerate edges are removed from the queue. The Boost library implementation of a binomial heap was chosen for its constant time access of the next edge to be collapsed, and amortized logarithmic time for updating edges.
 
 \section{Progressive Meshes}
 
