@@ -195,10 +195,10 @@ edge_data::calculate_quad_error(vector<vertex>& verts) {
 						+ 2*f*y*z + 2*g*y + h*z*z + 2*i*z + Q1[9];
 						
 	merge_cost = abs(merge_cost) * multiplier;
-	merge_cost += (rand()%1000)/100000000.0f; // jitter
+	merge_cost += (rand()%100000)/100000000.0f; // jitter
 	
 	if (firstEdge && secondEdge) {
-		merge_cost += 10;
+		merge_cost += 10; //collapse this case near the end
 	}
 }
 
