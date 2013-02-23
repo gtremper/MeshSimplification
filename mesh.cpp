@@ -10,7 +10,6 @@ Mesh::Mesh(vector<vertex>& vertices, vector<vec3>& faces) {
 	max_lod = -1;
   
 	existing_edges = boost::unordered_map< pair<int, int>, half_edge* >();
-    pq_contains = boost::unordered_map< edge_data*, bool >();
 	level_of_detail = 0;
 	
 	for (int i=0; i<vertices.size(); i+=1){
@@ -78,22 +77,6 @@ Mesh::~Mesh(){
 
 void
 Mesh::debug() {
-	/*
-  cout << "******************" << endl;
-  cout << "Data for half_edge" << endl;
-  cout << "Position: \nsrc vertex: " << he->v << endl;
-  cout << verts[he->v].position[0];
-  cout << ", " << verts[he->v].position[1];
-  cout << ", " << verts[he->v].position[2] << endl;
-  cout << "Next edge: " << he->next->v << endl;
-  cout << verts[he->next->v].position[0];
-  cout << ", " << verts[he->next->v].position[1];
-  cout << ", " << verts[he->next->v].position[2] << endl;
-  cout << "Prev edge: " << he->prev->v << endl;
-  cout << verts[he->prev->v].position[0];
-  cout << ", " << verts[he->prev->v].position[1];
-  cout << ", " << verts[he->prev->v].position[2] << endl;
-*/
 	cout << "******************" << endl;
 	for (int i=0; i<edges.size(); i+=3){
 		if (!edges[i]) continue;
@@ -195,7 +178,7 @@ edge_data::calculate_quad_error(vector<vertex>& verts) {
 						+ 2*f*y*z + 2*g*y + h*z*z + 2*i*z + Q1[9];
 						
 	merge_cost = abs(merge_cost) * multiplier;
-	merge_cost += (rand()%100000)/100000000.0f; // jitter
+	merge_cost += (rand()%100000)/1000000000.0f; // jitter
 	
 	if (firstEdge && secondEdge) {
 		merge_cost += 10; //collapse this case near the end
@@ -586,8 +569,8 @@ Mesh::collapse_edge() {
 		return;
 	}
 	pq.pop();
+	cout << edata->merge_cost << endl;
 	
-    //pq_contains[edata] = false;
 	level_of_detail += 1;
 	half_edge* he = edata->edge;
 	half_edge* hesym = he->sym;	
@@ -597,12 +580,6 @@ Mesh::collapse_edge() {
 	int v3 = he->next->next->v;
 	
 	/* Remove degenerates */
-	
-	if (ec.V1==ec.V2 && ec.V1==v3 && ec.V2==v3){
-		cout <<"ALL three the same" << endl;
-	}
-	
-	
 	if (ec.V1 == ec.V2) {
 		cout << "SAME VERT0" << endl;
 		remove_degenerate(he,ec);
