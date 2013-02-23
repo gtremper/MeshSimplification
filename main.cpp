@@ -86,7 +86,8 @@ void printHelp() {
 			<< "use 'wasd' to move object.\n"
 			<< "use 'c' to move camera.\n"
 			<< "use 'm' to animate.\n"
-			<< "use 'up' or 'down' to change level of detail.\n"
+			<< "use 'up' or 'down' arrows to change level of detail.\n"
+			<< "use 'left' or 'right' arrows to change rate of collapse"
 			<< "use '1-9' to move lights.\n"
 			<< "press ESC to quit.\n\n";	
 }
@@ -149,8 +150,8 @@ void keyboard(unsigned char key, int x, int y) {
 		else trans -= vec3(0,WALKSPEED,0);
 		break;
 	case 'h':
-		//printHelp();
-		mesh->debug();
+		printHelp();
+		//mesh->debug();
 		break;
 	case 27:  // Escape to quit
 		delete mesh;

@@ -569,7 +569,6 @@ Mesh::collapse_edge() {
 		return;
 	}
 	pq.pop();
-	cout << edata->merge_cost << endl;
 	
 	level_of_detail += 1;
 	half_edge* he = edata->edge;
@@ -581,13 +580,13 @@ Mesh::collapse_edge() {
 	
 	/* Remove degenerates */
 	if (ec.V1 == ec.V2) {
-		cout << "SAME VERT0" << endl;
+		//cout << "SAME VERT0" << endl;
 		remove_degenerate(he,ec);
 		collapse_list.push_back(ec);
 		return;
 	}
 	if (ec.V2 == v3) {
-		cout << "SAME VERT1" << endl;
+		//cout << "SAME VERT1" << endl;
 		he->data->pq_handle = pq.push(he->data);
 		remove_degenerate(he->next,ec);
 		pq.erase(he->next->data->pq_handle);
@@ -595,7 +594,7 @@ Mesh::collapse_edge() {
 		return;
 	}
 	if (v3 == ec.V1) {
-		cout << "SAME VERT2" << endl;
+		//cout << "SAME VERT2" << endl;
 		he->data->pq_handle = pq.push(he->data);
 		remove_degenerate(he->prev,ec);
 		pq.erase(he->prev->data->pq_handle);
