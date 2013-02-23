@@ -479,7 +479,7 @@ Mesh::remove_fins(half_edge* he, edge_collapse& ec) {
 			return; //no fin
 		}
 		
-		cout << "REMOVING FINS " << counter <<endl;
+		//cout << "REMOVING FINS " << counter <<endl;
 		counter += 1;
 		
 		/* Removed fins */
@@ -539,6 +539,46 @@ Mesh::remove_fins(half_edge* he, edge_collapse& ec) {
  */
 
 void
+Mesh::remove_degenerate(half_edge* he, edge_collapse& ec){
+	half_edge* left = he->prev->sym;
+	half_edge* right = he->next->sym;
+	
+	left->sym = right;
+	right->sym = left;
+	pq.erase(left->data->pq_handle);
+	right->data->edge = right;
+	left->data = right->data;
+
+	edges[he->index]=NULL;
+	edges[he->next->index]=NULL;
+	edges[he->prev->index]=NULL;
+	ec.removed.push_back(he);
+	ec.removed.push_back(he->next);
+	ec.removed.push_back(he->prev);
+	
+	if (!he->sym) return;
+	
+	he = he->sym;
+	
+	left = he->prev->sym;
+	right = he->next->sym;
+	
+	left->sym = right;
+	right->sym = left;
+	pq.erase(left->data->pq_handle);
+	right->data->edge = right;
+	left->data = right->data;
+
+	edges[he->index]=NULL;
+	edges[he->next->index]=NULL;
+	edges[he->prev->index]=NULL;
+	ec.removed.push_back(he);
+	ec.removed.push_back(he->next);
+	ec.removed.push_back(he->prev);
+}
+
+
+void
 Mesh::collapse_edge() {
 	edge_data *edata;
 	edata = pq.top();
@@ -554,12 +594,41 @@ Mesh::collapse_edge() {
 	edge_collapse ec; //store edge collapse information
 	ec.V1 = he->v;
     ec.V2 = he->next->v;
+	int v3 = he->next->next->v;
 	
-	if (ec.V1 != ec.V2){
-		remove_fins(he,ec);
-		if (hesym) remove_fins(hesym,ec);
-	} else {
-		cout << "SAME VERT" << endl;
+	/* Remove degenerates */
+	
+	if (ec.V1==ec.V2 && ec.V1==v3 && ec.V2==v3){
+		cout <<"ALL three the same" << endl;
+	}
+	
+	
+	if (ec.V1 == ec.V2) {
+		cout << "SAME VERT0" << endl;
+		remove_degenerate(he,ec);
+		collapse_list.push_back(ec);
+		return;
+	}
+	if (ec.V2 == v3) {
+		cout << "SAME VERT1" << endl;
+		he->data->pq_handle = pq.push(he->data);
+		remove_degenerate(he->next,ec);
+		pq.erase(he->next->data->pq_handle);
+		collapse_list.push_back(ec);
+		return;
+	}
+	if (v3 == ec.V1) {
+		cout << "SAME VERT2" << endl;
+		he->data->pq_handle = pq.push(he->data);
+		remove_degenerate(he->prev,ec);
+		pq.erase(he->prev->data->pq_handle);
+		collapse_list.push_back(ec);
+		return;
+	}
+	
+	remove_fins(he,ec);
+	if (hesym){ 
+		remove_fins(hesym,ec);
 	}
 
     vector<half_edge*> src_neighbors;

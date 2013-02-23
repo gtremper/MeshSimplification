@@ -224,7 +224,7 @@ void specialKey(int key,int x,int y) {
 			mesh->update_buffer();
 			break;
 		case 102: //right
-			if (collapseSpeed != 10000){
+			if (collapseSpeed != 100000){
 				collapseSpeed *= 10;
 			}
 			cout << "Now collapsing " << collapseSpeed << " triangles" << endl;

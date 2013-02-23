@@ -106,6 +106,7 @@ class Mesh {
     void update_edge_pointers(half_edge* he, half_edge* hesym);
     void update_src_neighbors(half_edge* he, vector<half_edge*>& neighbors, edge_collapse& ec);
     void update_dst_neighbors(half_edge* he, vector<half_edge*>& neighbors, edge_collapse& ec);
+	void remove_degenerate(half_edge* he, edge_collapse&);
 	void update_buffer();
 	void draw();
 	void upLevelOfDetail(const int);
