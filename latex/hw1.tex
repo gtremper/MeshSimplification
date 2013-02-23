@@ -12,11 +12,35 @@
 \section{Introduction}
 
 A video demonstration of our solution can be found here:
+\begin{center}
 \href{http://www.youtube.com/watch?v=DfLkut3YniE}{http://www.youtube.com/watch?v=DfLkut3YniE}.
+\end{center}
 The code for our solution is publicly available on Github:
+\begin{center}
 \href{https://github.com/gtremper/MeshSimplification}{https://github.com/gtremper/MeshSimplification}.
+\end{center}
 The code was compiled using Boost 1.53.0 and GLM 0.9.4.1 on Mac OS X 10.7.4 and
 10.8.2.
+
+To compile, run \verb`make` from the \verb`MeshSimplification` directory. The OFF models
+are included in the \verb`Models` directory. The compiled binary, \verb`viewer`,
+accepts the path to a model as the only argument, and can be run as follows:
+
+\begin{center}
+  \verb`prompt> ./viewer Models/teapot.off`
+\end{center}
+
+The up and down arrow keys will increase and decrease the number of edges in
+the displayed mesh. Initially, the viewer will change the mesh at the rate of 1
+edge collapse each time the up or down arrows are pressed. This rate can be
+increased or decreased by an order of magnitude by using the right and left
+arrows respectively. For example, to simplify a model by 1000 edges at a time,
+press the right arrow 3 times to increase from 1 to 10 to 100 to 1000 edges,
+then press the down arrow to start collapsing edges.
+
+To toggle displaying the wireframe of the model, press \verb`f`. Press \verb`p`
+to toggle between flat and smooth shading. Clicking and dragging the mouse will
+move the model, and pressing \verb`m` will slowly rotate the model.
 
 \section{Half Edges}
 
